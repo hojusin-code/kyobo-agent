@@ -81,16 +81,15 @@
 
     /* ── KPI ROW ── */
     .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
-    .kpi-card { background:white; border-radius:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-top:3px solid #E5E7EB; }
-    .kpi-card.c-blue   { border-top-color:#3B82F6; }
-    .kpi-card.c-teal   { border-top-color:#0891B2; }
-    .kpi-card.c-amber  { border-top-color:#F59E0B; }
-    .kpi-card.c-red    { border-top-color:var(--red); background:#FFF5F5; }
-    .kpi-lbl { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:4px; }
-    .kpi-val { font-size:24px; font-weight:900; color:#111; line-height:1; }
+    .kpi-card { background:white; border-radius:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-left:3px solid #E5E7EB; }
+    .kpi-card.c-blue  { border-left-color:#3B82F6; }
+    .kpi-card.c-teal  { border-left-color:#0891B2; }
+    .kpi-card.c-red   { border-left-color:var(--red); }
+    .kpi-lbl { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+    .kpi-val { font-size:26px; font-weight:900; color:#111; line-height:1; }
     .kpi-card.c-red .kpi-val { color:var(--red); }
-    .kpi-unit { font-size:11px; color:#9CA3AF; margin-left:2px; }
-    .kpi-sub { font-size:10px; color:#9CA3AF; margin-top:4px; }
+    .kpi-unit { font-size:12px; color:#9CA3AF; font-weight:500; margin-left:2px; }
+    .kpi-sub { font-size:11px; color:#9CA3AF; margin-top:5px; }
 
     /* ── NAVER ── */
     .naver-card { background:white; border-radius:10px; padding:12px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-left:3px solid #03C75A; margin-bottom:14px; display:none; }
@@ -292,8 +291,8 @@
     </div>
   </div>
 
-  <!-- KPI 4칸 -->
-  <div class="kpi-row hidden" id="kpiRow">
+  <!-- KPI 3칸 -->
+  <div class="kpi-row hidden" id="kpiRow" style="grid-template-columns:repeat(3,1fr);">
     <div class="kpi-card c-blue">
       <div class="kpi-lbl">현재 재고</div>
       <div class="kpi-val"><span id="kpiStock">—</span><span class="kpi-unit">권</span></div>
@@ -304,13 +303,8 @@
       <div class="kpi-val"><span id="kpiIncoming">—</span><span class="kpi-unit">권</span></div>
       <div class="kpi-sub" id="kpiIncomingSub"></div>
     </div>
-    <div class="kpi-card c-amber">
-      <div class="kpi-lbl">예상 판매량</div>
-      <div class="kpi-val"><span id="kpiForecast">—</span><span class="kpi-unit">권</span></div>
-      <div class="kpi-sub" id="kpiForecastSub"></div>
-    </div>
     <div class="kpi-card c-red">
-      <div class="kpi-lbl">⚡ 권장 발주량</div>
+      <div class="kpi-lbl">이번주 권장 발주량</div>
       <div class="kpi-val"><span id="kpiRecommend">—</span><span class="kpi-unit">권</span></div>
       <div class="kpi-sub" id="kpiRecommendSub"></div>
     </div>
@@ -585,16 +579,12 @@ function startAnalysis() {
   document.getElementById('heroRepTitle').textContent  = `『${ar.repTitle}』 출간 ${ar.pubDate}`;
   document.getElementById('heroRepComment').textContent = ar.comment;
 
-  // KPI
+  // KPI (3칸 - 권장발주는 아래서 계산 후 채움)
   show('kpiRow');
   document.getElementById('kpiStock').textContent    = book.stock.toLocaleString();
   document.getElementById('kpiIncoming').textContent = book.incoming.toLocaleString();
-  document.getElementById('kpiForecast').textContent = book.forecast.toLocaleString();
-  document.getElementById('kpiRecommend').textContent= book.recommend.toLocaleString();
   document.getElementById('kpiStockSub').textContent    = book.stock >= 200 ? '▲ 안전 재고 이상' : book.stock >= 100 ? '보통' : '⚠ 재고 부족';
   document.getElementById('kpiIncomingSub').textContent = 'D+3 예정';
-  document.getElementById('kpiForecastSub').textContent = '전작 대비 +10%';
-  document.getElementById('kpiRecommendSub').textContent= g.label.replace(/[🔴🟡🟢]\s?/,'');
 
   // 발주 플랜 계산
   show('bottomGrid');
@@ -614,6 +604,10 @@ function startAnalysis() {
   const monthly = Math.round(book.forecast * 1.1);
 
   document.getElementById('recGradeLabel').textContent = g.label.replace(/[🔴🟡🟢]\s?/,'');
+
+  // KPI 권장발주 동기화
+  document.getElementById('kpiRecommend').textContent = week1.toLocaleString();
+  document.getElementById('kpiRecommendSub').textContent = g.label;
   document.getElementById('recWeek1').textContent = week1.toLocaleString();
   document.getElementById('recWeek1Sub').textContent = `2주 판매 기준 · 즉시 발주 권장`;
   document.getElementById('recWeek2').textContent = week2.toLocaleString();
