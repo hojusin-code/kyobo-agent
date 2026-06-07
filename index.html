@@ -172,6 +172,15 @@
     .step-tag { font-weight:700; color:#111; }
     .ai-summary-box { background:#F8FAFF; border:1.5px solid #DBEAFE; border-radius:8px; padding:12px 14px; margin-top:10px; font-size:12px; color:#374151; line-height:1.7; }
 
+    /* ── SAFETY STOCK ── */
+    .safety-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12); }
+    .safety-box { background:rgba(255,255,255,0.1); border-radius:8px; padding:10px 12px; }
+    .safety-box-label { font-size:10px; color:rgba(255,255,255,0.5); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
+    .safety-box-value { font-size:20px; font-weight:900; color:white; line-height:1; }
+    .safety-box-unit { font-size:11px; font-weight:500; opacity:0.7; margin-left:2px; }
+    .safety-box-sub { font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px; }
+    .safety-est-badge { font-size:9px; background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); padding:1px 5px; border-radius:3px; font-weight:700; }
+
     /* ── HOT SEARCH ── */
     .hot-search-card { background:white; border-radius:12px; padding:16px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); margin-top:12px; }
     .hot-search-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
@@ -353,6 +362,27 @@
       <div class="rec-label">AI 권장 발주량</div>
       <div class="rec-value" id="recValue">—<span class="rec-unit">권</span></div>
       <div class="rec-formula" id="recFormula"></div>
+
+      <!-- 주중/주말 평균 안전재고 -->
+      <div class="safety-row">
+        <div class="safety-box">
+          <div class="safety-box-label">
+            🗓 평일 기준 안전재고
+            <span class="safety-est-badge">추정</span>
+          </div>
+          <div class="safety-box-value"><span id="safetyWeekday">—</span><span class="safety-box-unit">권</span></div>
+          <div class="safety-box-sub" id="safetyWeekdaySub">일평균 —권 × 리드타임 2일</div>
+        </div>
+        <div class="safety-box">
+          <div class="safety-box-label">
+            🏖 주말 기준 안전재고
+            <span class="safety-est-badge">추정</span>
+          </div>
+          <div class="safety-box-value"><span id="safetyWeekend">—</span><span class="safety-box-unit">권</span></div>
+          <div class="safety-box-sub" id="safetyWeekendSub">일평균 —권 × 리드타임 2일</div>
+        </div>
+      </div>
+
       <div class="rec-row2">
         <div>
           <div class="rec-trust-label">예측 신뢰도</div>
@@ -506,6 +536,29 @@ const GRADE_MAP = {
 };
 
 let currentIsbn = null;
+
+// 분야별 주말 판매 비율 (추정 - 내부 시스템 연동 시 실데이터로 교체)
+const WEEKEND_RATIO = {
+  '아동 학습만화': 0.45,  // 주말 45% / 주중 55%
+  '판타지':        0.40,
+  '한국소설':      0.35,
+  'default':       0.38,
+};
+const LEAD_TIME = 2; // 리드타임 2일 (발주 후 입고까지)
+
+function calcSafetyStock(sales1m, category) {
+  const weekendRatio = WEEKEND_RATIO[category] || WEEKEND_RATIO['default'];
+  const weekdayRatio = 1 - weekendRatio;
+  const WEEKDAYS = 22; // 30일 중 평일
+  const WEEKENDS = 8;  // 30일 중 주말
+
+  const weekdayDaily  = Math.round((sales1m * weekdayRatio) / WEEKDAYS);
+  const weekendDaily  = Math.round((sales1m * weekendRatio) / WEEKENDS);
+  const safetyWeekday = weekdayDaily * LEAD_TIME;
+  const safetyWeekend = weekendDaily * LEAD_TIME;
+
+  return { weekdayDaily, weekendDaily, safetyWeekday, safetyWeekend };
+}
 
 // 분야별 실시간 인기검색어 (교보문고 분야 데이터 기반 더미)
 const HOT_KEYWORDS = {
@@ -681,6 +734,13 @@ function startAnalysis() {
     normal:   `『${book.title}』은 중장기 판매 패턴을 보입니다. 초도 <strong>${book.recommend.toLocaleString()}권</strong> 안정 발주 후 반응을 보고 추가 대응을 권장합니다.`,
   };
   document.getElementById('aiSummary').innerHTML = summaryMap[book.grade];
+
+  // 주중/주말 안전재고
+  const safety = calcSafetyStock(p.sales1m, book.category);
+  document.getElementById('safetyWeekday').textContent    = safety.safetyWeekday.toLocaleString();
+  document.getElementById('safetyWeekend').textContent    = safety.safetyWeekend.toLocaleString();
+  document.getElementById('safetyWeekdaySub').textContent = `일평균 ${safety.weekdayDaily}권 × 리드타임 ${LEAD_TIME}일`;
+  document.getElementById('safetyWeekendSub').textContent = `일평균 ${safety.weekendDaily}권 × 리드타임 ${LEAD_TIME}일`;
 
   // Hot Search
   renderHotSearch(book.category);
