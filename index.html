@@ -357,13 +357,13 @@
       <span class="dot"></span>
       ISBN 도서 조회
     </div>
-    <div class="flex gap-3 mb-4">
-      <input id="isbnInput" type="text" class="isbn-input" placeholder="ISBN을 입력하세요 (예: 9791172461942)" maxlength="20" />
-      <button onclick="startAnalysis()" class="action-btn btn-primary whitespace-nowrap">
+    <form onsubmit="startAnalysis(); return false;" class="flex gap-3 mb-4">
+      <input id="isbnInput" type="text" class="isbn-input" placeholder="ISBN을 입력하세요 (예: 9791172461942)" maxlength="20" autocomplete="off" />
+      <button type="submit" class="action-btn btn-primary whitespace-nowrap">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         분석하기
       </button>
-    </div>
+    </form>
     <div class="flex flex-wrap gap-2">
       <span class="text-xs text-gray-500 mr-1 flex items-center">예시:</span>
       <span class="chip bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="selectBook('9791173326516', '흔한남매 세계사 탐험대 6 - 이슬람 세계')">📚 흔한남매 세계사 탐험대 6</span>
@@ -931,12 +931,6 @@
   let currentBook = null;
   let stepsVisible = true;
 
-  document.getElementById('isbnInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.keyCode === 13) {
-      e.preventDefault();
-      startAnalysis();
-    }
-  });
 
   function selectBook(isbn, title) {
     document.getElementById('isbnInput').value = isbn;
