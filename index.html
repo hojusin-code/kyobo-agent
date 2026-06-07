@@ -107,26 +107,41 @@
     .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
 
     /* ── RECOMMEND CARD ── */
-    .rec-card { background:var(--red); border-radius:10px; padding:18px 20px; display:flex; flex-direction:column; gap:0; }
-    .rec-eyebrow { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
-    .rec-num { font-size:44px; font-weight:900; color:white; line-height:1; }
-    .rec-unit { font-size:14px; font-weight:500; margin-left:3px; opacity:0.75; }
-    .rec-formula { font-size:10px; color:rgba(255,255,255,0.4); margin-top:4px; }
+    .rec-card { background:var(--navy); border-radius:10px; padding:18px 20px; display:flex; flex-direction:column; }
+    .rec-eyebrow { font-size:10px; font-weight:700; color:rgba(255,255,255,0.38); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+
+    /* 이번주/다음주 발주 분리 */
+    .week-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .week-box { border-radius:8px; padding:13px 14px; }
+    .week-box.this-week { background:var(--red); }
+    .week-box.next-week { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); }
+    .week-box-tag { font-size:10px; font-weight:800; color:rgba(255,255,255,0.55); margin-bottom:4px; letter-spacing:0.5px; }
+    .week-box.this-week .week-box-tag { color:rgba(255,255,255,0.7); }
+    .week-box-num { font-size:32px; font-weight:900; color:white; line-height:1; }
+    .week-box-unit { font-size:12px; font-weight:500; opacity:0.65; margin-left:2px; }
+    .week-box-sub { font-size:10px; color:rgba(255,255,255,0.42); margin-top:4px; line-height:1.4; }
+    .week-box.this-week .week-box-sub { color:rgba(255,255,255,0.6); }
+
+    /* 월간 유지 목표 */
+    .monthly-row { background:rgba(255,255,255,0.05); border-radius:7px; padding:10px 12px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; }
+    .monthly-lbl { font-size:11px; color:rgba(255,255,255,0.45); font-weight:600; }
+    .monthly-num { font-size:18px; font-weight:900; color:rgba(255,255,255,0.8); }
+    .monthly-unit { font-size:11px; opacity:0.5; margin-left:2px; }
 
     /* 평일/주말 안전재고 */
-    .safety-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.12); }
-    .safety-box { background:rgba(0,0,0,0.15); border-radius:7px; padding:10px 12px; }
-    .safety-lbl { font-size:10px; color:rgba(255,255,255,0.45); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
-    .safety-est { font-size:9px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.5); padding:1px 5px; border-radius:3px; font-weight:700; }
-    .safety-num { font-size:22px; font-weight:900; color:white; line-height:1; }
-    .safety-unit { font-size:11px; opacity:0.6; margin-left:2px; }
-    .safety-sub { font-size:10px; color:rgba(255,255,255,0.35); margin-top:3px; }
+    .safety-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); }
+    .safety-box { background:rgba(255,255,255,0.05); border-radius:7px; padding:9px 11px; }
+    .safety-lbl { font-size:10px; color:rgba(255,255,255,0.38); font-weight:700; margin-bottom:3px; display:flex; align-items:center; gap:4px; }
+    .safety-est { font-size:9px; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); padding:1px 4px; border-radius:3px; font-weight:700; }
+    .safety-num { font-size:18px; font-weight:900; color:rgba(255,255,255,0.75); line-height:1; }
+    .safety-unit { font-size:10px; opacity:0.5; margin-left:2px; }
+    .safety-sub { font-size:10px; color:rgba(255,255,255,0.28); margin-top:2px; }
 
-    .rec-footer { display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.12); }
-    .rec-trust-lbl { font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:2px; }
-    .rec-trust-num { font-size:24px; font-weight:900; color:rgba(255,255,255,0.85); }
-    .copy-btn { background:rgba(255,255,255,0.13); border:1.5px solid rgba(255,255,255,0.25); color:white; border-radius:6px; padding:7px 14px; font-size:11px; font-weight:700; cursor:pointer; transition:background 0.15s; }
-    .copy-btn:hover { background:rgba(255,255,255,0.22); }
+    .rec-footer { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); }
+    .rec-trust-lbl { font-size:10px; color:rgba(255,255,255,0.35); margin-bottom:2px; }
+    .rec-trust-num { font-size:22px; font-weight:900; color:rgba(255,255,255,0.75); }
+    .copy-btn { background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); border-radius:6px; padding:7px 14px; font-size:11px; font-weight:700; cursor:pointer; transition:background 0.15s; }
+    .copy-btn:hover { background:rgba(255,255,255,0.18); }
 
     /* ── RIGHT DETAIL COL ── */
     .detail-col { display:flex; flex-direction:column; gap:10px; }
@@ -319,18 +334,37 @@
 
     <!-- 왼쪽: 권장발주 카드 -->
     <div class="rec-card">
-      <div class="rec-eyebrow">AI 권장 발주량</div>
-      <div class="rec-num" id="recNum">—<span class="rec-unit">권</span></div>
-      <div class="rec-formula" id="recFormula"></div>
+      <div class="rec-eyebrow">AI 발주 플랜 · <span id="recGradeLabel"></span></div>
 
+      <!-- 이번주 / 다음주 -->
+      <div class="week-grid">
+        <div class="week-box this-week">
+          <div class="week-box-tag">🚨 이번주 발주량</div>
+          <div class="week-box-num"><span id="recWeek1">—</span><span class="week-box-unit">권</span></div>
+          <div class="week-box-sub" id="recWeek1Sub">즉시 발주 권장</div>
+        </div>
+        <div class="week-box next-week">
+          <div class="week-box-tag">📦 다음주 유지 목표</div>
+          <div class="week-box-num"><span id="recWeek2">—</span><span class="week-box-unit">권</span></div>
+          <div class="week-box-sub" id="recWeek2Sub">적정 재고 유지선</div>
+        </div>
+      </div>
+
+      <!-- 한달 유지 권장수량 -->
+      <div class="monthly-row">
+        <div class="monthly-lbl">📅 한달간 적정 재고 유지 권장수량</div>
+        <div><span class="monthly-num" id="recMonthly">—</span><span class="monthly-unit">권</span></div>
+      </div>
+
+      <!-- 평일/주말 안전재고 -->
       <div class="safety-grid">
         <div class="safety-box">
-          <div class="safety-lbl">🗓 평일 기준 안전재고 <span class="safety-est">추정</span></div>
+          <div class="safety-lbl">🗓 평일 안전재고 <span class="safety-est">추정</span></div>
           <div class="safety-num"><span id="safetyWd">—</span><span class="safety-unit">권</span></div>
           <div class="safety-sub" id="safetyWdSub"></div>
         </div>
         <div class="safety-box">
-          <div class="safety-lbl">🏖 주말 기준 안전재고 <span class="safety-est">추정</span></div>
+          <div class="safety-lbl">🏖 주말 안전재고 <span class="safety-est">추정</span></div>
           <div class="safety-num"><span id="safetyWe">—</span><span class="safety-unit">권</span></div>
           <div class="safety-sub" id="safetyWeSub"></div>
         </div>
@@ -338,7 +372,7 @@
 
       <div class="rec-footer">
         <div>
-          <div class="rec-trust-lbl">예측 신뢰도</div>
+          <div class="rec-trust-lbl">AI 예측 신뢰도</div>
           <div class="rec-trust-num">87%</div>
         </div>
         <button class="copy-btn" id="copyBtn" onclick="copyOrder()">📋 발주정보 복사</button>
@@ -562,17 +596,33 @@ function startAnalysis() {
   document.getElementById('kpiForecastSub').textContent = '전작 대비 +10%';
   document.getElementById('kpiRecommendSub').textContent= g.label.replace(/[🔴🟡🟢]\s?/,'');
 
-  // 권장발주
+  // 발주 플랜 계산
   show('bottomGrid');
-  document.getElementById('recNum').innerHTML = `${book.recommend.toLocaleString()}<span class="rec-unit">권</span>`;
-  document.getElementById('recFormula').textContent = `예측 ${book.forecast.toLocaleString()} - 재고 ${book.stock} - 입고 ${book.incoming} + 안전재고`;
-
-  // 안전재고 계산
-  const wRatio = WEEKEND_RATIO[book.category] || WEEKEND_RATIO.default;
-  const wdDaily = Math.round((p.sales2w * (1 - wRatio)) / 10); // 2주(14일) 중 평일 10일
+  const wRatio  = WEEKEND_RATIO[book.category] || WEEKEND_RATIO.default;
+  const wdDaily = Math.round((p.sales2w * (1 - wRatio)) / 10); // 2주 중 평일 10일
   const weDaily = Math.round((p.sales2w * wRatio) / 4);        // 2주 중 주말 4일
-  document.getElementById('safetyWd').textContent  = (wdDaily * LEAD_TIME).toLocaleString();
-  document.getElementById('safetyWe').textContent  = (weDaily * LEAD_TIME).toLocaleString();
+  const dailyAvg = Math.round(p.sales2w / 14);
+
+  // 이번주 발주량: 예측 판매량 - 현재재고 - 입고예정 + 1주 안전재고
+  const week1Safety = Math.round((wdDaily * 5 + weDaily * 2)); // 1주 안전재고
+  const week1 = Math.max(0, Math.round(book.forecast / 4) - book.stock - book.incoming + week1Safety);
+
+  // 다음주 유지 목표: 2주치 판매 + 안전재고
+  const week2 = Math.round(p.sales2w + week1Safety);
+
+  // 한달 적정 유지 권장수량: 월 예측 판매 × 1.1 (안전마진)
+  const monthly = Math.round(book.forecast * 1.1);
+
+  document.getElementById('recGradeLabel').textContent = g.label.replace(/[🔴🟡🟢]\s?/,'');
+  document.getElementById('recWeek1').textContent = week1.toLocaleString();
+  document.getElementById('recWeek1Sub').textContent = `재고부족 방지 · 즉시 발주 권장`;
+  document.getElementById('recWeek2').textContent = week2.toLocaleString();
+  document.getElementById('recWeek2Sub').textContent = `2주 판매 + 안전재고 확보`;
+  document.getElementById('recMonthly').textContent = monthly.toLocaleString();
+
+  // 안전재고
+  document.getElementById('safetyWd').textContent    = (wdDaily * LEAD_TIME).toLocaleString();
+  document.getElementById('safetyWe').textContent    = (weDaily * LEAD_TIME).toLocaleString();
   document.getElementById('safetyWdSub').textContent = `일평균 ${wdDaily}권 × 리드타임 ${LEAD_TIME}일`;
   document.getElementById('safetyWeSub').textContent = `일평균 ${weDaily}권 × 리드타임 ${LEAD_TIME}일`;
 
@@ -687,8 +737,10 @@ function copyOrder() {
     `도서명: ${book.title}`,
     `ISBN: ${currentIsbn}  출판사: ${book.publisher}`,
     `발주 등급: ${g.label}`,
-    `권장 발주량: ${book.recommend.toLocaleString()}권`,
-    `판매 예측: ${book.forecast.toLocaleString()}권`,
+    `이번주 발주량: ${Math.max(0, Math.round(book.forecast/4) - book.stock - book.incoming + Math.round((book.prev2w.sales2w*(1-(WEEKEND_RATIO[book.category]||WEEKEND_RATIO.default))/10)*5 + (book.prev2w.sales2w*(WEEKEND_RATIO[book.category]||WEEKEND_RATIO.default)/4)*2)).toLocaleString()}권`,
+    `다음주 유지 목표: ${Math.round(book.prev2w.sales2w + Math.round((book.prev2w.sales2w*(1-(WEEKEND_RATIO[book.category]||WEEKEND_RATIO.default))/10)*5 + (book.prev2w.sales2w*(WEEKEND_RATIO[book.category]||WEEKEND_RATIO.default)/4)*2)).toLocaleString()}권`,
+    `한달 적정 유지 권장수량: ${Math.round(book.forecast*1.1).toLocaleString()}권`,
+    `판매 예측 (월): ${book.forecast.toLocaleString()}권`,
     `현재 재고: ${book.stock.toLocaleString()}권 / 입고예정: ${book.incoming.toLocaleString()}권`,
     `직전권 2주 판매: ${book.prev2w.sales2w.toLocaleString()}권 (누적 ${book.prev2w.salesTotal.toLocaleString()}권)`,
     '─'.repeat(30),'* 교보문고 AI Agent 자동 분석 결과'
