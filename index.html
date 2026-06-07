@@ -584,7 +584,7 @@
       시리즈 판매 추이
       <span class="ml-auto text-xs text-gray-400 font-normal">단위: 권</span>
     </div>
-    <div class="space-y-2">
+    <div class="space-y-2" id="seriesChartContainer">
       <div>
         <div class="flex justify-between text-sm mb-1">
           <span class="text-gray-600">세계사 탐험대 1권</span>
@@ -1126,7 +1126,7 @@
   }
 
   function updateSeriesChart(series) {
-    const container = document.querySelector('#chartSection .space-y-4');
+    const container = document.getElementById('seriesChartContainer');
     container.innerHTML = '';
     const maxVal = Math.max(...series.map(s => s.val));
     series.forEach(s => {
