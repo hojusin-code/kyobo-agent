@@ -344,9 +344,9 @@
           <div class="week-box-sub" id="recWeek1Sub">즉시 발주 권장</div>
         </div>
         <div class="week-box next-week">
-          <div class="week-box-tag">📦 다음주 유지 목표</div>
+          <div class="week-box-tag">📦 안정기 유지 재고 (7일)</div>
           <div class="week-box-num"><span id="recWeek2">—</span><span class="week-box-unit">권</span></div>
-          <div class="week-box-sub" id="recWeek2Sub">적정 재고 유지선</div>
+          <div class="week-box-sub" id="recWeek2Sub">초반 이후 적정 유지선</div>
         </div>
       </div>
 
@@ -603,21 +603,21 @@ function startAnalysis() {
   const weDaily = Math.round((p.sales2w * wRatio) / 4);        // 2주 중 주말 4일
   const dailyAvg = Math.round(p.sales2w / 14);
 
-  // 이번주 발주량: 예측 판매량 - 현재재고 - 입고예정 + 1주 안전재고
-  const week1Safety = Math.round((wdDaily * 5 + weDaily * 2)); // 1주 안전재고
-  const week1 = Math.max(0, Math.round(book.forecast / 4) - book.stock - book.incoming + week1Safety);
+  // 이번주 발주량: 출간 초반 집중 수요 커버 (2주 판매 - 현재고 - 입고 + 안전재고)
+  const week1Safety = wdDaily * 5 + weDaily * 2; // 1주 안전재고
+  const week1 = Math.max(0, p.sales2w - book.stock - book.incoming + Math.round(week1Safety));
 
-  // 다음주 유지 목표: 2주치 판매 + 안전재고
-  const week2 = Math.round(p.sales2w + week1Safety);
+  // 안정기 유지 재고 (7일분): 초반 이후 일평균 × 7
+  const week2 = Math.round(dailyAvg * 7);
 
-  // 한달 적정 유지 권장수량: 월 예측 판매 × 1.1 (안전마진)
+  // 한달 적정 유지 권장수량: 월 예측 판매 × 1.1
   const monthly = Math.round(book.forecast * 1.1);
 
   document.getElementById('recGradeLabel').textContent = g.label.replace(/[🔴🟡🟢]\s?/,'');
   document.getElementById('recWeek1').textContent = week1.toLocaleString();
-  document.getElementById('recWeek1Sub').textContent = `재고부족 방지 · 즉시 발주 권장`;
+  document.getElementById('recWeek1Sub').textContent = `2주 판매 기준 · 즉시 발주 권장`;
   document.getElementById('recWeek2').textContent = week2.toLocaleString();
-  document.getElementById('recWeek2Sub').textContent = `2주 판매 + 안전재고 확보`;
+  document.getElementById('recWeek2Sub').textContent = `일평균 ${dailyAvg}권 × 7일 유지`;
   document.getElementById('recMonthly').textContent = monthly.toLocaleString();
 
   // 안전재고
