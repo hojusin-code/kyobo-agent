@@ -9,337 +9,299 @@
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
     * { font-family: 'Noto Sans KR', sans-serif; box-sizing: border-box; }
 
-    :root {
-      --kyobo-red:  #E60012;
-      --kyobo-navy: #0F1F3D;
-    }
+    :root { --red: #E60012; --navy: #0F1F3D; }
 
-    body { margin:0; background:#EEF0F5; min-height:100vh; }
+    body { margin:0; background:#F2F3F6; min-height:100vh; }
 
     /* ── HEADER ── */
     .header {
-      background:var(--kyobo-navy);
-      padding:0 32px;
-      height:60px;
+      background:var(--navy); padding:0 32px; height:56px;
       display:flex; align-items:center; justify-content:space-between;
       position:sticky; top:0; z-index:100;
     }
-    .header-left { display:flex; align-items:center; gap:12px; }
-    .header-logo { color:white; font-size:20px; font-weight:900; letter-spacing:-0.5px; }
-    .header-badge { background:var(--kyobo-red); color:white; font-size:10px; font-weight:800; padding:3px 9px; border-radius:99px; letter-spacing:0.5px; }
-    .header-sub { color:rgba(255,255,255,0.38); font-size:11px; margin-top:1px; }
-    .header-right { display:flex; align-items:center; gap:14px; color:rgba(255,255,255,0.65); font-size:12px; }
-    .header-avatar { width:32px; height:32px; border-radius:50%; background:var(--kyobo-red); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:white; }
+    .header-logo { color:white; font-size:19px; font-weight:900; }
+    .header-badge { background:var(--red); color:white; font-size:10px; font-weight:800; padding:2px 8px; border-radius:99px; margin-left:8px; }
+    .header-sub { color:rgba(255,255,255,0.32); font-size:11px; margin-top:1px; }
+    .header-right { display:flex; align-items:center; gap:12px; color:rgba(255,255,255,0.55); font-size:12px; }
+    .header-avatar { width:30px; height:30px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:white; }
 
-    /* ── CONTENT ── */
-    .page { max-width:1100px; margin:0 auto; padding:24px 20px 40px; }
+    /* ── PAGE ── */
+    .page { max-width:1060px; margin:0 auto; padding:20px 18px 48px; }
 
-    /* ── CARD ── */
-    .card { background:white; border-radius:12px; padding:22px 24px; box-shadow:0 1px 4px rgba(0,0,0,0.07); margin-bottom:16px; }
+    /* ── WHITE CARD ── */
+    .card { background:white; border-radius:10px; padding:20px 22px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-bottom:14px; }
 
-    /* ── SEARCH CARD ── */
-    .search-card-title { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:#111; margin-bottom:14px; }
-    .search-dot { width:8px; height:8px; border-radius:50%; background:var(--kyobo-red); flex-shrink:0; }
-    .search-row { display:flex; gap:10px; }
+    /* ── SEARCH ── */
+    .search-label { font-size:12px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+    .search-row { display:flex; gap:8px; }
     .isbn-input {
-      flex:1; border:1.5px solid #E5E7EB; border-radius:8px;
-      padding:13px 18px; font-size:15px; outline:none; color:#111;
-      background:#FAFAFA; transition:border-color 0.2s, background 0.2s;
+      flex:1; border:1.5px solid #E5E7EB; border-radius:7px;
+      padding:11px 16px; font-size:15px; outline:none; color:#111; background:#FAFAFA;
+      transition:border-color 0.2s;
     }
-    .isbn-input:focus { border-color:var(--kyobo-red); background:white; }
+    .isbn-input:focus { border-color:var(--red); background:white; }
     .search-btn {
-      background:var(--kyobo-red); color:white; border:none;
-      border-radius:8px; padding:13px 26px;
-      font-size:14px; font-weight:700; cursor:pointer;
-      display:flex; align-items:center; gap:7px; white-space:nowrap;
-      transition:background 0.15s;
+      background:var(--red); color:white; border:none; border-radius:7px;
+      padding:11px 22px; font-size:13px; font-weight:700; cursor:pointer;
+      display:flex; align-items:center; gap:6px; white-space:nowrap; transition:opacity 0.15s;
     }
-    .search-btn:hover { background:#cc0010; }
-    .quick-row { display:flex; align-items:center; gap:8px; margin-top:11px; flex-wrap:wrap; }
-    .quick-label { font-size:11px; color:#9CA3AF; }
-    .quick-btn { display:flex; align-items:center; gap:5px; font-size:11px; border:1px solid #E5E7EB; border-radius:5px; padding:4px 10px; background:white; cursor:pointer; color:#555; font-weight:600; transition:all 0.15s; }
-    .quick-btn:hover { border-color:var(--kyobo-red); color:var(--kyobo-red); }
+    .search-btn:hover { opacity:0.88; }
+    .quick-row { display:flex; align-items:center; gap:6px; margin-top:10px; flex-wrap:wrap; }
+    .quick-label { font-size:11px; color:#C4C4C4; }
+    .quick-btn { font-size:11px; border:1px solid #E5E7EB; border-radius:5px; padding:3px 9px; background:white; cursor:pointer; color:#666; font-weight:600; transition:all 0.15s; }
+    .quick-btn:hover { border-color:var(--red); color:var(--red); }
 
-    /* ── BOOK INFO CARD ── */
-    .book-info-row { display:flex; align-items:center; gap:16px; }
-    #bookCover { width:70px; height:96px; border-radius:6px; object-fit:cover; box-shadow:0 3px 12px rgba(0,0,0,0.15); display:none; flex-shrink:0; }
-    #bookCoverPlaceholder { width:70px; height:96px; border-radius:6px; background:#F3F4F6; display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; }
-    .book-meta-grid { display:grid; grid-template-columns:auto 1fr auto 1fr auto 1fr auto 1fr; gap:0 20px; flex:1; align-items:center; }
-    .book-meta-label { font-size:11px; color:#9CA3AF; font-weight:600; }
-    .book-meta-value { font-size:13px; font-weight:700; color:#111; }
-    .book-status-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:5px; background:#DCFCE7; color:#16A34A; }
+    /* ── BOOK INFO ── */
+    .book-info-row { display:flex; align-items:center; gap:14px; }
+    #bookCover { width:64px; height:88px; border-radius:5px; object-fit:cover; box-shadow:0 2px 10px rgba(0,0,0,0.13); display:none; flex-shrink:0; }
+    #bookCoverPlaceholder { width:64px; height:88px; border-radius:5px; background:#F3F4F6; display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+    .book-fields { display:flex; gap:28px; flex:1; flex-wrap:wrap; }
+    .book-field-label { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:3px; }
+    .book-field-value { font-size:13px; font-weight:700; color:#111; }
+    .done-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:5px; background:#F0FDF4; color:#16A34A; border:1px solid #BBF7D0; white-space:nowrap; }
 
-    /* ── HERO CARDS ── */
-    .hero-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
-    .hero-card { border-radius:12px; padding:22px 24px; }
-    .hero-card.navy  { background:linear-gradient(135deg,#0F2040 0%,#1a3260 100%); }
-    .hero-card.purple { background:linear-gradient(135deg,#1A0B35 0%,#2D1B69 100%); }
+    /* ── HERO ROW ── */
+    .hero-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
 
-    .hero-top-label { font-size:10px; font-weight:700; color:rgba(255,255,255,0.38); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px; }
-    .hero-main-title { font-size:15px; font-weight:800; color:white; margin-bottom:14px; }
-    .hero-tag { display:inline-block; font-size:10px; font-weight:700; padding:3px 9px; border-radius:5px; float:right; margin-top:-18px; }
-    .hero-card.navy  .hero-tag { background:#1E40AF; color:#93C5FD; }
-    .hero-card.purple .hero-tag { background:#4C1D95; color:#C4B5FD; }
+    .hero-card { border-radius:10px; padding:20px 22px; }
+    .hero-card.navy   { background:#0F2040; }
+    .hero-card.purple { background:#1A0B35; }
 
-    .hero-value { font-size:44px; font-weight:900; line-height:1; }
-    .hero-card.navy   .hero-value { color:#FBBF24; }
-    .hero-card.purple .hero-value { color:#C084FC; }
-    .hero-value-unit { font-size:14px; font-weight:600; margin-left:3px; opacity:0.7; }
+    .hero-eyebrow { font-size:10px; font-weight:700; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .hero-num { font-size:42px; font-weight:900; line-height:1; }
+    .hero-card.navy   .hero-num { color:#FBBF24; }
+    .hero-card.purple .hero-num { color:#C084FC; }
+    .hero-num-unit { font-size:13px; font-weight:600; opacity:0.6; margin-left:2px; }
+    .hero-subs { display:flex; gap:14px; margin-top:5px; }
+    .hero-sub { font-size:11px; color:rgba(255,255,255,0.38); }
+    .hero-sub strong { color:rgba(255,255,255,0.7); }
+    .hero-divider { border:none; border-top:1px solid rgba(255,255,255,0.07); margin:12px 0; }
+    .hero-book-name { font-size:12px; font-weight:700; color:rgba(255,255,255,0.65); }
+    .hero-book-comment { font-size:11px; color:rgba(255,255,255,0.35); margin-top:4px; line-height:1.5; }
 
-    .hero-sub-row { display:flex; align-items:center; gap:14px; margin-top:4px; }
-    .hero-sub-item { font-size:12px; color:rgba(255,255,255,0.45); }
-    .hero-sub-item strong { color:rgba(255,255,255,0.75); font-weight:700; }
+    /* ── KPI ROW ── */
+    .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+    .kpi-card { background:white; border-radius:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-top:3px solid #E5E7EB; }
+    .kpi-card.c-blue   { border-top-color:#3B82F6; }
+    .kpi-card.c-teal   { border-top-color:#0891B2; }
+    .kpi-card.c-amber  { border-top-color:#F59E0B; }
+    .kpi-card.c-red    { border-top-color:var(--red); background:#FFF5F5; }
+    .kpi-lbl { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:4px; }
+    .kpi-val { font-size:24px; font-weight:900; color:#111; line-height:1; }
+    .kpi-card.c-red .kpi-val { color:var(--red); }
+    .kpi-unit { font-size:11px; color:#9CA3AF; margin-left:2px; }
+    .kpi-sub { font-size:10px; color:#9CA3AF; margin-top:4px; }
 
-    .hero-divider { border:none; border-top:1px solid rgba(255,255,255,0.08); margin:12px 0; }
-
-    .hero-book-title { font-size:13px; font-weight:700; color:rgba(255,255,255,0.75); margin-bottom:2px; }
-    .hero-book-date  { font-size:11px; color:rgba(255,255,255,0.35); }
-    .hero-comment { font-size:11px; color:rgba(255,255,255,0.38); margin-top:6px; line-height:1.5; }
-    .hero-comment-box { background:rgba(255,255,255,0.05); border-radius:6px; padding:8px 10px; margin-top:8px; }
-
-    /* ── KPI CARDS ── */
-    .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
-    .kpi-card { background:white; border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.07); border-left:4px solid transparent; }
-    .kpi-card.blue-l   { border-left-color:#2563EB; }
-    .kpi-card.teal-l   { border-left-color:#0891B2; }
-    .kpi-card.amber-l  { border-left-color:#D97706; }
-    .kpi-card.red-l    { border-left-color:var(--kyobo-red); border:1.5px solid #FEE2E2; border-left:4px solid var(--kyobo-red); }
-    .kpi-label { font-size:11px; color:#9CA3AF; font-weight:600; margin-bottom:5px; }
-    .kpi-value { font-size:26px; font-weight:900; color:#111; line-height:1; }
-    .kpi-card.red-l .kpi-value { color:var(--kyobo-red); }
-    .kpi-unit { font-size:12px; font-weight:500; color:#6B7280; margin-left:2px; }
-    .kpi-tag { display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; margin-top:5px; }
-    .kpi-tag.blue-t   { background:#DBEAFE; color:#1E40AF; }
-    .kpi-tag.teal-t   { background:#CFFAFE; color:#0E7490; }
-    .kpi-tag.amber-t  { background:#FEF3C7; color:#D97706; }
-    .kpi-tag.red-t    { background:#FEE2E2; color:var(--kyobo-red); }
-
-    /* ── NAVER STRIP ── */
-    .naver-card { background:white; border-radius:12px; padding:14px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); border:1.5px solid #E6F9EE; margin-bottom:16px; display:none; }
+    /* ── NAVER ── */
+    .naver-card { background:white; border-radius:10px; padding:12px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.06); border-left:3px solid #03C75A; margin-bottom:14px; display:none; }
     .naver-inner { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .naver-dot { width:7px; height:7px; border-radius:50%; background:#03C75A; flex-shrink:0; }
-    .naver-lbl { font-size:12px; font-weight:700; color:#03C75A; }
-    .naver-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; }
+    .naver-dot { width:6px; height:6px; border-radius:50%; background:#03C75A; flex-shrink:0; }
+    .naver-lbl { font-size:11px; font-weight:700; color:#03C75A; }
+    .naver-status { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
     .naver-book-title { font-size:12px; font-weight:700; color:#111; }
     .naver-pubdate { font-size:11px; color:#9CA3AF; }
-    .naver-cnt-label { font-size:11px; color:#9CA3AF; margin-left:auto; }
-    .naver-cnt { font-size:18px; font-weight:900; color:#03C75A; }
-    .naver-cmnt { width:100%; font-size:11px; color:#6B7280; padding-top:6px; margin-top:4px; border-top:1px solid #E6F9EE; }
+    .naver-cnt { font-size:17px; font-weight:900; color:#03C75A; margin-left:auto; }
+    .naver-cmnt { width:100%; font-size:11px; color:#6B7280; padding-top:5px; margin-top:4px; border-top:1px solid #F0FDF4; }
 
-    /* ── RECOMMEND + DETAIL ── */
-    .bottom-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+    /* ── BOTTOM GRID ── */
+    .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
 
-    .recommend-card { background:var(--kyobo-red); border-radius:12px; padding:20px 22px; }
-    .rec-label { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
-    .rec-value { font-size:40px; font-weight:900; color:white; line-height:1; }
-    .rec-unit { font-size:14px; font-weight:500; margin-left:3px; opacity:0.8; }
-    .rec-formula { font-size:11px; color:rgba(255,255,255,0.45); margin-top:6px; }
-    .rec-row2 { display:flex; align-items:flex-end; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.12); }
-    .rec-trust-label { font-size:10px; color:rgba(255,255,255,0.45); }
-    .rec-trust-val   { font-size:26px; font-weight:900; color:rgba(255,255,255,0.88); }
-    .copy-btn { background:rgba(255,255,255,0.14); border:1.5px solid rgba(255,255,255,0.28); color:white; border-radius:7px; padding:7px 15px; font-size:12px; font-weight:700; cursor:pointer; transition:background 0.15s; }
-    .copy-btn:hover { background:rgba(255,255,255,0.24); }
+    /* ── RECOMMEND CARD ── */
+    .rec-card { background:var(--red); border-radius:10px; padding:18px 20px; display:flex; flex-direction:column; gap:0; }
+    .rec-eyebrow { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+    .rec-num { font-size:44px; font-weight:900; color:white; line-height:1; }
+    .rec-unit { font-size:14px; font-weight:500; margin-left:3px; opacity:0.75; }
+    .rec-formula { font-size:10px; color:rgba(255,255,255,0.4); margin-top:4px; }
 
-    /* ── TRUST + SERIES ── */
-    .detail-card { background:white; border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
-    .detail-label { font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
-    .detail-label::after { content:''; flex:1; height:1px; background:#F3F4F6; }
+    /* 평일/주말 안전재고 */
+    .safety-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.12); }
+    .safety-box { background:rgba(0,0,0,0.15); border-radius:7px; padding:10px 12px; }
+    .safety-lbl { font-size:10px; color:rgba(255,255,255,0.45); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
+    .safety-est { font-size:9px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.5); padding:1px 5px; border-radius:3px; font-weight:700; }
+    .safety-num { font-size:22px; font-weight:900; color:white; line-height:1; }
+    .safety-unit { font-size:11px; opacity:0.6; margin-left:2px; }
+    .safety-sub { font-size:10px; color:rgba(255,255,255,0.35); margin-top:3px; }
 
-    .trust-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .rec-footer { display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.12); }
+    .rec-trust-lbl { font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:2px; }
+    .rec-trust-num { font-size:24px; font-weight:900; color:rgba(255,255,255,0.85); }
+    .copy-btn { background:rgba(255,255,255,0.13); border:1.5px solid rgba(255,255,255,0.25); color:white; border-radius:6px; padding:7px 14px; font-size:11px; font-weight:700; cursor:pointer; transition:background 0.15s; }
+    .copy-btn:hover { background:rgba(255,255,255,0.22); }
+
+    /* ── RIGHT DETAIL COL ── */
+    .detail-col { display:flex; flex-direction:column; gap:10px; }
+    .detail-card { background:white; border-radius:10px; padding:16px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+    .section-label { font-size:10px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+
+    /* Trust bars */
+    .trust-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
     .trust-row:last-child { margin-bottom:0; }
-    .trust-name { font-size:11px; color:#6B7280; width:56px; flex-shrink:0; }
-    .trust-bg { flex:1; height:6px; background:#F3F4F6; border-radius:99px; overflow:hidden; }
-    .trust-fill { height:100%; border-radius:99px; width:0; transition:width 1.2s cubic-bezier(0.4,0,0.2,1); }
-    .trust-fill.r { background:linear-gradient(90deg,var(--kyobo-red),#ff7070); }
-    .trust-fill.a { background:linear-gradient(90deg,#D97706,#FBBF24); }
-    .trust-pct { font-size:11px; font-weight:700; width:28px; text-align:right; }
+    .trust-name { font-size:11px; color:#6B7280; width:54px; flex-shrink:0; }
+    .trust-bg { flex:1; height:5px; background:#F3F4F6; border-radius:99px; overflow:hidden; }
+    .trust-fill { height:100%; border-radius:99px; width:0; transition:width 1.2s cubic-bezier(0.4,0,0.2,1); background:var(--red); }
+    .trust-fill.amber { background:#F59E0B; }
+    .trust-pct { font-size:11px; font-weight:700; color:#374151; width:26px; text-align:right; }
 
-    .series-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+    /* Series */
+    .series-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
     .series-row:last-child { margin-bottom:0; }
-    .series-name { font-size:11px; color:#6B7280; width:68px; flex-shrink:0; }
-    .series-bg { flex:1; height:20px; background:#F3F4F6; border-radius:4px; overflow:hidden; }
-    .series-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; width:0; transition:width 1s ease; }
-    .series-fill.act { background:linear-gradient(90deg,var(--kyobo-navy),#2563EB); }
-    .series-fill.fct { background:linear-gradient(90deg,var(--kyobo-red),#F87171); }
+    .series-name { font-size:11px; color:#6B7280; width:66px; flex-shrink:0; }
+    .series-bg { flex:1; height:18px; background:#F3F4F6; border-radius:4px; overflow:hidden; }
+    .series-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:7px; width:0; transition:width 1s ease; }
+    .series-fill.act { background:var(--navy); }
+    .series-fill.fct { background:var(--red); }
     .series-val { font-size:10px; color:white; font-weight:700; white-space:nowrap; }
 
-    /* ── AI STEPS ── */
-    .ai-card { background:white; border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); margin-bottom:16px; }
-    .step-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid #F9FAFB; }
-    .step-item:last-child { border-bottom:none; }
-    .step-num { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; margin-top:1px; }
-    .step-text { font-size:12px; color:#374151; line-height:1.55; }
-    .step-tag { font-weight:700; color:#111; }
-    .ai-summary-box { background:#F8FAFF; border:1.5px solid #DBEAFE; border-radius:8px; padding:12px 14px; margin-top:10px; font-size:12px; color:#374151; line-height:1.7; }
-
-    /* ── SAFETY STOCK ── */
-    .safety-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12); }
-    .safety-box { background:rgba(255,255,255,0.1); border-radius:8px; padding:10px 12px; }
-    .safety-box-label { font-size:10px; color:rgba(255,255,255,0.5); font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
-    .safety-box-value { font-size:20px; font-weight:900; color:white; line-height:1; }
-    .safety-box-unit { font-size:11px; font-weight:500; opacity:0.7; margin-left:2px; }
-    .safety-box-sub { font-size:10px; color:rgba(255,255,255,0.4); margin-top:3px; }
-    .safety-est-badge { font-size:9px; background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); padding:1px 5px; border-radius:3px; font-weight:700; }
-
     /* ── HOT SEARCH ── */
-    .hot-search-card { background:white; border-radius:12px; padding:16px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); margin-top:12px; }
-    .hot-search-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .hot-search-title { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:800; color:#111; }
-    .hot-live-dot { width:7px; height:7px; border-radius:50%; background:var(--kyobo-red); animation:pulse 1.5s infinite; flex-shrink:0; }
-    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-    .hot-search-time { font-size:10px; color:#9CA3AF; }
+    .hot-card { background:white; border-radius:10px; padding:16px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-bottom:14px; }
+    .hot-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .hot-title { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#111; }
+    .hot-dot { width:6px; height:6px; border-radius:50%; background:var(--red); animation:blink 1.5s infinite; flex-shrink:0; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+    .hot-time { font-size:10px; color:#C4C4C4; }
     .hot-item { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid #F9FAFB; }
     .hot-item:last-child { border-bottom:none; }
-    .hot-rank { width:20px; text-align:center; font-size:13px; font-weight:900; flex-shrink:0; }
-    .hot-rank.r1 { color:var(--kyobo-red); }
-    .hot-rank.r2 { color:#D97706; }
-    .hot-rank.r3 { color:#2563EB; }
-    .hot-rank.r4,.hot-rank.r5 { color:#9CA3AF; }
-    .hot-keyword { flex:1; font-size:13px; font-weight:600; color:#111; }
-    .hot-change { font-size:10px; font-weight:700; }
-    .hot-change.up   { color:#E60012; }
-    .hot-change.down { color:#2563EB; }
-    .hot-change.new  { background:#FEE2E2; color:#E60012; padding:1px 5px; border-radius:3px; }
-    .hot-change.same { color:#9CA3AF; }
+    .hot-rank { width:18px; text-align:center; font-size:12px; font-weight:900; flex-shrink:0; }
+    .hot-rank.n1 { color:var(--red); }
+    .hot-rank.n2 { color:#F59E0B; }
+    .hot-rank.n3 { color:#3B82F6; }
+    .hot-rank.n4,.hot-rank.n5 { color:#C4C4C4; font-size:11px; }
+    .hot-kw { flex:1; font-size:13px; font-weight:600; color:#111; }
+    .hot-chg { font-size:10px; font-weight:700; }
+    .hot-chg.up   { color:var(--red); }
+    .hot-chg.down { color:#3B82F6; }
+    .hot-chg.new  { background:#FEE2E2; color:var(--red); padding:1px 5px; border-radius:3px; }
+    .hot-chg.same { color:#C4C4C4; }
+
+    /* ── AI STEPS ── */
+    .ai-card { background:white; border-radius:10px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-bottom:14px; }
+    .step-item { display:flex; gap:10px; padding:7px 0; border-bottom:1px solid #F9FAFB; }
+    .step-item:last-child { border-bottom:none; }
+    .step-num { width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; margin-top:1px; }
+    .step-text { font-size:12px; color:#374151; line-height:1.55; }
+    .step-tag { font-weight:700; color:#111; }
+    .ai-summary { background:#F8FAFF; border:1px solid #DBEAFE; border-radius:7px; padding:11px 13px; margin-top:10px; font-size:12px; color:#374151; line-height:1.7; }
 
     /* ── GRADE CHIP ── */
-    .grade-chip { display:inline-flex; align-items:center; font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; }
-    .g-intensive { background:#FEE2E2; color:var(--kyobo-red); }
+    .grade-chip { display:inline-flex; align-items:center; font-size:11px; font-weight:700; padding:2px 9px; border-radius:99px; }
+    .g-intensive { background:#FEE2E2; color:var(--red); }
     .g-expand    { background:#FEF3C7; color:#D97706; }
     .g-normal    { background:#DCFCE7; color:#16A34A; }
 
-    /* ── HIDDEN ── */
     .hidden { display:none !important; }
-
-    /* Scrollbar */
     ::-webkit-scrollbar { width:4px; }
     ::-webkit-scrollbar-thumb { background:#D1D5DB; border-radius:99px; }
-    ::-webkit-scrollbar-track { background:transparent; }
   </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══ -->
+<!-- HEADER -->
 <header class="header">
-  <div class="header-left">
-    <div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="header-logo">교보문고</span>
-        <span class="header-badge">AI AGENT</span>
-      </div>
-      <div class="header-sub">발주 의사결정 지원 시스템 · Ordering Intelligence</div>
+  <div>
+    <div style="display:flex;align-items:center;">
+      <span class="header-logo">교보문고</span>
+      <span class="header-badge">AI AGENT</span>
     </div>
+    <div class="header-sub">발주 의사결정 지원 시스템 · Ordering Intelligence</div>
   </div>
   <div class="header-right">
-    <span>📅 2026.06.06</span>
+    <span>📅 2026.06.07</span>
     <span>담당: 신호주 과장</span>
     <div class="header-avatar">신</div>
   </div>
 </header>
 
-<!-- ═══ PAGE ═══ -->
 <div class="page">
 
-  <!-- Search Card -->
+  <!-- 검색 -->
   <div class="card">
-    <div class="search-card-title">
-      <div class="search-dot"></div>
-      ISBN 도서 조회
-    </div>
+    <div class="search-label">ISBN 도서 조회</div>
     <div class="search-row">
       <input id="isbnInput" class="isbn-input" type="text" placeholder="ISBN 13자리 입력 또는 바코드 스캔" maxlength="20" autocomplete="off" />
       <button class="search-btn" id="searchBtn">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         분석하기
       </button>
     </div>
     <div class="quick-row">
       <span class="quick-label">예시:</span>
-      <button class="quick-btn" onclick="quickTest('9791173326516')">📚 흔한남매 세계사 탐험대 6</button>
-      <button class="quick-btn" onclick="quickTest('9791172461942')">📚 세계사 탐험대 6 (구버전)</button>
-      <button class="quick-btn" onclick="quickTest('9791172461234')">📚 마법사 연대기 5권</button>
-      <button class="quick-btn" onclick="quickTest('9791172469876')">📚 첫 번째 빛</button>
+      <button class="quick-btn" onclick="quickTest('9791173326516')">흔한남매 세계탐험대 6 (주니어김영사)</button>
+      <button class="quick-btn" onclick="quickTest('9791172461942')">흔한남매 세계탐험대 6 (미래엔)</button>
+      <button class="quick-btn" onclick="quickTest('9791172461234')">마법사 연대기 5권</button>
+      <button class="quick-btn" onclick="quickTest('9791172469876')">첫 번째 빛</button>
     </div>
   </div>
 
-  <!-- Book Info Card -->
+  <!-- 도서 정보 -->
   <div class="card hidden" id="bookInfoCard">
     <div class="book-info-row">
       <img id="bookCover" src="" alt="책 표지" />
       <div id="bookCoverPlaceholder">📚</div>
-      <div class="book-meta-grid" id="bookMetaGrid"></div>
-      <span class="book-status-badge" id="bookStatusBadge">조회 완료</span>
+      <div class="book-fields" id="bookFields"></div>
+      <span class="done-badge">조회 완료</span>
     </div>
   </div>
 
-  <!-- Hero Row: 직전권 + 저자대표작 -->
+  <!-- 핵심 지표: 직전권 2주 + 저자대표작 -->
   <div class="hero-row hidden" id="heroRow">
-    <!-- 직전권 -->
     <div class="hero-card navy">
-      <div class="hero-top-label">핵심 발주 기준</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="hero-main-title">직전권 출간 후 <span style="color:#FBBF24;">30일</span> 판매량</div>
-        <span class="hero-tag">초도 기준</span>
+      <div class="hero-eyebrow">핵심 발주 기준</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+        <span style="font-size:15px;font-weight:800;color:white;">직전권 출간 후 <span style="color:#FBBF24;">2주</span> 판매량</span>
+        <span style="font-size:10px;font-weight:700;background:#1E3A5F;color:#93C5FD;padding:3px 8px;border-radius:5px;">초도 기준</span>
       </div>
-      <div class="hero-value" id="heroPrev1m">—<span class="hero-value-unit">권 / 30일</span></div>
-      <div class="hero-sub-row">
-        <div class="hero-sub-item">누적 <strong id="heroPrevTotal">—</strong>권</div>
-        <div class="hero-sub-item">첫 달 집중률 <strong id="heroPrevRatio">—</strong>%</div>
+      <div class="hero-num" id="heroPrev2w">—<span class="hero-num-unit">권 / 14일</span></div>
+      <div class="hero-subs">
+        <div class="hero-sub">누적 <strong id="heroPrevTotal">—</strong>권</div>
+        <div class="hero-sub">2주 집중률 <strong id="heroPrevRatio">—</strong>%</div>
       </div>
-      <hr class="hero-divider">
-      <div class="hero-book-title" id="heroPrevTitle">—</div>
-      <div class="hero-book-date" id="heroPrevDate">—</div>
-      <div class="hero-comment-box">
-        <div style="font-size:11px;color:rgba(255,255,255,0.5);" id="heroPrevComment"></div>
-      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-book-name" id="heroPrevTitle"></div>
+      <div class="hero-book-comment" id="heroPrevComment"></div>
     </div>
 
-    <!-- 저자대표작 -->
     <div class="hero-card purple">
-      <div class="hero-top-label">저자 판매 레퍼런스</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="hero-main-title">저자 <span style="color:#C084FC;">대표작</span> 판매 실적</div>
-        <span class="hero-tag">저자 지표</span>
+      <div class="hero-eyebrow">저자 판매 레퍼런스</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+        <span style="font-size:15px;font-weight:800;color:white;">저자 <span style="color:#C084FC;">대표작</span> 판매 실적</span>
+        <span style="font-size:10px;font-weight:700;background:#3B0764;color:#C4B5FD;padding:3px 8px;border-radius:5px;">저자 지표</span>
       </div>
-      <div class="hero-value" id="heroRepTotal">—<span class="hero-value-unit">권 누적</span></div>
-      <div class="hero-sub-row">
-        <div class="hero-sub-item">30일 <strong id="heroRep1m">—</strong>권</div>
-        <div class="hero-sub-item">초기 집중률 <strong id="heroRepRatio">—</strong>%</div>
+      <div class="hero-num" id="heroRepTotal">—<span class="hero-num-unit">권 누적</span></div>
+      <div class="hero-subs">
+        <div class="hero-sub">2주 <strong id="heroRep2w">—</strong>권</div>
+        <div class="hero-sub">초기 집중률 <strong id="heroRepRatio">—</strong>%</div>
       </div>
-      <hr class="hero-divider">
-      <div class="hero-book-title" id="heroRepTitle">—</div>
-      <div class="hero-book-date" id="heroRepDate">—</div>
-      <div class="hero-comment-box">
-        <div style="font-size:11px;color:rgba(255,255,255,0.5);" id="heroRepComment"></div>
-      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-book-name" id="heroRepTitle"></div>
+      <div class="hero-book-comment" id="heroRepComment"></div>
     </div>
   </div>
 
-  <!-- KPI Row -->
+  <!-- KPI 4칸 -->
   <div class="kpi-row hidden" id="kpiRow">
-    <div class="kpi-card blue-l">
-      <div class="kpi-label">현재 재고</div>
-      <div class="kpi-value"><span id="kpiStock">—</span><span class="kpi-unit">권</span></div>
-      <span class="kpi-tag blue-t" id="kpiStockTag">분석 전</span>
+    <div class="kpi-card c-blue">
+      <div class="kpi-lbl">현재 재고</div>
+      <div class="kpi-val"><span id="kpiStock">—</span><span class="kpi-unit">권</span></div>
+      <div class="kpi-sub" id="kpiStockSub"></div>
     </div>
-    <div class="kpi-card teal-l">
-      <div class="kpi-label">입고 예정</div>
-      <div class="kpi-value"><span id="kpiIncoming">—</span><span class="kpi-unit">권</span></div>
-      <span class="kpi-tag teal-t" id="kpiIncomingTag">분석 전</span>
+    <div class="kpi-card c-teal">
+      <div class="kpi-lbl">입고 예정</div>
+      <div class="kpi-val"><span id="kpiIncoming">—</span><span class="kpi-unit">권</span></div>
+      <div class="kpi-sub" id="kpiIncomingSub"></div>
     </div>
-    <div class="kpi-card amber-l">
-      <div class="kpi-label">예상 판매량</div>
-      <div class="kpi-value"><span id="kpiForecast">—</span><span class="kpi-unit">권</span></div>
-      <span class="kpi-tag amber-t" id="kpiForecastTag">분석 전</span>
+    <div class="kpi-card c-amber">
+      <div class="kpi-lbl">예상 판매량</div>
+      <div class="kpi-val"><span id="kpiForecast">—</span><span class="kpi-unit">권</span></div>
+      <div class="kpi-sub" id="kpiForecastSub"></div>
     </div>
-    <div class="kpi-card red-l">
-      <div class="kpi-label">⚡ 권장 발주량</div>
-      <div class="kpi-value"><span id="kpiRecommend">—</span><span class="kpi-unit">권</span></div>
-      <span class="kpi-tag red-t" id="kpiRecommendTag">분석 전</span>
+    <div class="kpi-card c-red">
+      <div class="kpi-lbl">⚡ 권장 발주량</div>
+      <div class="kpi-val"><span id="kpiRecommend">—</span><span class="kpi-unit">권</span></div>
+      <div class="kpi-sub" id="kpiRecommendSub"></div>
     </div>
   </div>
 
-  <!-- Naver Strip -->
+  <!-- 네이버 관심도 -->
   <div class="naver-card" id="naverCard">
     <div class="naver-inner">
       <div class="naver-dot"></div>
@@ -347,109 +309,99 @@
       <span class="naver-status" id="naverStatus"></span>
       <span class="naver-book-title" id="naverTitle"></span>
       <span class="naver-pubdate" id="naverPubdate"></span>
-      <span class="naver-cnt-label">검색량</span>
       <span class="naver-cnt" id="naverSearchCount"></span>
       <div class="naver-cmnt" id="naverComment"></div>
     </div>
   </div>
 
-  <!-- Bottom Row: Recommend + Detail -->
-  <div class="bottom-row hidden" id="bottomRow">
+  <!-- 권장발주 + 신뢰도/시리즈 -->
+  <div class="bottom-grid hidden" id="bottomGrid">
 
-    <!-- Left: Recommend + Hot Search -->
-    <div style="display:flex;flex-direction:column;gap:0;">
-    <div class="recommend-card">
-      <div class="rec-label">AI 권장 발주량</div>
-      <div class="rec-value" id="recValue">—<span class="rec-unit">권</span></div>
+    <!-- 왼쪽: 권장발주 카드 -->
+    <div class="rec-card">
+      <div class="rec-eyebrow">AI 권장 발주량</div>
+      <div class="rec-num" id="recNum">—<span class="rec-unit">권</span></div>
       <div class="rec-formula" id="recFormula"></div>
 
-      <!-- 주중/주말 평균 안전재고 -->
-      <div class="safety-row">
+      <div class="safety-grid">
         <div class="safety-box">
-          <div class="safety-box-label">
-            🗓 평일 기준 안전재고
-            <span class="safety-est-badge">추정</span>
-          </div>
-          <div class="safety-box-value"><span id="safetyWeekday">—</span><span class="safety-box-unit">권</span></div>
-          <div class="safety-box-sub" id="safetyWeekdaySub">일평균 —권 × 리드타임 2일</div>
+          <div class="safety-lbl">🗓 평일 기준 안전재고 <span class="safety-est">추정</span></div>
+          <div class="safety-num"><span id="safetyWd">—</span><span class="safety-unit">권</span></div>
+          <div class="safety-sub" id="safetyWdSub"></div>
         </div>
         <div class="safety-box">
-          <div class="safety-box-label">
-            🏖 주말 기준 안전재고
-            <span class="safety-est-badge">추정</span>
-          </div>
-          <div class="safety-box-value"><span id="safetyWeekend">—</span><span class="safety-box-unit">권</span></div>
-          <div class="safety-box-sub" id="safetyWeekendSub">일평균 —권 × 리드타임 2일</div>
+          <div class="safety-lbl">🏖 주말 기준 안전재고 <span class="safety-est">추정</span></div>
+          <div class="safety-num"><span id="safetyWe">—</span><span class="safety-unit">권</span></div>
+          <div class="safety-sub" id="safetyWeSub"></div>
         </div>
       </div>
 
-      <div class="rec-row2">
+      <div class="rec-footer">
         <div>
-          <div class="rec-trust-label">예측 신뢰도</div>
-          <div class="rec-trust-val">87%</div>
+          <div class="rec-trust-lbl">예측 신뢰도</div>
+          <div class="rec-trust-num">87%</div>
         </div>
         <button class="copy-btn" id="copyBtn" onclick="copyOrder()">📋 발주정보 복사</button>
       </div>
     </div>
 
-    <!-- Hot Search -->
-    <div class="hot-search-card">
-      <div class="hot-search-header">
-        <div class="hot-search-title">
-          <div class="hot-live-dot"></div>
-          교보문고 <span id="hotSearchCategory" style="color:var(--kyobo-red);">분야</span> 실시간 인기검색어
-        </div>
-        <span class="hot-search-time" id="hotSearchTime"></span>
-      </div>
-      <div id="hotSearchList"></div>
-    </div>
-    </div><!-- /left col -->
-
-    <!-- Trust + Series -->
-    <div style="display:flex;flex-direction:column;gap:12px;">
+    <!-- 오른쪽: 신뢰도 + 시리즈 -->
+    <div class="detail-col">
       <div class="detail-card">
-        <div class="detail-label">AI 예측 신뢰도</div>
-        <div class="trust-row"><div class="trust-name">시리즈</div><div class="trust-bg"><div class="trust-fill r" id="tr1"></div></div><div class="trust-pct" style="color:var(--kyobo-red)">95%</div></div>
-        <div class="trust-row"><div class="trust-name">카테고리</div><div class="trust-bg"><div class="trust-fill a" id="tr2"></div></div><div class="trust-pct" style="color:#D97706">75%</div></div>
-        <div class="trust-row"><div class="trust-name">시장동향</div><div class="trust-bg"><div class="trust-fill r" id="tr3"></div></div><div class="trust-pct" style="color:var(--kyobo-red)">88%</div></div>
+        <div class="section-label">AI 예측 신뢰도</div>
+        <div class="trust-row"><div class="trust-name">시리즈</div><div class="trust-bg"><div class="trust-fill" id="tr1"></div></div><div class="trust-pct">95%</div></div>
+        <div class="trust-row"><div class="trust-name">카테고리</div><div class="trust-bg"><div class="trust-fill amber" id="tr2"></div></div><div class="trust-pct">75%</div></div>
+        <div class="trust-row"><div class="trust-name">시장동향</div><div class="trust-bg"><div class="trust-fill" id="tr3"></div></div><div class="trust-pct">88%</div></div>
       </div>
       <div class="detail-card" style="flex:1;">
-        <div class="detail-label">시리즈 판매 추이</div>
-        <div id="seriesChartContainer"></div>
+        <div class="section-label">시리즈 판매 추이</div>
+        <div id="seriesChart"></div>
       </div>
     </div>
 
   </div>
 
-  <!-- AI Steps -->
-  <div class="ai-card hidden" id="aiCard">
-    <div class="detail-label">AI 분석 근거</div>
-    <div id="aiSteps"></div>
-    <div class="ai-summary-box" id="aiSummary"></div>
+  <!-- 인기검색어 -->
+  <div class="hot-card hidden" id="hotCard">
+    <div class="hot-header">
+      <div class="hot-title">
+        <div class="hot-dot"></div>
+        교보문고 <span id="hotCategory" style="color:var(--red);margin:0 2px;"></span> 실시간 인기검색어
+      </div>
+      <span class="hot-time" id="hotTime"></span>
+    </div>
+    <div id="hotList"></div>
   </div>
 
-</div><!-- /page -->
+  <!-- AI 분석 근거 -->
+  <div class="ai-card hidden" id="aiCard">
+    <div class="section-label">AI 분석 근거</div>
+    <div id="aiSteps"></div>
+    <div class="ai-summary" id="aiSummary"></div>
+  </div>
+
+</div>
 
 <script>
+// ── 데이터 (sales2w = 2주 판매량) ──
 const BOOKS = {
   '9791173326516': {
     title: '흔한남매 세계사 탐험대 6 - 이슬람 세계',
     author: '진서 / 흔한남매 원작 / 팀키즈 그림',
-    publisher: '주니어김영사',
-    category: '아동 학습만화',
+    publisher: '주니어김영사', category: '아동 학습만화',
     stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
     grade: 'intensive',
-    prev1m: {
+    prev2w: {
       prevTitle: '흔한남매 세계사 탐험대 5',
       pubDate: '2025.11.28',
-      sales1m: 3847, salesTotal: 5241,
-      comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
+      sales2w: 2810, salesTotal: 5241,
+      comment: '출간 2주 만에 누적의 54%가 집중 판매 → 초도 발주량 결정의 핵심 기준'
     },
     authorRep: {
       repTitle: '흔한남매 20권 (대표 베스트)',
       pubDate: '2024.03.15',
-      sales1m: 4320, salesTotal: 12850, ratio: 34,
-      comment: '시리즈 전체 20권 중 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
+      sales2w: 3100, salesTotal: 12850, ratio: 24,
+      comment: '시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
     },
     series: [
       {label:'1권',val:4102},{label:'2권',val:4530},{label:'3권',val:4780},
@@ -459,20 +411,19 @@ const BOOKS = {
   '9791172461942': {
     title: '흔한남매 세계사 탐험대 6',
     author: '흔한남매 원작 / 신명환 그림',
-    publisher: '미래엔',
-    category: '아동 학습만화',
+    publisher: '미래엔', category: '아동 학습만화',
     stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
     grade: 'intensive',
-    prev1m: {
+    prev2w: {
       prevTitle: '흔한남매 세계사 탐험대 5',
       pubDate: '2025.11.28',
-      sales1m: 3847, salesTotal: 5241,
-      comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
+      sales2w: 2810, salesTotal: 5241,
+      comment: '출간 2주 만에 누적의 54%가 집중 판매 → 초도 발주량 결정의 핵심 기준'
     },
     authorRep: {
       repTitle: '흔한남매 20권 (대표 베스트)',
       pubDate: '2024.03.15',
-      sales1m: 4320, salesTotal: 12850, ratio: 34,
+      sales2w: 3100, salesTotal: 12850, ratio: 24,
       comment: '시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
     },
     series: [
@@ -482,22 +433,20 @@ const BOOKS = {
   },
   '9791172461234': {
     title: '마법사 연대기 5권',
-    author: '박민준',
-    publisher: '황금가지',
-    category: '판타지',
+    author: '박민준', publisher: '황금가지', category: '판타지',
     stock: 150, incoming: 50, forecast: 3200, recommend: 3000,
     grade: 'expand',
-    prev1m: {
+    prev2w: {
       prevTitle: '마법사 연대기 4',
       pubDate: '2025.08.15',
-      sales1m: 1820, salesTotal: 3050,
-      comment: '출간 첫 달 60% 집중 판매 → 확대 발주 후 추가 대응 권장'
+      sales2w: 1310, salesTotal: 3050,
+      comment: '출간 2주 43% 집중 판매 → 확대 발주 후 추가 대응 권장'
     },
     authorRep: {
       repTitle: '마법사 연대기 1권 (시리즈 최고)',
       pubDate: '2022.05.10',
-      sales1m: 2100, salesTotal: 9200, ratio: 23,
-      comment: '데뷔작 최고 판매 기록. 시리즈 충성 독자층 형성으로 신권 수요 안정'
+      sales2w: 1500, salesTotal: 9200, ratio: 16,
+      comment: '데뷔작 최고 판매. 시리즈 충성 독자층 형성으로 신권 수요 안정'
     },
     series: [
       {label:'1권',val:2100},{label:'2권',val:2450},{label:'3권',val:2780},
@@ -506,21 +455,19 @@ const BOOKS = {
   },
   '9791172469876': {
     title: '첫 번째 빛',
-    author: '이새봄',
-    publisher: '문학동네',
-    category: '한국소설',
+    author: '이새봄', publisher: '문학동네', category: '한국소설',
     stock: 80, incoming: 30, forecast: 1200, recommend: 1100,
     grade: 'normal',
-    prev1m: {
+    prev2w: {
       prevTitle: '두 번째 계절',
       pubDate: '2025.03.10',
-      sales1m: 520, salesTotal: 1050,
-      comment: '1개월 판매 비율 50% · 중장기 판매 비중이 높아 안정 발주 권장'
+      sales2w: 380, salesTotal: 1050,
+      comment: '2주 판매 36% · 중장기 비중 높아 안정 발주 권장'
     },
     authorRep: {
       repTitle: '두 번째 계절 (전작)',
       pubDate: '2025.03.10',
-      sales1m: 520, salesTotal: 1050, ratio: 50,
+      sales2w: 380, salesTotal: 1050, ratio: 36,
       comment: '중장기 판매 패턴. 초도 소량 → 반응 보고 추가 발주 전략 유효'
     },
     series: [
@@ -529,145 +476,79 @@ const BOOKS = {
   }
 };
 
-const GRADE_MAP = {
+const GRADE = {
   intensive: { label:'🔴 집중 발주', cls:'g-intensive' },
   expand:    { label:'🟡 확대 발주', cls:'g-expand' },
   normal:    { label:'🟢 일반 발주', cls:'g-normal' },
 };
 
-let currentIsbn = null;
+// 주말 비율 (내부 시스템 연동 시 salesByDate 실데이터로 교체)
+const WEEKEND_RATIO = { '아동 학습만화':0.45, '판타지':0.40, '한국소설':0.35, default:0.38 };
+const LEAD_TIME = 2;
 
-// 분야별 주말 판매 비율 (추정 - 내부 시스템 연동 시 실데이터로 교체)
-const WEEKEND_RATIO = {
-  '아동 학습만화': 0.45,  // 주말 45% / 주중 55%
-  '판타지':        0.40,
-  '한국소설':      0.35,
-  'default':       0.38,
-};
-const LEAD_TIME = 2; // 리드타임 2일 (발주 후 입고까지)
-
-function calcSafetyStock(sales1m, category) {
-  const weekendRatio = WEEKEND_RATIO[category] || WEEKEND_RATIO['default'];
-  const weekdayRatio = 1 - weekendRatio;
-  const WEEKDAYS = 22; // 30일 중 평일
-  const WEEKENDS = 8;  // 30일 중 주말
-
-  const weekdayDaily  = Math.round((sales1m * weekdayRatio) / WEEKDAYS);
-  const weekendDaily  = Math.round((sales1m * weekendRatio) / WEEKENDS);
-  const safetyWeekday = weekdayDaily * LEAD_TIME;
-  const safetyWeekend = weekendDaily * LEAD_TIME;
-
-  return { weekdayDaily, weekendDaily, safetyWeekday, safetyWeekend };
-}
-
-// 분야별 실시간 인기검색어 (교보문고 분야 데이터 기반 더미)
 const HOT_KEYWORDS = {
   '아동 학습만화': [
-    { kw:'흔한남매',     change:'up',   delta:'+2' },
-    { kw:'마법천자문',   change:'same', delta:'—'  },
-    { kw:'설민석 세계사',change:'new',  delta:'NEW'},
-    { kw:'who 시리즈',   change:'down', delta:'-1' },
-    { kw:'살아남기',     change:'up',   delta:'+3' },
+    {kw:'흔한남매',      chg:'up',  d:'+2'},{kw:'마법천자문',    chg:'same',d:'—'},
+    {kw:'설민석 세계사', chg:'new', d:'NEW'},{kw:'who 시리즈',   chg:'down',d:'1'},
+    {kw:'살아남기',      chg:'up',  d:'+3'},
   ],
   '판타지': [
-    { kw:'전지적 독자시점', change:'up',   delta:'+1' },
-    { kw:'나 혼자만 레벨업', change:'same', delta:'—'  },
-    { kw:'달빛조각사',    change:'new',  delta:'NEW'},
-    { kw:'마법사 연대기', change:'up',   delta:'+2' },
-    { kw:'오버로드',      change:'down', delta:'-2' },
+    {kw:'전지적 독자시점',chg:'up',  d:'+1'},{kw:'나 혼자만 레벨업',chg:'same',d:'—'},
+    {kw:'달빛조각사',    chg:'new', d:'NEW'},{kw:'마법사 연대기', chg:'up',  d:'+2'},
+    {kw:'오버로드',      chg:'down',d:'2'},
   ],
   '한국소설': [
-    { kw:'채식주의자',   change:'up',   delta:'+1' },
-    { kw:'파친코',       change:'same', delta:'—'  },
-    { kw:'82년생 김지영',change:'down', delta:'-1' },
-    { kw:'아몬드',       change:'new',  delta:'NEW'},
-    { kw:'달러구트',     change:'up',   delta:'+2' },
+    {kw:'채식주의자',    chg:'up',  d:'+1'},{kw:'파친코',        chg:'same',d:'—'},
+    {kw:'82년생 김지영', chg:'down',d:'1'}, {kw:'아몬드',        chg:'new', d:'NEW'},
+    {kw:'달러구트',      chg:'up',  d:'+2'},
   ],
-  'default': [
-    { kw:'베스트셀러',   change:'up',   delta:'+1' },
-    { kw:'신간도서',     change:'same', delta:'—'  },
-    { kw:'스테디셀러',   change:'up',   delta:'+2' },
-    { kw:'추천도서',     change:'new',  delta:'NEW'},
-    { kw:'화제의 책',    change:'down', delta:'-1' },
+  default: [
+    {kw:'베스트셀러',    chg:'up',  d:'+1'},{kw:'신간도서',      chg:'same',d:'—'},
+    {kw:'스테디셀러',    chg:'up',  d:'+2'},{kw:'추천도서',      chg:'new', d:'NEW'},
+    {kw:'화제의 책',     chg:'down',d:'1'},
   ],
 };
 
-function renderHotSearch(category) {
-  const list = HOT_KEYWORDS[category] || HOT_KEYWORDS['default'];
-  const rankCls = ['r1','r2','r3','r4','r5'];
-  const rankIcon = ['🥇','🥈','🥉','4','5'];
+let currentIsbn = null;
 
-  document.getElementById('hotSearchCategory').textContent = category;
+const show = id => document.getElementById(id).classList.remove('hidden');
 
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('hotSearchTime').textContent = `${hh}:${mm} 기준`;
-
-  document.getElementById('hotSearchList').innerHTML = list.map((item, i) => {
-    let changeHtml = '';
-    if (item.change === 'new')  changeHtml = `<span class="hot-change new">NEW</span>`;
-    else if (item.change === 'up')   changeHtml = `<span class="hot-change up">▲ ${item.delta}</span>`;
-    else if (item.change === 'down') changeHtml = `<span class="hot-change down">▼ ${item.delta.replace('-','')}</span>`;
-    else changeHtml = `<span class="hot-change same">—</span>`;
-
-    return `<div class="hot-item">
-      <div class="hot-rank ${rankCls[i]}">${i < 3 ? rankIcon[i] : i+1}</div>
-      <div class="hot-keyword">${item.kw}</div>
-      ${changeHtml}
-    </div>`;
-  }).join('');
-}
-
-function show(id)  { document.getElementById(id).classList.remove('hidden'); }
-function hide(id)  { document.getElementById(id).classList.add('hidden'); }
-
-function quickTest(isbn) {
-  document.getElementById('isbnInput').value = isbn;
-  startAnalysis();
-}
+function quickTest(isbn) { document.getElementById('isbnInput').value = isbn; startAnalysis(); }
 
 function startAnalysis() {
   const isbn = document.getElementById('isbnInput').value.trim().replace(/-/g,'');
-  if (!BOOKS[isbn]) {
-    alert('등록된 ISBN이 아닙니다.\n\n등록된 ISBN:\n' + Object.keys(BOOKS).join('\n'));
-    return;
-  }
+  if (!BOOKS[isbn]) { alert('등록된 ISBN이 아닙니다.\n\n' + Object.keys(BOOKS).join('\n')); return; }
   currentIsbn = isbn;
   const book = BOOKS[isbn];
-  const g    = GRADE_MAP[book.grade];
-  const p    = book.prev1m;
+  const g    = GRADE[book.grade];
+  const p    = book.prev2w;
   const ar   = book.authorRep;
-  const ratio = Math.round((p.sales1m / p.salesTotal) * 100);
+  const ratio2w = Math.round((p.sales2w / p.salesTotal) * 100);
 
-  // Book info
+  // 도서 정보
   show('bookInfoCard');
   document.getElementById('bookCover').style.display = 'none';
   document.getElementById('bookCoverPlaceholder').style.display = 'flex';
-  document.getElementById('bookMetaGrid').innerHTML = `
-    <span class="book-meta-label">도서명</span>
-    <span class="book-meta-value" style="font-size:14px;">${book.title}</span>
-    <span class="book-meta-label">저자</span>
-    <span class="book-meta-value">${book.author}</span>
-    <span class="book-meta-label">출판사</span>
-    <span class="book-meta-value">${book.publisher}</span>
-    <span class="book-meta-label">분야</span>
-    <span class="book-meta-value">${book.category}</span>`;
+  document.getElementById('bookFields').innerHTML = `
+    <div><div class="book-field-label">도서명</div><div class="book-field-value" style="font-size:14px;">${book.title}</div></div>
+    <div><div class="book-field-label">저자</div><div class="book-field-value">${book.author}</div></div>
+    <div><div class="book-field-label">출판사</div><div class="book-field-value">${book.publisher}</div></div>
+    <div><div class="book-field-label">분야</div><div class="book-field-value">${book.category}</div></div>
+    <div><div class="book-field-label">등급</div><div class="book-field-value"><span class="grade-chip ${g.cls}">${g.label}</span></div></div>`;
 
-  // Hero
+  // 히어로
   show('heroRow');
-  document.getElementById('heroPrev1m').innerHTML   = `${p.sales1m.toLocaleString()}<span class="hero-value-unit">권 / 30일</span>`;
-  document.getElementById('heroPrevTotal').textContent = p.salesTotal.toLocaleString();
-  document.getElementById('heroPrevRatio').textContent = ratio;
-  document.getElementById('heroPrevTitle').textContent = p.prevTitle;
-  document.getElementById('heroPrevDate').textContent  = `출간일 ${p.pubDate}`;
+  document.getElementById('heroPrev2w').innerHTML = `${p.sales2w.toLocaleString()}<span class="hero-num-unit">권 / 14일</span>`;
+  document.getElementById('heroPrevTotal').textContent  = p.salesTotal.toLocaleString();
+  document.getElementById('heroPrevRatio').textContent  = ratio2w;
+  document.getElementById('heroPrevTitle').textContent  = `『${p.prevTitle}』 출간 ${p.pubDate}`;
   document.getElementById('heroPrevComment').textContent = p.comment;
 
-  document.getElementById('heroRepTotal').innerHTML  = `${ar.salesTotal.toLocaleString()}<span class="hero-value-unit">권 누적</span>`;
-  document.getElementById('heroRep1m').textContent   = ar.sales1m.toLocaleString();
-  document.getElementById('heroRepRatio').textContent = ar.ratio;
-  document.getElementById('heroRepTitle').textContent = ar.repTitle;
-  document.getElementById('heroRepDate').textContent  = `출간 ${ar.pubDate}`;
+  const ar2wRatio = Math.round((ar.sales2w / ar.salesTotal) * 100);
+  document.getElementById('heroRepTotal').innerHTML = `${ar.salesTotal.toLocaleString()}<span class="hero-num-unit">권 누적</span>`;
+  document.getElementById('heroRep2w').textContent     = ar.sales2w.toLocaleString();
+  document.getElementById('heroRepRatio').textContent  = ar.ratio;
+  document.getElementById('heroRepTitle').textContent  = `『${ar.repTitle}』 출간 ${ar.pubDate}`;
   document.getElementById('heroRepComment').textContent = ar.comment;
 
   // KPI
@@ -676,17 +557,26 @@ function startAnalysis() {
   document.getElementById('kpiIncoming').textContent = book.incoming.toLocaleString();
   document.getElementById('kpiForecast').textContent = book.forecast.toLocaleString();
   document.getElementById('kpiRecommend').textContent= book.recommend.toLocaleString();
-  document.getElementById('kpiStockTag').textContent = book.stock >= 200 ? '▲ 안전 재고 이상' : book.stock >= 100 ? '보통' : '⚠ 재고 부족';
-  document.getElementById('kpiIncomingTag').textContent = `D+3 예정`;
-  document.getElementById('kpiForecastTag').textContent = '전작 대비 +10%';
-  document.getElementById('kpiRecommendTag').textContent = g.label.replace(/[🔴🟡🟢]\s?/,'');
+  document.getElementById('kpiStockSub').textContent    = book.stock >= 200 ? '▲ 안전 재고 이상' : book.stock >= 100 ? '보통' : '⚠ 재고 부족';
+  document.getElementById('kpiIncomingSub').textContent = 'D+3 예정';
+  document.getElementById('kpiForecastSub').textContent = '전작 대비 +10%';
+  document.getElementById('kpiRecommendSub').textContent= g.label.replace(/[🔴🟡🟢]\s?/,'');
 
-  // Recommend
-  show('bottomRow');
-  document.getElementById('recValue').innerHTML = `${book.recommend.toLocaleString()}<span class="rec-unit">권</span>`;
+  // 권장발주
+  show('bottomGrid');
+  document.getElementById('recNum').innerHTML = `${book.recommend.toLocaleString()}<span class="rec-unit">권</span>`;
   document.getElementById('recFormula').textContent = `예측 ${book.forecast.toLocaleString()} - 재고 ${book.stock} - 입고 ${book.incoming} + 안전재고`;
 
-  // Trust bars
+  // 안전재고 계산
+  const wRatio = WEEKEND_RATIO[book.category] || WEEKEND_RATIO.default;
+  const wdDaily = Math.round((p.sales2w * (1 - wRatio)) / 10); // 2주(14일) 중 평일 10일
+  const weDaily = Math.round((p.sales2w * wRatio) / 4);        // 2주 중 주말 4일
+  document.getElementById('safetyWd').textContent  = (wdDaily * LEAD_TIME).toLocaleString();
+  document.getElementById('safetyWe').textContent  = (weDaily * LEAD_TIME).toLocaleString();
+  document.getElementById('safetyWdSub').textContent = `일평균 ${wdDaily}권 × 리드타임 ${LEAD_TIME}일`;
+  document.getElementById('safetyWeSub').textContent = `일평균 ${weDaily}권 × 리드타임 ${LEAD_TIME}일`;
+
+  // 신뢰도 바
   ['tr1','tr2','tr3'].forEach(id => document.getElementById(id).style.width='0%');
   setTimeout(() => {
     document.getElementById('tr1').style.width='95%';
@@ -694,58 +584,63 @@ function startAnalysis() {
     document.getElementById('tr3').style.width='88%';
   }, 100);
 
-  // Series chart
-  const maxVal = Math.max(...book.series.map(s=>s.val));
-  document.getElementById('seriesChartContainer').innerHTML = book.series.map(s => {
-    const pct = Math.round((s.val/maxVal)*100);
+  // 시리즈 차트
+  const maxV = Math.max(...book.series.map(s=>s.val));
+  document.getElementById('seriesChart').innerHTML = book.series.map(s => {
+    const pct = Math.round((s.val/maxV)*100);
     return `<div class="series-row">
       <div class="series-name">${s.label}</div>
-      <div class="series-bg">
-        <div class="series-fill ${s.forecast?'fct':'act'}" data-pct="${pct}">
-          <span class="series-val">${s.val.toLocaleString()}</span>
-        </div>
-      </div>
+      <div class="series-bg"><div class="series-fill ${s.forecast?'fct':'act'}" data-pct="${pct}">
+        <span class="series-val">${s.val.toLocaleString()}</span>
+      </div></div>
     </div>`;
   }).join('');
   setTimeout(() => {
     document.querySelectorAll('.series-fill').forEach(el => { el.style.width = el.dataset.pct + '%'; });
   }, 100);
 
-  // AI Steps
+  // 인기검색어
+  show('hotCard');
+  const kwList = HOT_KEYWORDS[book.category] || HOT_KEYWORDS.default;
+  const rankCls = ['n1','n2','n3','n4','n5'];
+  const now = new Date();
+  document.getElementById('hotCategory').textContent = book.category;
+  document.getElementById('hotTime').textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
+  document.getElementById('hotList').innerHTML = kwList.map((item,i) => {
+    const chgHtml = item.chg==='new' ? `<span class="hot-chg new">NEW</span>`
+                  : item.chg==='up'  ? `<span class="hot-chg up">▲ ${item.d}</span>`
+                  : item.chg==='down'? `<span class="hot-chg down">▼ ${item.d}</span>`
+                  :                    `<span class="hot-chg same">—</span>`;
+    return `<div class="hot-item">
+      <div class="hot-rank ${rankCls[i]}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+      <div class="hot-kw">${item.kw}</div>${chgHtml}
+    </div>`;
+  }).join('');
+
+  // AI 분석
   show('aiCard');
   const prevBooks = book.series.filter(s=>!s.forecast);
   const avg = Math.round(prevBooks.reduce((a,b)=>a+b.val,0)/prevBooks.length);
   const steps = [
     {color:'#1E40AF',bg:'#DBEAFE',tag:'저자조회',   text:`대표작 포함 시리즈 ${prevBooks.length}권. 평균 ${avg.toLocaleString()}권 · 직전권 누적 ${p.salesTotal.toLocaleString()}권`},
-    {color:'#7C3AED',bg:'#EDE9FE',tag:'직전권조회', text:`출간 후 30일 판매 ${p.sales1m.toLocaleString()}권 (누적 대비 ${ratio}% 집중) — ${p.comment}`},
+    {color:'#7C3AED',bg:'#EDE9FE',tag:'직전권조회', text:`출간 후 2주 판매 ${p.sales2w.toLocaleString()}권 (누적 대비 ${ratio2w}% 집중) — ${p.comment}`},
     {color:'#16A34A',bg:'#DCFCE7',tag:'분야분석',   text:`'${book.category}' YoY +15.3% · 분야 배율 1.1 적용`},
-    {color:'#D97706',bg:'#FEF3C7',tag:'판매예측',   text:`직전 30일 ${p.sales1m.toLocaleString()}권 × 추세 × 분야배율 = 예측 ${book.forecast.toLocaleString()}권`},
+    {color:'#D97706',bg:'#FEF3C7',tag:'판매예측',   text:`직전 2주 ${p.sales2w.toLocaleString()}권 × 추세 × 분야배율 = 예측 ${book.forecast.toLocaleString()}권`},
     {color:'#E60012',bg:'#FEE2E2',tag:'발주추천',   text:`${g.label} · 예측 ${book.forecast.toLocaleString()} - 재고 ${book.stock} - 입고 ${book.incoming} + 안전재고 = 권장 ${book.recommend.toLocaleString()}권`},
   ];
-  document.getElementById('aiSteps').innerHTML = steps.map((s,i)=>`
+  document.getElementById('aiSteps').innerHTML = steps.map((s,i) => `
     <div class="step-item">
       <div class="step-num" style="background:${s.bg};color:${s.color};">${i+1}</div>
       <div class="step-text"><span class="step-tag">[${s.tag}]</span> ${s.text}</div>
     </div>`).join('');
 
-  const summaryMap = {
-    intensive:`『${book.title}』시리즈는 출간마다 안정적 성장세를 기록합니다. 직전권 30일 <strong>${p.sales1m.toLocaleString()}권</strong>의 강한 초기 수요와 ${book.category} 분야 YoY 성장을 감안할 때, 권장 발주량 <strong>${book.recommend.toLocaleString()}권</strong> 확보가 필수입니다.`,
-    expand:   `『${book.title}』은 안정적 판매 흐름을 보이며 전작 대비 성장이 예상됩니다. 수요 증가 추세를 반영해 <strong>${book.recommend.toLocaleString()}권</strong> 확대 발주를 권장합니다.`,
+  const summary = {
+    intensive:`『${book.title}』시리즈는 출간마다 안정적 성장세를 기록합니다. 직전권 2주 <strong>${p.sales2w.toLocaleString()}권</strong>의 강한 초기 수요를 감안할 때, 권장 발주량 <strong>${book.recommend.toLocaleString()}권</strong> 확보가 필수입니다.`,
+    expand:   `『${book.title}』은 전작 대비 성장이 예상됩니다. 직전권 2주 판매 <strong>${p.sales2w.toLocaleString()}권</strong> 기준, <strong>${book.recommend.toLocaleString()}권</strong> 확대 발주를 권장합니다.`,
     normal:   `『${book.title}』은 중장기 판매 패턴을 보입니다. 초도 <strong>${book.recommend.toLocaleString()}권</strong> 안정 발주 후 반응을 보고 추가 대응을 권장합니다.`,
   };
-  document.getElementById('aiSummary').innerHTML = summaryMap[book.grade];
+  document.getElementById('aiSummary').innerHTML = summary[book.grade];
 
-  // 주중/주말 안전재고
-  const safety = calcSafetyStock(p.sales1m, book.category);
-  document.getElementById('safetyWeekday').textContent    = safety.safetyWeekday.toLocaleString();
-  document.getElementById('safetyWeekend').textContent    = safety.safetyWeekend.toLocaleString();
-  document.getElementById('safetyWeekdaySub').textContent = `일평균 ${safety.weekdayDaily}권 × 리드타임 ${LEAD_TIME}일`;
-  document.getElementById('safetyWeekendSub').textContent = `일평균 ${safety.weekendDaily}권 × 리드타임 ${LEAD_TIME}일`;
-
-  // Hot Search
-  renderHotSearch(book.category);
-
-  // Naver
   fetchNaver(isbn);
 }
 
@@ -755,39 +650,28 @@ async function fetchNaver(isbn) {
     if (!res.ok) return;
     const { item, searchCount } = await res.json();
     if (!item) return;
-
-    // Cover
     if (item.image) {
-      const cover = document.getElementById('bookCover');
-      cover.src = item.image; cover.style.display='block';
-      document.getElementById('bookCoverPlaceholder').style.display='none';
+      document.getElementById('bookCover').src = item.image;
+      document.getElementById('bookCover').style.display = 'block';
+      document.getElementById('bookCoverPlaceholder').style.display = 'none';
     }
-
-    // Naver strip
     const card = document.getElementById('naverCard');
     card.style.display = 'block';
-
-    const pd = item.pubdate || '';
+    const pd = item.pubdate||'';
     const pubStr = pd.length===8 ? `${pd.slice(0,4)}.${pd.slice(4,6)}.${pd.slice(6,8)}` : pd;
-    const pubDate = pd.length===8 ? new Date(+pd.slice(0,4), +pd.slice(4,6)-1, +pd.slice(6,8)) : null;
+    const pubDate = pd.length===8 ? new Date(+pd.slice(0,4),+pd.slice(4,6)-1,+pd.slice(6,8)) : null;
     const today = new Date();
-    const isPre    = pubDate && pubDate > today;
+    const isPre = pubDate && pubDate > today;
     const isRecent = pubDate && (today-pubDate) < 30*24*60*60*1000;
-
     const statusEl = document.getElementById('naverStatus');
-    if (isPre)       { statusEl.textContent='🟡 예약판매중'; statusEl.style.cssText='background:#FEF3C7;color:#D97706;'; }
-    else if(isRecent){ statusEl.textContent='🟢 출간 직후';  statusEl.style.cssText='background:#DCFCE7;color:#16A34A;'; }
-    else             { statusEl.textContent='⚪ 출간';       statusEl.style.cssText='background:#F3F4F6;color:#6B7280;'; }
-
-    document.getElementById('naverTitle').textContent       = item.title.replace(/<[^>]+>/g,'');
-    document.getElementById('naverPubdate').textContent     = pubStr;
-    document.getElementById('naverSearchCount').textContent = (searchCount||0).toLocaleString()+'건';
-
+    if (isPre)        { statusEl.textContent='🟡 예약판매중'; statusEl.style.cssText='background:#FEF3C7;color:#D97706;'; }
+    else if(isRecent) { statusEl.textContent='🟢 출간 직후';  statusEl.style.cssText='background:#DCFCE7;color:#16A34A;'; }
+    else              { statusEl.textContent='⚪ 출간';       statusEl.style.cssText='background:#F3F4F6;color:#6B7280;'; }
+    document.getElementById('naverTitle').textContent = item.title.replace(/<[^>]+>/g,'');
+    document.getElementById('naverPubdate').textContent = pubStr;
     const cnt = searchCount||0;
-    const lvl = cnt>5000 ? '관심도 매우 높음 — 초도 발주 확대 권장'
-              : cnt>1000 ? '관심도 높음 — 출간 전 수요 확인됨'
-              : cnt>300  ? '관심도 보통 — 일반 발주 수준'
-              :             '관심도 낮음 — 보수적 발주 권장';
+    document.getElementById('naverSearchCount').textContent = cnt.toLocaleString()+'건';
+    const lvl = cnt>5000?'관심도 매우 높음 — 초도 발주 확대 권장':cnt>1000?'관심도 높음 — 출간 전 수요 확인됨':cnt>300?'관심도 보통 — 일반 발주 수준':'관심도 낮음 — 보수적 발주 권장';
     document.getElementById('naverComment').textContent = `네이버 검색 ${cnt.toLocaleString()}건 · ${lvl}`;
   } catch(e) { console.warn('Naver:', e); }
 }
@@ -795,11 +679,10 @@ async function fetchNaver(isbn) {
 function copyOrder() {
   if (!currentIsbn) return;
   const book = BOOKS[currentIsbn];
-  const g = GRADE_MAP[book.grade];
+  const g = GRADE[book.grade];
   const today = new Date().toLocaleDateString('ko-KR');
   const text = [
-    '[ 교보문고 AI 발주 정보 ]',
-    '─'.repeat(30),
+    '[ 교보문고 AI 발주 정보 ]','─'.repeat(30),
     `발주일: ${today}  담당: 신호주 과장 (아동팀)`,
     `도서명: ${book.title}`,
     `ISBN: ${currentIsbn}  출판사: ${book.publisher}`,
@@ -807,19 +690,18 @@ function copyOrder() {
     `권장 발주량: ${book.recommend.toLocaleString()}권`,
     `판매 예측: ${book.forecast.toLocaleString()}권`,
     `현재 재고: ${book.stock.toLocaleString()}권 / 입고예정: ${book.incoming.toLocaleString()}권`,
-    `직전권 30일: ${book.prev1m.sales1m.toLocaleString()}권 (누적 ${book.prev1m.salesTotal.toLocaleString()}권)`,
-    '─'.repeat(30),
-    '* 교보문고 AI Agent 자동 분석 결과'
+    `직전권 2주 판매: ${book.prev2w.sales2w.toLocaleString()}권 (누적 ${book.prev2w.salesTotal.toLocaleString()}권)`,
+    '─'.repeat(30),'* 교보문고 AI Agent 자동 분석 결과'
   ].join('\n');
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copyBtn');
     btn.textContent = '✓ 복사 완료!';
     setTimeout(() => { btn.textContent = '📋 발주정보 복사'; }, 2000);
-  }).catch(() => prompt('복사하세요 (Ctrl+A → Ctrl+C)', text));
+  }).catch(() => prompt('복사 (Ctrl+A → Ctrl+C)', text));
 }
 
 document.getElementById('searchBtn').addEventListener('click', startAnalysis);
-document.getElementById('isbnInput').addEventListener('keyup', e => { if (e.key==='Enter') startAnalysis(); });
+document.getElementById('isbnInput').addEventListener('keyup', e => { if(e.key==='Enter') startAnalysis(); });
 </script>
 </body>
 </html>
