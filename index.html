@@ -277,6 +277,36 @@
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+    .rank-tab { background: #f3f4f6; color: #6b7280; }
+    .rank-tab:hover { background: #e5e7eb; }
+    .rank-tab.active-tab { background: #1e293b; color: white; }
+
+    .rank-row {
+      display: flex; align-items: center; gap-8px;
+      padding: 6px 8px; border-radius: 8px;
+      transition: background 0.15s;
+      gap: 8px;
+    }
+    .rank-row:hover { background: #f9fafb; }
+
+    .rank-num {
+      width: 22px; height: 22px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+    .rank-num.top1 { background: #E8003D; color: white; }
+    .rank-num.top2 { background: #1d4ed8; color: white; }
+    .rank-num.top3 { background: #b45309; color: white; }
+    .rank-num.normal { background: #f3f4f6; color: #6b7280; }
+
+    .rank-change { font-size: 10px; font-weight: 600; flex-shrink: 0; width: 28px; text-align: right; }
+    .rank-change.up { color: #dc2626; }
+    .rank-change.down { color: #2563EB; }
+    .rank-change.same { color: #9ca3af; }
+    .rank-change.new { color: #16a34a; }
+
+    .rank-highlight { background: #fff7ed !important; border: 1px solid #fed7aa; }
+
     .tag {
       display: inline-block;
       padding: 3px 8px;
@@ -510,8 +540,11 @@
     </div>
   </div>
 
-  <!-- 시리즈 판매 비교 차트 -->
-  <div id="chartSection" class="result-section section-card mb-6">
+  <!-- 시리즈 차트 + 실시간 순위 -->
+  <div id="chartSection" class="result-section mb-6">
+  <div class="grid md:grid-cols-5 gap-4">
+  <!-- 시리즈 판매 비교 (좌, 3칸) -->
+  <div class="md:col-span-3 section-card">
     <div class="section-title">
       <span class="dot"></span>
       시리즈 판매 비교
@@ -575,6 +608,30 @@
     </div>
     <p class="text-xs text-gray-400 mt-4 text-right">* 시리즈 권당 평균 성장률 +9.7% 반영</p>
   </div>
+
+  <!-- 인터넷서점 실시간 순위 (우, 2칸) -->
+  <div class="md:col-span-2 section-card flex flex-col">
+    <div class="section-title mb-3">
+      <span class="dot"></span>
+      분야 실시간 검색순위
+      <span id="rankTimestamp" class="ml-auto text-xs text-gray-400 font-normal"></span>
+    </div>
+    <!-- 서점 탭 -->
+    <div class="flex gap-1 mb-3">
+      <button onclick="switchRank('kyobo')" id="tab-kyobo"
+        class="rank-tab active-tab text-xs px-3 py-1.5 rounded-lg font-semibold transition-all">교보문고</button>
+      <button onclick="switchRank('yes24')" id="tab-yes24"
+        class="rank-tab text-xs px-3 py-1.5 rounded-lg font-semibold transition-all">예스24</button>
+      <button onclick="switchRank('aladin')" id="tab-aladin"
+        class="rank-tab text-xs px-3 py-1.5 rounded-lg font-semibold transition-all">알라딘</button>
+    </div>
+    <!-- 순위 리스트 -->
+    <div id="rankList" class="flex-1 space-y-1 overflow-hidden"></div>
+    <p class="text-xs text-gray-300 mt-3">* 데모용 시뮬레이션 데이터</p>
+  </div>
+
+  </div><!-- /grid -->
+  </div><!-- /chartSection -->
 
   <!-- AI 분석 통합 카드 -->
   <div id="aiSection" class="result-section mb-6">
@@ -843,6 +900,9 @@
     // AI 의견
     updateAIOpinion(book);
 
+    // 실시간 순위
+    updateRankSection(book);
+
     // Step 순차 표시
     animateSteps(book);
 
@@ -1076,6 +1136,186 @@
     closeOrderForm();
     alert(`발주서가 생성되었습니다!\n📦 ${bookName} · ${parseInt(qty).toLocaleString()}권`);
   }
+
+  // ── 실시간 순위 ──────────────────────────────────
+  const RANK_DATA = {
+    '아동 학습만화': {
+      kyobo: [
+        { title: '흔한남매 세계사 탐험대 6', author: '진서', change: 'new',  highlight: true },
+        { title: '마법천자문 54권',           author: '박시백', change: 'up2' },
+        { title: '살아남기 시리즈 45',        author: '곰돌이 co.', change: 'same' },
+        { title: '흔한남매 세계사 탐험대 5',  author: '진서', change: 'down1' },
+        { title: '그리스 로마 신화 60',       author: '박시백', change: 'up3' },
+        { title: '놓지마 과학 32',            author: '신태훈', change: 'down2' },
+        { title: '어메이징 사이언스 16',      author: '이현세', change: 'up1' },
+        { title: '역사 탐정단 12',            author: '김진', change: 'same' },
+        { title: '수학도둑 77',               author: '송도수', change: 'down1' },
+        { title: '과학탐험대 지구 8',         author: '강은진', change: 'up2' },
+      ],
+      yes24: [
+        { title: '흔한남매 세계사 탐험대 6', author: '진서', change: 'new',  highlight: true },
+        { title: '살아남기 시리즈 45',        author: '곰돌이 co.', change: 'up1' },
+        { title: '마법천자문 54권',           author: '박시백', change: 'down1' },
+        { title: '그리스 로마 신화 60',       author: '박시백', change: 'up2' },
+        { title: '흔한남매 세계사 탐험대 5',  author: '진서', change: 'same' },
+        { title: '수학도둑 77',               author: '송도수', change: 'up4' },
+        { title: '놓지마 과학 32',            author: '신태훈', change: 'down3' },
+        { title: '역사 탐정단 12',            author: '김진', change: 'up1' },
+        { title: '어메이징 사이언스 16',      author: '이현세', change: 'same' },
+        { title: '미래 탐험대 3',             author: '홍길동', change: 'new' },
+      ],
+      aladin: [
+        { title: '흔한남매 세계사 탐험대 6', author: '진서', change: 'new',  highlight: true },
+        { title: '그리스 로마 신화 60',       author: '박시백', change: 'up1' },
+        { title: '살아남기 시리즈 45',        author: '곰돌이 co.', change: 'up2' },
+        { title: '마법천자문 54권',           author: '박시백', change: 'down2' },
+        { title: '수학도둑 77',               author: '송도수', change: 'up3' },
+        { title: '흔한남매 세계사 탐험대 5',  author: '진서', change: 'down1' },
+        { title: '어메이징 사이언스 16',      author: '이현세', change: 'up2' },
+        { title: '놓지마 과학 32',            author: '신태훈', change: 'same' },
+        { title: '역사 탐정단 12',            author: '김진', change: 'down2' },
+        { title: '코딩탐험대 5',              author: '이정은', change: 'new' },
+      ],
+    },
+    '판타지': {
+      kyobo: [
+        { title: '마법사 연대기 5권', author: '박민준', change: 'new', highlight: true },
+        { title: '드래곤 라자 리마스터', author: '이영도', change: 'up1' },
+        { title: '달빛조각사 58권', author: '남희성', change: 'same' },
+        { title: '전지적 독자 시점 7', author: '싱숑', change: 'down1' },
+        { title: '나 혼자만 레벨업 11', author: '추공', change: 'up2' },
+        { title: '천마신군 귀환 4', author: '미천', change: 'up3' },
+        { title: '검술명가 막내아들 9', author: '검술', change: 'down2' },
+        { title: '회귀자의 마법은 특별해 6', author: '유소야', change: 'same' },
+        { title: '아카데미의 천재 마법사 5', author: '저자', change: 'up1' },
+        { title: '빙의 황녀 3', author: '하리', change: 'new' },
+      ],
+      yes24: [
+        { title: '마법사 연대기 5권', author: '박민준', change: 'new', highlight: true },
+        { title: '전지적 독자 시점 7', author: '싱숑', change: 'up2' },
+        { title: '드래곤 라자 리마스터', author: '이영도', change: 'down1' },
+        { title: '나 혼자만 레벨업 11', author: '추공', change: 'up1' },
+        { title: '달빛조각사 58권', author: '남희성', change: 'same' },
+        { title: '천마신군 귀환 4', author: '미천', change: 'up4' },
+        { title: '검술명가 막내아들 9', author: '검술', change: 'down1' },
+        { title: '빙의 황녀 3', author: '하리', change: 'new' },
+        { title: '회귀자의 마법은 특별해 6', author: '유소야', change: 'down2' },
+        { title: '아카데미의 천재 마법사 5', author: '저자', change: 'same' },
+      ],
+      aladin: [
+        { title: '마법사 연대기 5권', author: '박민준', change: 'new', highlight: true },
+        { title: '나 혼자만 레벨업 11', author: '추공', change: 'up3' },
+        { title: '전지적 독자 시점 7', author: '싱숑', change: 'up1' },
+        { title: '달빛조각사 58권', author: '남희성', change: 'down1' },
+        { title: '드래곤 라자 리마스터', author: '이영도', change: 'same' },
+        { title: '아카데미의 천재 마법사 5', author: '저자', change: 'up2' },
+        { title: '천마신군 귀환 4', author: '미천', change: 'down2' },
+        { title: '검술명가 막내아들 9', author: '검술', change: 'up1' },
+        { title: '빙의 황녀 3', author: '하리', change: 'new' },
+        { title: '회귀자의 마법은 특별해 6', author: '유소야', change: 'same' },
+      ],
+    },
+    '한국소설': {
+      kyobo: [
+        { title: '첫 번째 빛', author: '이새봄', change: 'new', highlight: true },
+        { title: '채식주의자', author: '한강', change: 'up2' },
+        { title: '아몬드', author: '손원평', change: 'same' },
+        { title: '82년생 김지영', author: '조남주', change: 'down1' },
+        { title: '달러구트 꿈 백화점 3', author: '이미예', change: 'up1' },
+        { title: '불편한 편의점 2', author: '김호연', change: 'down2' },
+        { title: '시선으로부터', author: '정세랑', change: 'up3' },
+        { title: '나의 아름다운 이웃', author: '최진영', change: 'same' },
+        { title: '파친코', author: '이민진', change: 'up1' },
+        { title: '연남동 빌라 사람들', author: '임경선', change: 'new' },
+      ],
+      yes24: [
+        { title: '첫 번째 빛', author: '이새봄', change: 'new', highlight: true },
+        { title: '아몬드', author: '손원평', change: 'up1' },
+        { title: '채식주의자', author: '한강', change: 'down1' },
+        { title: '달러구트 꿈 백화점 3', author: '이미예', change: 'up2' },
+        { title: '82년생 김지영', author: '조남주', change: 'same' },
+        { title: '파친코', author: '이민진', change: 'up3' },
+        { title: '불편한 편의점 2', author: '김호연', change: 'down3' },
+        { title: '시선으로부터', author: '정세랑', change: 'up1' },
+        { title: '연남동 빌라 사람들', author: '임경선', change: 'new' },
+        { title: '나의 아름다운 이웃', author: '최진영', change: 'same' },
+      ],
+      aladin: [
+        { title: '첫 번째 빛', author: '이새봄', change: 'new', highlight: true },
+        { title: '달러구트 꿈 백화점 3', author: '이미예', change: 'up1' },
+        { title: '채식주의자', author: '한강', change: 'up2' },
+        { title: '아몬드', author: '손원평', change: 'down1' },
+        { title: '파친코', author: '이민진', change: 'up4' },
+        { title: '82년생 김지영', author: '조남주', change: 'same' },
+        { title: '시선으로부터', author: '정세랑', change: 'up2' },
+        { title: '불편한 편의점 2', author: '김호연', change: 'down2' },
+        { title: '나의 아름다운 이웃', author: '최진영', change: 'up1' },
+        { title: '연남동 빌라 사람들', author: '임경선', change: 'new' },
+      ],
+    },
+  };
+
+  let currentStore = 'kyobo';
+  let currentCategory = '';
+
+  function renderRank(store) {
+    currentStore = store;
+    // 탭 스타일
+    ['kyobo','yes24','aladin'].forEach(s => {
+      const el = document.getElementById('tab-' + s);
+      if (el) el.className = 'rank-tab ' + (s === store ? 'active-tab' : '') + ' text-xs px-3 py-1.5 rounded-lg font-semibold transition-all';
+    });
+
+    const data = (RANK_DATA[currentCategory] || {})[store] || [];
+    const list = document.getElementById('rankList');
+    if (!list) return;
+    list.innerHTML = '';
+
+    data.forEach((item, i) => {
+      const rank = i + 1;
+      const numClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : 'normal';
+
+      let changeHtml = '';
+      if (item.change === 'new') {
+        changeHtml = '<span class="rank-change new">NEW</span>';
+      } else if (item.change === 'same') {
+        changeHtml = '<span class="rank-change same">-</span>';
+      } else if (item.change.startsWith('up')) {
+        changeHtml = `<span class="rank-change up">▲${item.change.slice(2)}</span>`;
+      } else if (item.change.startsWith('down')) {
+        changeHtml = `<span class="rank-change down">▽${item.change.slice(4)}</span>`;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'rank-row' + (item.highlight ? ' rank-highlight' : '');
+      row.innerHTML = `
+        <div class="rank-num ${numClass}">${rank}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-gray-800 truncate${item.highlight ? ' text-red-700' : ''}">${item.title}</p>
+          <p class="text-xs text-gray-400">${item.author}</p>
+        </div>
+        ${changeHtml}`;
+      list.appendChild(row);
+    });
+
+    // 타임스탬프
+    const now = new Date();
+    const ts = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
+    const el = document.getElementById('rankTimestamp');
+    if (el) el.textContent = ts;
+  }
+
+  function switchRank(store) { renderRank(store); }
+
+  function updateRankSection(book) {
+    currentCategory = book.category;
+    // 카테고리 데이터 없으면 기본값
+    if (!RANK_DATA[currentCategory]) {
+      currentCategory = Object.keys(RANK_DATA)[0];
+    }
+    renderRank('kyobo');
+  }
+  // ── 순위 끝 ──────────────────────────────────────
 
   function resetAnalysis() {
     document.getElementById('isbnInput').value = '';
