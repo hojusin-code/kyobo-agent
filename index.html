@@ -405,6 +405,52 @@
   <!-- 핵심 벤치마크 배너 -->
   <div id="kpiSection" class="result-section mb-6">
 
+    <!-- 네이버 출간 전 관심도 배너 -->
+    <div id="naverInterest" class="mb-4 rounded-2xl overflow-hidden hidden" style="background:linear-gradient(135deg,#03c75a18,#03c75a08);border:1.5px solid #03c75a44;">
+      <div class="px-5 py-3 flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex items-center gap-3 shrink-0">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:#03c75a22">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="#03c75a" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <p class="text-xs font-bold" style="color:#03c75a">네이버 출간 전 관심도</p>
+            <p class="text-xs text-gray-500 mt-0.5">오프라인 판매 시작 전 온라인 수요 선행 지표</p>
+          </div>
+        </div>
+        <div class="flex-1 flex flex-wrap items-center gap-5 md:justify-end">
+          <div class="text-center">
+            <p class="text-xs text-gray-400 mb-0.5">도서명 확인</p>
+            <p id="naverTitle" class="text-xs font-bold text-gray-800 max-w-xs truncate">—</p>
+          </div>
+          <div class="w-px h-8 bg-gray-200 hidden md:block"></div>
+          <div class="text-center">
+            <p class="text-xs text-gray-400 mb-0.5">출판사</p>
+            <p id="naverPublisher" class="text-xs font-semibold text-gray-700">—</p>
+          </div>
+          <div class="w-px h-8 bg-gray-200 hidden md:block"></div>
+          <div class="text-center">
+            <p class="text-xs text-gray-400 mb-0.5">출간일</p>
+            <p id="naverPubdate" class="text-xs font-semibold text-gray-700">—</p>
+          </div>
+          <div class="w-px h-8 bg-gray-200 hidden md:block"></div>
+          <div class="text-center">
+            <p class="text-xs text-gray-400 mb-0.5">네이버 검색 결과</p>
+            <p id="naverSearchCount" class="text-xl font-black" style="color:#03c75a">—</p>
+          </div>
+          <div class="w-px h-8 bg-gray-200 hidden md:block"></div>
+          <div class="text-center">
+            <p class="text-xs text-gray-400 mb-0.5">출간 상태</p>
+            <p id="naverStatus" class="text-xs font-bold px-2 py-1 rounded-lg">—</p>
+          </div>
+        </div>
+      </div>
+      <div class="px-5 pb-3">
+        <div class="rounded-xl px-4 py-2" style="background:#03c75a11">
+          <p class="text-xs text-gray-500">💡 <span id="naverComment">—</span></p>
+        </div>
+      </div>
+    </div>
+
     <!-- 직전 시리즈 1개월 판매량 강조 배너 -->
     <div class="mb-4 rounded-2xl overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #1e3a5f 100%); border: 1.5px solid #2563EB33;">
       <div class="px-5 py-4 flex flex-col md:flex-row md:items-center gap-4">
@@ -867,6 +913,58 @@
     document.getElementById('isbnInput').value = isbn;
   }
 
+  async function fetchNaverBook(isbn) {
+    try {
+      const res = await fetch(`/api/search?isbn=${isbn}`);
+      if (!res.ok) return;
+      const { item, searchCount } = await res.json();
+      if (!item) return;
+
+      // 출간일 파싱
+      const pd = item.pubdate || '';
+      const pubStr = pd.length === 8
+        ? `${pd.slice(0,4)}.${pd.slice(4,6)}.${pd.slice(6,8)}`
+        : pd;
+
+      // 출간 상태 판별
+      const today = new Date();
+      const pubDate = pd.length === 8
+        ? new Date(+pd.slice(0,4), +pd.slice(4,6)-1, +pd.slice(6,8))
+        : null;
+      const isPre    = pubDate && pubDate > today;
+      const isRecent = pubDate && (today - pubDate) < 30 * 24 * 60 * 60 * 1000;
+
+      const statusEl = document.getElementById('naverStatus');
+      if (isPre) {
+        statusEl.textContent = '🟡 예약판매 중';
+        statusEl.style.cssText = 'background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;';
+      } else if (isRecent) {
+        statusEl.textContent = '🟢 출간 직후';
+        statusEl.style.cssText = 'background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;';
+      } else {
+        statusEl.textContent = '⚪ 출간';
+        statusEl.style.cssText = 'background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;';
+      }
+
+      // 검색량 코멘트
+      const countLabel = searchCount > 5000 ? '관심도 매우 높음 — 초도 발주 확대 권장'
+                       : searchCount > 1000 ? '관심도 높음 — 출간 전 수요 확인됨'
+                       : searchCount > 300  ? '관심도 보통 — 일반 발주 수준'
+                       : '관심도 낮음 — 보수적 발주 권장';
+
+      document.getElementById('naverTitle').textContent        = item.title.replace(/<[^>]+>/g,'');
+      document.getElementById('naverPublisher').textContent    = item.publisher || '—';
+      document.getElementById('naverPubdate').textContent      = pubStr || '—';
+      document.getElementById('naverSearchCount').textContent  = searchCount.toLocaleString() + '건';
+      document.getElementById('naverComment').textContent      =
+        `네이버 도서 검색 결과 ${searchCount.toLocaleString()}건 · ${countLabel}`;
+      document.getElementById('naverInterest').classList.remove('hidden');
+
+    } catch(e) {
+      console.warn('Naver API 오류:', e);
+    }
+  }
+
   function startAnalysis() {
     const isbn = document.getElementById('isbnInput').value.trim().replace(/-/g, '');
     const book = BOOKS[isbn];
@@ -875,6 +973,7 @@
       return;
     }
     currentBook = book;
+    fetchNaverBook(isbn);
     runAnalysis(book);
   }
 
