@@ -480,22 +480,22 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 kpi-grid mb-3">
       <div class="kpi-card stock">
         <p class="text-xs text-gray-400 mb-2 font-medium">현재 재고</p>
-        <p class="text-2xl font-black text-gray-800">320<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
+        <p id="kpiStock" class="text-2xl font-black text-gray-800">320<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
         <p class="text-xs text-indigo-500 mt-1">▲ 안전 재고 이상</p>
       </div>
       <div class="kpi-card incoming">
         <p class="text-xs text-gray-400 mb-2 font-medium">입고 예정</p>
-        <p class="text-2xl font-black text-gray-800">100<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
+        <p id="kpiIncoming" class="text-2xl font-black text-gray-800">100<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
         <p class="text-xs text-cyan-500 mt-1">D+3 예정</p>
       </div>
       <div class="kpi-card forecast">
         <p class="text-xs text-gray-400 mb-2 font-medium">예상 판매량</p>
-        <p class="text-2xl font-black text-gray-800">5,765<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
+        <p id="kpiForecast" class="text-2xl font-black text-gray-800">5,765<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
         <p class="text-xs text-amber-500 mt-1">▲ 전작 대비 +10%</p>
       </div>
       <div class="kpi-card recommend recommend-highlight">
         <p class="text-xs text-red-400 mb-2 font-medium">⚡ 권장 발주량</p>
-        <p class="text-3xl font-black text-red-600">5,400<span class="text-sm font-normal text-red-400 ml-1">권</span></p>
+        <p id="kpiRecommend" class="text-3xl font-black text-red-600">5,400<span class="text-sm font-normal text-red-400 ml-1">권</span></p>
         <div class="mt-2 pt-2 border-t border-red-100">
           <span id="gradeInlineLabel" class="text-xs text-red-500 font-semibold">🔴 집중 발주</span>
         </div>
@@ -1098,13 +1098,11 @@
       document.getElementById('authorRepComment').textContent = ar.comment;
     }
 
-    // KPI 카드
-    const kpiSection = document.getElementById('kpiSection');
-    const cards = kpiSection.querySelectorAll('.kpi-card');
-    cards[0].querySelector('p:nth-child(2)').innerHTML = `${book.stock.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
-    cards[1].querySelector('p:nth-child(2)').innerHTML = `${book.incoming.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
-    cards[2].querySelector('p:nth-child(2)').innerHTML = `${book.forecast.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
-    cards[3].querySelector('p:nth-child(2)').innerHTML = `${book.recommend.toLocaleString()}<span class="text-sm font-normal text-red-400 ml-1">권</span>`;
+    // KPI 카드 (ID로 직접 참조)
+    document.getElementById('kpiStock').innerHTML    = `${book.stock.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
+    document.getElementById('kpiIncoming').innerHTML = `${book.incoming.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
+    document.getElementById('kpiForecast').innerHTML = `${book.forecast.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
+    document.getElementById('kpiRecommend').innerHTML= `${book.recommend.toLocaleString()}<span class="text-sm font-normal text-red-400 ml-1">권</span>`;
     document.getElementById('gradeInlineLabel').textContent = gradeLabel[book.grade];
   }
 
