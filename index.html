@@ -3,1523 +3,738 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>교보문고 AI 발주 Agent</title>
+  <title>Kyobo AI Agent · 발주 Intelligence</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
-    * { font-family: 'Noto Sans KR', sans-serif; }
+    * { font-family: 'Noto Sans KR', sans-serif; box-sizing: border-box; }
+    body { background: #f0f2f5; margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-    :root {
-      --kyobo-red: #E8003D;
-      --kyobo-dark: #1a1a2e;
-      --kyobo-navy: #16213e;
-      --kyobo-blue: #0f3460;
-      --accent-blue: #2563EB;
-      --accent-green: #16a34a;
-      --accent-yellow: #d97706;
-      --accent-red: #dc2626;
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: #0d1f17;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow-y: auto;
     }
-
-    body { background: #f0f2f7; }
-
-    .kyobo-header {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    .sidebar-brand {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid #1a3328;
     }
+    .sidebar-brand .logo { color: #4ade80; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .sidebar-brand .title { color: white; font-size: 15px; font-weight: 800; margin-top: 4px; }
+    .sidebar-brand .sub { color: #6b9e82; font-size: 10px; margin-top: 2px; }
 
-    .agent-badge {
-      background: linear-gradient(135deg, #E8003D, #ff4d6d);
-      animation: pulse-badge 2s infinite;
+    .nav-section { padding: 16px 12px 8px; }
+    .nav-label { color: #4a7a60; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px;
+      color: #8ab09a; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s; margin-bottom: 2px;
+      text-decoration: none;
     }
+    .nav-item:hover { background: #1a3328; color: #d1fae5; }
+    .nav-item.active { background: #166534; color: #4ade80; font-weight: 700; }
+    .nav-item svg { opacity: 0.7; flex-shrink: 0; }
+    .nav-item.active svg { opacity: 1; }
 
-    @keyframes pulse-badge {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(232,0,61,0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(232,0,61,0); }
+    .sidebar-footer { margin-top: auto; padding: 16px 12px; border-top: 1px solid #1a3328; }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      background: white; border-bottom: 1px solid #e5e7eb;
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
     }
+    .topbar-title { font-size: 16px; font-weight: 800; color: #0d1f17; }
+    .topbar-sub { font-size: 12px; color: #9ca3af; margin-left: 8px; }
 
-    .kpi-card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 4px;
-      height: 100%;
-      border-radius: 4px 0 0 4px;
-    }
-
-    .kpi-card.stock::before { background: #6366f1; }
-    .kpi-card.incoming::before { background: #0891b2; }
-    .kpi-card.forecast::before { background: #d97706; }
-    .kpi-card.recommend::before { background: #E8003D; }
-
-    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-
-    .recommend-highlight {
-      background: linear-gradient(135deg, #fff5f5, #ffe4e6);
-      border: 2px solid #E8003D;
-    }
-
-    .step-card {
-      background: white;
-      border-radius: 12px;
-      padding: 16px 20px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-      border-left: 3px solid #e5e7eb;
-      transition: all 0.3s;
-      opacity: 0.5;
-    }
-
-    .step-card.active {
-      border-left-color: #2563EB;
-      opacity: 1;
-      box-shadow: 0 4px 16px rgba(37,99,235,0.15);
-    }
-
-    .step-card.done {
-      border-left-color: #16a34a;
-      opacity: 1;
-    }
-
-    .step-icon {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700;
-      background: #e5e7eb; color: #9ca3af;
-      transition: all 0.3s;
-    }
-
-    .step-card.active .step-icon { background: #2563EB; color: white; }
-    .step-card.done .step-icon { background: #16a34a; color: white; }
-
-    .grade-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 999px;
-      font-weight: 700; font-size: 15px;
-    }
-
-    .grade-intensive { background: #fee2e2; color: #dc2626; }
-    .grade-expand { background: #fef3c7; color: #d97706; }
-    .grade-normal { background: #dcfce7; color: #16a34a; }
-
-    .ai-opinion-card {
-      background: linear-gradient(135deg, #1e293b, #1a2744);
-      color: white;
-      border-radius: 16px;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .ai-opinion-card::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 120px; height: 120px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 50%;
-    }
-
-    .typing-cursor::after {
-      content: '|';
-      animation: blink 0.8s infinite;
-    }
-
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-    .trust-bar {
-      height: 8px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      overflow: hidden;
-    }
-
-    .trust-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #16a34a, #4ade80);
-      transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .section-card {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-title .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #E8003D;
-    }
-
-    .action-btn {
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex; align-items: center; gap: 8px;
-    }
-
-    .btn-primary {
-      background: #E8003D;
-      color: white;
-      border: none;
-    }
-    .btn-primary:hover { background: #c8002f; transform: translateY(-1px); }
-
-    .btn-secondary {
-      background: white;
-      color: #374151;
-      border: 2px solid #e5e7eb;
-    }
-    .btn-secondary:hover { border-color: #9ca3af; }
-
-    .btn-outline {
-      background: transparent;
-      color: #2563EB;
-      border: 2px solid #2563EB;
-    }
-    .btn-outline:hover { background: #eff6ff; }
-
+    .search-wrap { display: flex; align-items: center; gap: 8px; }
     .isbn-input {
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 16px;
-      width: 100%;
-      outline: none;
+      border: 1.5px solid #d1fae5; border-radius: 8px;
+      padding: 8px 14px; font-size: 13px; width: 260px; outline: none;
+      background: #f0fdf4; color: #0d1f17;
       transition: border-color 0.2s;
     }
-    .isbn-input:focus { border-color: #E8003D; }
-
-    .chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 4px 10px; border-radius: 6px;
-      font-size: 12px; font-weight: 500;
-      cursor: pointer; transition: all 0.15s;
-    }
-
-    .analyzing {
-      animation: fadeInUp 0.4s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .result-section { display: none; }
-    .result-section.visible { display: block; animation: fadeInUp 0.5s ease; }
-
-    .order-form-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 100;
-      align-items: center; justify-content: center;
-    }
-    .order-form-overlay.open { display: flex; }
-
-    .order-form-modal {
-      background: white;
-      border-radius: 20px;
-      padding: 32px;
-      width: 90%; max-width: 640px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
-      animation: fadeInUp 0.3s ease;
-    }
-
-    .progress-ring {
-      transform: rotate(-90deg);
-    }
-
-    .series-bar {
-      height: 32px;
-      border-radius: 6px;
-      background: linear-gradient(90deg, #2563EB, #60a5fa);
-      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex; align-items: center;
-      padding: 0 12px; color: white;
-      font-size: 13px; font-weight: 600;
-      min-width: 60px;
-    }
-
-    .series-bar.forecast {
-      background: linear-gradient(90deg, #E8003D, #ff6b6b);
-    }
-
-    @media (max-width: 768px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    .rank-tab { background: #f3f4f6; color: #6b7280; }
-    .rank-tab:hover { background: #e5e7eb; }
-    .rank-tab.active-tab { background: #1e293b; color: white; }
-
-    .rank-row {
-      display: flex; align-items: center; gap-8px;
-      padding: 6px 8px; border-radius: 8px;
+    .isbn-input:focus { border-color: #16a34a; background: white; }
+    .search-btn {
+      background: #16a34a; color: white; border: none;
+      border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
       transition: background 0.15s;
-      gap: 8px;
     }
-    .rank-row:hover { background: #f9fafb; }
+    .search-btn:hover { background: #15803d; }
 
-    .rank-num {
-      width: 22px; height: 22px; border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    .content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+    /* ── KPI Cards ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .kpi-card {
+      background: white; border-radius: 12px; padding: 18px 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #f0f0f0;
+      position: relative; overflow: hidden;
     }
-    .rank-num.top1 { background: #E8003D; color: white; }
-    .rank-num.top2 { background: #1d4ed8; color: white; }
-    .rank-num.top3 { background: #b45309; color: white; }
-    .rank-num.normal { background: #f3f4f6; color: #6b7280; }
+    .kpi-card::after {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%; border-radius: 3px 0 0 3px;
+    }
+    .kpi-card.green::after { background: #16a34a; }
+    .kpi-card.blue::after  { background: #2563eb; }
+    .kpi-card.amber::after { background: #d97706; }
+    .kpi-card.red::after   { background: #dc2626; }
+    .kpi-label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .kpi-value { font-size: 26px; font-weight: 900; color: #111827; line-height: 1; }
+    .kpi-sub { font-size: 11px; color: #9ca3af; margin-top: 6px; }
+    .kpi-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; margin-top: 6px; }
+    .kpi-badge.up { background: #dcfce7; color: #16a34a; }
+    .kpi-badge.down { background: #fee2e2; color: #dc2626; }
 
-    .rank-change { font-size: 10px; font-weight: 600; flex-shrink: 0; width: 28px; text-align: right; }
-    .rank-change.up { color: #dc2626; }
-    .rank-change.down { color: #2563EB; }
-    .rank-change.same { color: #9ca3af; }
-    .rank-change.new { color: #16a34a; }
+    /* ── Layout: table + panel ── */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 400px; gap: 16px; }
+    .dashboard-grid.full { grid-template-columns: 1fr; }
 
-    .rank-highlight { background: #fff7ed !important; border: 1px solid #fed7aa; }
+    /* ── Book Table ── */
+    .table-card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; overflow: hidden; }
+    .table-header { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; }
+    .table-title { font-size: 14px; font-weight: 800; color: #111827; }
+    .table-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; background: #fafafa; border-bottom: 1px solid #f3f4f6; }
+    td { padding: 12px 16px; border-bottom: 1px solid #f9fafb; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr.book-row { cursor: pointer; transition: background 0.1s; }
+    tr.book-row:hover { background: #f0fdf4; }
+    tr.book-row.selected { background: #f0fdf4; border-left: 3px solid #16a34a; }
 
-    .tag {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
+    .book-thumb { width: 36px; height: 50px; border-radius: 4px; object-fit: cover; background: #e5e7eb; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .book-info-cell { display: flex; align-items: center; gap: 10px; }
+    .book-title-text { font-size: 13px; font-weight: 700; color: #111827; line-height: 1.3; }
+    .book-meta-text { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+    .grade-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .grade-intensive { background: #fee2e2; color: #dc2626; }
+    .grade-expand    { background: #fef3c7; color: #d97706; }
+    .grade-normal    { background: #dcfce7; color: #16a34a; }
+
+    .metric-num { font-size: 14px; font-weight: 800; color: #111827; }
+    .metric-sub { font-size: 10px; color: #9ca3af; }
+
+    .action-btn-sm {
+      padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      cursor: pointer; border: none; transition: all 0.15s;
+    }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-green:hover { background: #15803d; }
+    .btn-outline-sm { background: white; color: #374151; border: 1.5px solid #e5e7eb; }
+    .btn-outline-sm:hover { border-color: #9ca3af; }
+
+    /* ── Analysis Panel ── */
+    .analysis-panel { display: flex; flex-direction: column; gap: 12px; }
+
+    .panel-card { background: white; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; }
+    .panel-label { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .panel-title { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 12px; }
+
+    .hero-metric { display: flex; gap: 12px; }
+    .hero-box {
+      flex: 1; border-radius: 10px; padding: 14px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hero-box.dark-blue { background: linear-gradient(135deg,#1e293b,#1e3a5f); }
+    .hero-box.dark-purple { background: linear-gradient(135deg,#1a1f2e,#2d1b69); }
+    .hero-box-label { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+    .hero-box-value { font-size: 28px; font-weight: 900; color: #fbbf24; line-height: 1; margin: 6px 0 2px; }
+    .hero-box.dark-purple .hero-box-value { color: #c084fc; }
+    .hero-box-sub { font-size: 10px; color: rgba(255,255,255,0.4); }
+    .hero-box-title { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; margin-top: 8px; }
+
+    .trust-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .trust-bar-wrap { flex: 1; height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .trust-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg,#16a34a,#4ade80); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+    .trust-bar-fill.amber { background: linear-gradient(90deg,#d97706,#fbbf24); }
+
+    .series-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .series-label { font-size: 11px; color: #6b7280; width: 60px; flex-shrink: 0; }
+    .series-bar-wrap { flex: 1; height: 18px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+    .series-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#2563eb,#60a5fa); display: flex; align-items: center; padding-left: 6px; transition: width 1s; }
+    .series-bar-fill.forecast { background: linear-gradient(90deg,#dc2626,#f87171); }
+    .series-val { font-size: 10px; color: white; font-weight: 700; white-space: nowrap; }
+
+    .step-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+    .step-row:last-child { border-bottom: none; }
+    .step-num { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+
+    .ai-summary { background: linear-gradient(135deg,#0d1f17,#1a3328); border-radius: 10px; padding: 14px; }
+    .ai-summary p { font-size: 12px; color: #a7f3d0; line-height: 1.7; margin-bottom: 6px; }
+    .ai-summary p:last-child { margin-bottom: 0; }
+
+    .naver-strip { background: linear-gradient(135deg,#03c75a12,#03c75a06); border: 1px solid #03c75a33; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap-12px; gap: 12px; flex-wrap: wrap; }
+
+    .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+    .recommend-banner {
+      background: linear-gradient(135deg,#16a34a,#15803d);
+      border-radius: 10px; padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
     }
 
-    .analysis-row {
-      display: flex; align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #f3f4f6;
-      gap: 12px;
-    }
-    .analysis-row:last-child { border-bottom: none; }
+    /* empty state */
+    .empty-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: #9ca3af; text-align: center; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
   </style>
 </head>
 <body>
 
-<!-- Header -->
-<header class="kyobo-header text-white">
-  <div class="max-w-6xl mx-auto px-4 py-4">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div>
-          <div class="flex items-center gap-3">
-            <span class="text-2xl font-black tracking-tight">교보문고</span>
-            <span class="agent-badge text-white text-xs font-bold px-3 py-1 rounded-full">AI AGENT</span>
-          </div>
-          <p class="text-xs text-blue-200 mt-0.5">발주 의사결정 지원 시스템 · Ordering Intelligence</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-4 text-sm text-blue-200">
-        <span>📅 2026.06.06</span>
-        <span class="hidden md:inline">담당: 신호주 대리</span>
-        <div class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-xs font-bold">신</div>
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">KYOBO</div>
+    <div class="title">AI Agent</div>
+    <div class="sub">발주 Intelligence Center</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="setNav(this)">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      대시보드
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      AI 발주 목록
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      분야 분석
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/></svg>
+      재고 현황
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">설정</div>
+    <div class="nav-item" onclick="setNav(this)">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      시스템 설정
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#166534;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#4ade80;">신</div>
+      <div>
+        <div style="color:#d1fae5;font-size:12px;font-weight:700;">신호주 대리</div>
+        <div style="color:#4a7a60;font-size:10px;">아동팀 · 대구점</div>
       </div>
     </div>
   </div>
-</header>
+</aside>
 
-<!-- Main Content -->
-<main class="max-w-6xl mx-auto px-4 py-6">
+<!-- ═══ MAIN ═══ -->
+<div class="main">
 
-  <!-- ISBN 입력 영역 -->
-  <div class="section-card mb-6">
-    <div class="section-title">
-      <span class="dot"></span>
-      ISBN 도서 조회
+  <!-- Topbar -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span class="topbar-title">Intelligence Dashboard</span>
+      <span class="topbar-sub">· AI 발주 의사결정 지원</span>
     </div>
-    <div class="flex gap-3 mb-4">
-      <input id="isbnInput" type="text" class="isbn-input" placeholder="ISBN을 입력하세요 (예: 9791172461942)" maxlength="20" autocomplete="off" />
-      <button type="button" id="searchBtn" class="action-btn btn-primary whitespace-nowrap">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <div class="search-wrap">
+      <input id="isbnInput" type="text" class="isbn-input" placeholder="ISBN 입력 또는 바코드 스캔" maxlength="20" autocomplete="off" />
+      <button class="search-btn" id="searchBtn">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         분석하기
       </button>
     </div>
-    <div class="flex flex-wrap gap-2">
-      <span class="text-xs text-gray-500 mr-1 flex items-center">예시:</span>
-      <span class="chip bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="selectBook('9791173326516', '흔한남매 세계사 탐험대 6 - 이슬람 세계')">📚 흔한남매 세계사 탐험대 6</span>
-      <span class="chip bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="selectBook('9791172461942', '흔한남매 세계사 탐험대 6')">📚 세계사 탐험대 6 (구버전)</span>
-      <span class="chip bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="selectBook('9791172461234', '마법사 연대기 5권')">📚 마법사 연대기 5권</span>
-      <span class="chip bg-gray-100 text-gray-600 hover:bg-gray-200" onclick="selectBook('9791172469876', '첫 번째 빛')">📚 첫 번째 빛</span>
+    <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:#9ca3af;">
+      <span>📅 2026.06.07</span>
+      <span style="background:#f0fdf4;color:#16a34a;padding:4px 10px;border-radius:999px;font-weight:700;font-size:11px;">● LIVE</span>
     </div>
   </div>
 
-  <!-- 도서 정보 패널 (분석 후 표시) -->
-  <div id="bookInfo" class="result-section mb-4">
-    <div class="section-card" style="padding:16px 20px;">
-      <div class="flex gap-4 items-start">
-        <!-- 책표지 -->
-        <img id="bookCover" src="" alt="책표지"
-          class="rounded-lg shadow object-cover shrink-0"
-          style="display:none;width:72px;min-height:100px;background:#f3f4f6;"/>
-        <div id="bookCoverPlaceholder"
-          class="rounded-lg shrink-0 flex items-center justify-center text-2xl"
-          style="width:72px;min-height:100px;background:#f3f4f6;">📚</div>
-        <!-- 도서 메타 -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-sm font-bold text-gray-800">도서 정보</span>
-            <span class="ml-auto tag bg-green-100 text-green-700 text-xs">조회 완료</span>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div>
-              <p class="text-gray-400 text-xs mb-0.5">도서명</p>
-              <p id="bookTitle" class="font-semibold text-gray-800 text-sm leading-snug">-</p>
-            </div>
-            <div>
-              <p class="text-gray-400 text-xs mb-0.5">저자</p>
-              <p id="bookAuthor" class="font-semibold text-gray-800 text-sm leading-snug">-</p>
-            </div>
-            <div>
-              <p class="text-gray-400 text-xs mb-0.5">출판사</p>
-              <p id="bookPublisher" class="font-semibold text-gray-800 text-sm">-</p>
-            </div>
-            <div>
-              <p class="text-gray-400 text-xs mb-0.5">분야</p>
-              <p id="bookCategory" class="font-semibold text-gray-800 text-sm">-</p>
-            </div>
-          </div>
-        </div>
+  <!-- Content -->
+  <div class="content">
+
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-label">등록 도서</div>
+        <div class="kpi-value">4</div>
+        <div class="kpi-sub">분석 대상 타이틀</div>
+        <span class="kpi-badge up">▲ AI 분석 완료</span>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">집중 발주 필요</div>
+        <div class="kpi-value">2</div>
+        <div class="kpi-sub">즉시 대응 권장</div>
+        <span class="kpi-badge down">🔴 집중</span>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-label">총 권장 발주량</div>
+        <div class="kpi-value">9,500</div>
+        <div class="kpi-sub">권 · 전체 합산</div>
+        <span class="kpi-badge up">▲ AI 권장</span>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">평균 신뢰도</div>
+        <div class="kpi-value">87%</div>
+        <div class="kpi-sub">시리즈 데이터 기반</div>
+        <span class="kpi-badge up">● 높음</span>
       </div>
     </div>
-  </div>
 
-  <!-- 핵심 벤치마크 배너 -->
-  <div id="kpiSection" class="result-section mb-4">
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid" id="dashboardGrid">
 
-    <!-- ★ 핵심 판매 지표 (가장 크게 강조) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-      <!-- 직전권 30일 판매 -->
-      <div class="rounded-2xl p-5" style="background:linear-gradient(135deg,#1e293b,#1e3a5f);border:1.5px solid #3b82f633;">
-        <div class="flex items-center justify-between mb-3">
+      <!-- Book Table -->
+      <div class="table-card">
+        <div class="table-header">
           <div>
-            <p class="text-xs text-blue-300 font-bold uppercase tracking-wider mb-0.5">핵심 발주 기준</p>
-            <p class="text-sm text-white font-bold">직전권 출간 후 <span class="text-yellow-300">30일</span> 판매량</p>
+            <div class="table-title">📚 AI 발주 분석 목록</div>
+            <div class="table-sub">도서를 클릭하면 상세 분석이 열립니다</div>
           </div>
-          <span class="text-xs bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 px-2 py-1 rounded-lg font-bold whitespace-nowrap">초도 기준</span>
-        </div>
-        <div class="flex items-end gap-4 mb-3">
-          <div>
-            <p id="prev1mSales" class="text-5xl font-black text-yellow-300 leading-none">—</p>
-            <p class="text-xs text-yellow-400/70 mt-1">권 / 30일</p>
-          </div>
-          <div class="pb-1">
-            <p id="prevTotalSales" class="text-sm text-gray-300 font-semibold">누적 —</p>
-            <p id="prev1mRatio" class="text-xs text-orange-300 mt-0.5">—</p>
+          <div style="display:flex;gap:6px;">
+            <span style="background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;">총 4종</span>
           </div>
         </div>
-        <div class="border-t border-white/10 pt-2">
-          <p id="prevTitleLabel" class="text-xs text-blue-200 font-semibold mb-0.5">—</p>
-          <p id="prevPubDate" class="text-xs text-gray-400 inline">출간일 — </p>
-          <p id="prev1mPeriod" class="text-xs text-gray-500 inline">· —</p>
-        </div>
-        <div class="mt-2 rounded-lg px-3 py-1.5 bg-white/5">
-          <p id="prev1mComment" class="text-xs text-gray-300 leading-relaxed">—</p>
-        </div>
-        <div id="prev1mBadge"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>도서 정보</th>
+              <th>현재재고</th>
+              <th>직전 30일</th>
+              <th>권장발주</th>
+              <th>등급</th>
+              <th>액션</th>
+            </tr>
+          </thead>
+          <tbody id="bookTableBody"></tbody>
+        </table>
       </div>
 
-      <!-- 저자 대표작 판매 -->
-      <div class="rounded-2xl p-5" style="background:linear-gradient(135deg,#1a1f2e,#1e2d3d);border:1.5px solid #8b5cf633;">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <p class="text-xs text-purple-300 font-bold uppercase tracking-wider mb-0.5">저자 판매 레퍼런스</p>
-            <p class="text-sm text-white font-bold">저자 대표작 <span class="text-purple-300">판매 실적</span></p>
-          </div>
-          <span class="text-xs bg-purple-400/20 text-purple-300 border border-purple-400/30 px-2 py-1 rounded-lg font-bold">저자 지표</span>
-        </div>
-        <div class="flex items-end gap-4 mb-3">
-          <div>
-            <p id="authorRepSales" class="text-5xl font-black text-purple-300 leading-none">—</p>
-            <p class="text-xs text-purple-400/70 mt-1">권 누적</p>
-          </div>
-          <div class="pb-1">
-            <p id="authorRep1m" class="text-sm text-gray-300 font-semibold">30일 —</p>
-            <p id="authorRepRatio" class="text-xs text-pink-300 mt-0.5">—</p>
+      <!-- Analysis Panel -->
+      <div class="analysis-panel" id="analysisPanel">
+        <div class="panel-card">
+          <div class="empty-panel">
+            <svg width="40" height="40" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <p style="font-size:13px;font-weight:600;margin:0 0 4px;">도서를 선택하세요</p>
+            <p style="font-size:12px;margin:0;">왼쪽 목록에서 도서를 클릭하거나<br>ISBN을 입력하면 분석이 시작됩니다</p>
           </div>
         </div>
-        <div class="border-t border-white/10 pt-2">
-          <p id="authorRepTitle" class="text-xs text-purple-200 font-semibold mb-0.5">—</p>
-          <p id="authorRepPub" class="text-xs text-gray-400">—</p>
-        </div>
-        <div class="mt-2 rounded-lg px-3 py-1.5 bg-white/5">
-          <p id="authorRepComment" class="text-xs text-gray-300 leading-relaxed">—</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 kpi-grid mb-3">
-      <div class="kpi-card stock">
-        <p class="text-xs text-gray-400 mb-2 font-medium">현재 재고</p>
-        <p id="kpiStock" class="text-2xl font-black text-gray-800">320<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
-        <p class="text-xs text-indigo-500 mt-1">▲ 안전 재고 이상</p>
-      </div>
-      <div class="kpi-card incoming">
-        <p class="text-xs text-gray-400 mb-2 font-medium">입고 예정</p>
-        <p id="kpiIncoming" class="text-2xl font-black text-gray-800">100<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
-        <p class="text-xs text-cyan-500 mt-1">D+3 예정</p>
-      </div>
-      <div class="kpi-card forecast">
-        <p class="text-xs text-gray-400 mb-2 font-medium">예상 판매량</p>
-        <p id="kpiForecast" class="text-2xl font-black text-gray-800">5,765<span class="text-sm font-normal text-gray-400 ml-1">권</span></p>
-        <p class="text-xs text-amber-500 mt-1">▲ 전작 대비 +10%</p>
-      </div>
-      <div class="kpi-card recommend recommend-highlight">
-        <p class="text-xs text-red-400 mb-2 font-medium">⚡ 권장 발주량</p>
-        <p id="kpiRecommend" class="text-3xl font-black text-red-600">5,400<span class="text-sm font-normal text-red-400 ml-1">권</span></p>
-        <div class="mt-2 pt-2 border-t border-red-100">
-          <span id="gradeInlineLabel" class="text-xs text-red-500 font-semibold">🔴 집중 발주</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 네이버 출간 전 관심도 (KPI 카드 아래) -->
-    <div id="naverInterest" class="hidden mt-3 rounded-xl px-4 py-3 flex flex-wrap items-center gap-x-5 gap-y-2" style="background:linear-gradient(135deg,#03c75a12,#03c75a06);border:1px solid #03c75a33;">
-      <div class="flex items-center gap-2 shrink-0">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="#03c75a" stroke-width="2.5" stroke-linecap="round"/></svg>
-        <span class="text-xs font-bold" style="color:#03c75a">네이버 출간 전 관심도</span>
-        <span id="naverStatus" class="text-xs px-2 py-0.5 rounded-md font-semibold ml-1">—</span>
-      </div>
-      <div class="flex items-center gap-1 text-xs text-gray-500">
-        <span id="naverTitle" class="font-semibold text-gray-700 max-w-xs truncate">—</span>
-        <span class="text-gray-300 mx-1">·</span>
-        <span id="naverPublisher" class="text-gray-500">—</span>
-        <span class="text-gray-300 mx-1">·</span>
-        <span id="naverPubdate" class="text-gray-500">—</span>
-      </div>
-      <div class="ml-auto flex items-center gap-2">
-        <span class="text-xs text-gray-400">검색량</span>
-        <span id="naverSearchCount" class="text-lg font-black" style="color:#03c75a">—</span>
-      </div>
-      <p id="naverComment" class="w-full text-xs text-gray-400 pt-1 border-t border-green-100">—</p>
-    </div>
-
-  </div>
-
-  <!-- 신뢰도 + 발주 등급 (컴팩트) -->
-  <div id="gradeSection" class="result-section mb-4">
-    <div class="section-card" style="padding:14px 20px;">
-      <div class="flex items-center gap-4">
-        <!-- 신뢰도 수치 -->
-        <div class="flex items-center gap-1 shrink-0">
-          <div class="relative" style="width:64px;height:64px;">
-            <svg width="64" height="64" class="progress-ring">
-              <circle cx="32" cy="32" r="26" fill="none" stroke="#e5e7eb" stroke-width="7"/>
-              <circle id="trustRing" cx="32" cy="32" r="26" fill="none" stroke="#16a34a" stroke-width="7"
-                stroke-dasharray="163.4" stroke-dashoffset="163.4" stroke-linecap="round"/>
-            </svg>
-            <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <span id="trustPct" class="text-sm font-black text-gray-800 leading-none">0%</span>
-              <span class="text-xs text-green-600" style="font-size:9px;">높음</span>
-            </div>
-          </div>
-          <div class="text-xs text-gray-500 leading-tight">
-            <p class="font-semibold text-gray-700 text-xs mb-0.5">AI 신뢰도</p>
-            <p>시리즈 데이터 기반</p>
-          </div>
-        </div>
-        <!-- 신뢰도 바 (2개만) -->
-        <div class="flex-1 space-y-2">
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400 shrink-0" style="width:64px;">시리즈</span>
-            <div class="trust-bar flex-1"><div class="trust-fill" style="width:95%"></div></div>
-            <span class="text-xs text-green-600 font-semibold shrink-0">95%</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400 shrink-0" style="width:64px;">카테고리</span>
-            <div class="trust-bar flex-1"><div class="trust-fill" style="width:75%;background:linear-gradient(90deg,#d97706,#fbbf24)"></div></div>
-            <span class="text-xs text-amber-600 font-semibold shrink-0">75%</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400 shrink-0" style="width:64px;">시장동향</span>
-            <div class="trust-bar flex-1"><div class="trust-fill" style="width:88%"></div></div>
-            <span class="text-xs text-green-600 font-semibold shrink-0">88%</span>
-          </div>
-        </div>
-        <!-- 발주 등급 -->
-        <div class="shrink-0 text-right">
-          <p class="text-xs text-gray-400 mb-1">발주 등급</p>
-          <span id="gradeBadgeSmall" class="grade-badge grade-intensive" style="font-size:12px;padding:4px 12px;">🔴 집중 발주</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 시리즈 차트 + 실시간 순위 -->
-  <div id="chartSection" class="result-section mb-4">
-  <div class="grid md:grid-cols-5 gap-3">
-  <!-- 시리즈 판매 비교 (좌, 2칸) -->
-  <div class="md:col-span-2 section-card" style="padding:16px 18px;">
-    <div class="section-title" style="margin-bottom:10px;font-size:13px;">
-      <span class="dot"></span>
-      시리즈 판매 추이
-      <span class="ml-auto text-xs text-gray-400 font-normal">단위: 권</span>
-    </div>
-    <div class="space-y-2" id="seriesChartContainer">
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span class="text-gray-600">세계사 탐험대 1권</span>
-          <span class="font-semibold text-gray-700">4,102권</span>
-        </div>
-        <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-          <div class="series-bar" style="width:71.3%" id="bar1">4,102</div>
-        </div>
-      </div>
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span class="text-gray-600">세계사 탐험대 2권</span>
-          <span class="font-semibold text-gray-700">4,530권</span>
-        </div>
-        <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-          <div class="series-bar" style="width:78.7%" id="bar2">4,530</div>
-        </div>
-      </div>
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span class="text-gray-600">세계사 탐험대 3권</span>
-          <span class="font-semibold text-gray-700">4,780권</span>
-        </div>
-        <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-          <div class="series-bar" style="width:83.1%" id="bar3">4,780</div>
-        </div>
-      </div>
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span class="text-gray-600">세계사 탐험대 4권</span>
-          <span class="font-semibold text-gray-700">4,980권</span>
-        </div>
-        <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-          <div class="series-bar" style="width:86.5%" id="bar4">4,980</div>
-        </div>
-      </div>
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span class="text-gray-600">세계사 탐험대 5권</span>
-          <span class="font-semibold text-gray-700">5,241권</span>
-        </div>
-        <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-          <div class="series-bar" style="width:91.1%" id="bar5">5,241</div>
-        </div>
-      </div>
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span class="text-gray-600 font-semibold">세계사 탐험대 6권 <span class="tag bg-red-100 text-red-600 ml-1">예측</span></span>
-          <span class="font-bold text-red-600">5,765권</span>
-        </div>
-        <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-          <div class="series-bar forecast" style="width:100%" id="bar6">5,765 (예측)</div>
-        </div>
-      </div>
-    </div>
-    <p class="text-xs text-gray-400 mt-2 text-right">* 권당 평균 성장률 +9.7%</p>
-  </div>
-
-  <!-- 인터넷서점 실시간 순위 (우, 3칸) -->
-  <div class="md:col-span-3 section-card flex flex-col">
-    <div class="section-title mb-3">
-      <span class="dot"></span>
-      분야 실시간 검색순위
-      <span id="rankTimestamp" class="ml-auto text-xs text-gray-400 font-normal"></span>
-    </div>
-    <!-- 서점 탭 -->
-    <div class="flex gap-1 mb-3">
-      <button onclick="switchRank('kyobo')" id="tab-kyobo"
-        class="rank-tab active-tab text-xs px-3 py-1.5 rounded-lg font-semibold transition-all">교보문고</button>
-      <button onclick="switchRank('yes24')" id="tab-yes24"
-        class="rank-tab text-xs px-3 py-1.5 rounded-lg font-semibold transition-all">예스24</button>
-      <button onclick="switchRank('aladin')" id="tab-aladin"
-        class="rank-tab text-xs px-3 py-1.5 rounded-lg font-semibold transition-all">알라딘</button>
-    </div>
-    <!-- 순위 리스트 -->
-    <div id="rankList" class="flex-1 space-y-1 overflow-hidden"></div>
-    <p class="text-xs text-gray-300 mt-3">* 데모용 시뮬레이션 데이터</p>
-  </div>
-
-  </div><!-- /grid -->
-  </div><!-- /chartSection -->
-
-  <!-- AI 분석 통합 카드 -->
-  <div id="aiSection" class="result-section mb-4">
-    <div class="section-card">
-      <div class="section-title">
-        <span class="dot"></span>
-        AI 분석 및 발주 근거
-        <div class="ml-auto flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          <span class="text-xs text-gray-400 font-normal">신뢰도 87% · 시리즈 데이터 기반</span>
-        </div>
       </div>
 
-      <!-- Agent 사고 과정 (번호 리스트) -->
-      <div id="agentStepList" class="space-y-0 mb-4"></div>
-
-      <!-- 발주 근거 한 줄 -->
-      <div class="py-3 border-t border-gray-100">
-        <p class="text-xs text-gray-400 mb-1">발주 수량 산출 근거</p>
-        <p id="agentReasonText" class="text-xs text-gray-600"></p>
-      </div>
-
-      <!-- AI 의견 (하단 다크 박스) -->
-      <div class="rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #1e293b, #1a2744);">
-        <div class="px-4 py-3 flex items-center gap-2 border-b border-white/10">
-          <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs">🤖</div>
-          <p class="text-xs font-bold text-white">AI Agent 종합 의견</p>
-        </div>
-        <div class="px-4 py-3">
-          <div id="aiOpinionText" class="text-sm text-gray-200 leading-relaxed space-y-2"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="stepSection" style="display:none;"></div>
-
-  <!-- 액션 버튼 -->
-  <div id="actionSection" class="result-section mb-10">
-    <div class="flex flex-wrap gap-3 justify-end">
-      <button onclick="resetAnalysis()" class="action-btn btn-secondary">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        다시 분석
-      </button>
-      <button onclick="toggleReason()" class="action-btn btn-outline">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        근거 보기
-      </button>
-      <!-- 통합유통 시스템 연결 버튼 -->
-      <button onclick="goToOrderSystem()" class="action-btn btn-primary">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-        </svg>
-        발주정보 복사
-      </button>
-    </div>
-  </div>
-
-</main>
-
-<!-- 발주서 모달 -->
-<div class="order-form-overlay" id="orderModal">
-  <div class="order-form-modal">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h2 class="text-xl font-black text-gray-900">발주서 생성</h2>
-        <p class="text-sm text-gray-400">AI 권장 기반 발주 정보 확인 및 수정</p>
-      </div>
-      <button onclick="closeOrderForm()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500">✕</button>
-    </div>
-
-    <div class="space-y-4 mb-6">
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">도서명</label>
-          <input id="orderBookName" type="text" value="흔한남매 세계사 탐험대 6" class="isbn-input text-sm py-2" style="padding:10px 12px"/>
-        </div>
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">ISBN</label>
-          <input id="orderIsbn" type="text" value="9791172461942" class="isbn-input text-sm" style="padding:10px 12px"/>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">출판사</label>
-          <input type="text" value="미래엔" class="isbn-input text-sm" style="padding:10px 12px"/>
-        </div>
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">발주 유형</label>
-          <select class="isbn-input text-sm" style="padding:10px 12px">
-            <option>집중 발주</option>
-            <option>확대 발주</option>
-            <option>일반 발주</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-3 gap-4">
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">현재 재고</label>
-          <input type="number" value="320" class="isbn-input text-sm" style="padding:10px 12px"/>
-        </div>
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">입고 예정</label>
-          <input type="number" value="100" class="isbn-input text-sm" style="padding:10px 12px"/>
-        </div>
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">발주 수량</label>
-          <input id="orderQty" type="number" value="5400" class="isbn-input text-sm font-bold text-red-600" style="padding:10px 12px"/>
-        </div>
-      </div>
-      <div>
-        <label class="text-xs text-gray-500 font-medium block mb-1">발주 근거 (자동 생성)</label>
-        <textarea rows="3" class="isbn-input text-sm resize-none" style="padding:10px 12px">시리즈 5권 대비 +10% 성장 예측. 아동 학습만화 카테고리 YoY +15.3%. 저자 브랜드 인지도 반영. 안전재고 55권 포함.</textarea>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">담당자</label>
-          <input type="text" value="신호주" class="isbn-input text-sm" style="padding:10px 12px"/>
-        </div>
-        <div>
-          <label class="text-xs text-gray-500 font-medium block mb-1">발주 희망일</label>
-          <input type="date" value="2026-06-09" class="isbn-input text-sm" style="padding:10px 12px"/>
-        </div>
-      </div>
-    </div>
-
-    <div class="p-4 bg-red-50 rounded-xl border border-red-100 mb-6">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl">🔴</span>
-        <div>
-          <p class="font-bold text-red-700">집중 발주 · 5,400권</p>
-          <p class="text-xs text-red-500">AI 신뢰도 87% · 시리즈 5종 데이터 기반</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex gap-3">
-      <button onclick="closeOrderForm()" class="action-btn btn-secondary flex-1 justify-center">취소</button>
-      <button onclick="downloadOrder()" class="action-btn btn-primary flex-1 justify-center">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        발주서 다운로드
-      </button>
     </div>
   </div>
 </div>
 
 <script>
-  const BOOKS = {
-    '9791173326516': {
-      title: '흔한남매 세계사 탐험대 6 - 이슬람 세계',
-      author: '진서 / 흔한남매 원작 / 팀키즈 그림',
-      publisher: '주니어김영사',
-      category: '아동 학습만화',
-      pubDate: '2026-05-29',
-      stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
-      grade: 'intensive',
-      prev1m: {
-        prevTitle: '흔한남매 세계사 탐험대 5',
-        pubDate: '2025-11-28',
-        sales1m: 3_847,
-        salesTotal: 5_241,
-        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
-      },
-      authorRep: {
-        repTitle: '흔한남매 20권 (대표 베스트)',
-        pubDate: '2024-03-15',
-        sales1m: 4_320,
-        salesTotal: 12_850,
-        ratio: 34,
-        comment: '시리즈 전체 20권 중 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
-      },
-      series: [
-        { label: '1권', val: 4102 }, { label: '2권', val: 4530 },
-        { label: '3권', val: 4780 }, { label: '4권', val: 4980 },
-        { label: '5권', val: 5241 }, { label: '6권(예측)', val: 5765, forecast: true }
-      ]
+const BOOKS = {
+  '9791173326516': {
+    title: '흔한남매 세계사 탐험대 6 - 이슬람 세계',
+    author: '진서 / 흔한남매 원작 / 팀키즈 그림',
+    publisher: '주니어김영사',
+    category: '아동 학습만화',
+    pubDate: '2026-05-29',
+    stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
+    grade: 'intensive',
+    prev1m: {
+      prevTitle: '흔한남매 세계사 탐험대 5',
+      pubDate: '2025-11-28',
+      sales1m: 3_847, salesTotal: 5_241,
+      comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
     },
-    '9791172461942': {
-      title: '흔한남매 세계사 탐험대 6',
-      author: '흔한남매 원작 / 신명환 그림',
-      publisher: '미래엔',
-      category: '아동 학습만화',
-      pubDate: '2026-05-29',
-      stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
-      grade: 'intensive',
-      prev1m: {
-        prevTitle: '흔한남매 세계사 탐험대 5',
-        pubDate: '2025-11-28',
-        sales1m: 3_847,
-        salesTotal: 5_241,
-        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
-      },
-      authorRep: {
-        repTitle: '흔한남매 20권 (대표 베스트)',
-        pubDate: '2024-03-15',
-        sales1m: 4_320,
-        salesTotal: 12_850,
-        ratio: 34,
-        comment: '시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
-      },
-      series: [
-        { label: '1권', val: 4102 }, { label: '2권', val: 4530 },
-        { label: '3권', val: 4780 }, { label: '4권', val: 4980 },
-        { label: '5권', val: 5241 }, { label: '6권(예측)', val: 5765, forecast: true }
-      ]
+    authorRep: {
+      repTitle: '흔한남매 20권 (대표 베스트)',
+      pubDate: '2024-03-15',
+      sales1m: 4_320, salesTotal: 12_850, ratio: 34,
+      comment: '시리즈 전체 20권 중 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
     },
-    '9791172461234': {
-      title: '마법사 연대기 5권',
-      author: '박민준',
-      publisher: '황금가지',
-      category: '판타지',
-      stock: 150, incoming: 50, forecast: 3200, recommend: 3000,
-      grade: 'expand',
-      prev1m: {
-        prevTitle: '마법사 연대기 4',
-        pubDate: '2025-08-15',
-        sales1m: 1_820,
-        salesTotal: 3_050,
-        comment: '출간 첫 달 60% 집중 판매 → 확대 발주 후 추가 대응 권장'
-      },
-      authorRep: {
-        repTitle: '마법사 연대기 1권 (시리즈 최고)',
-        pubDate: '2022-05-10',
-        sales1m: 2_100,
-        salesTotal: 9_200,
-        ratio: 23,
-        comment: '데뷔작 최고 판매 기록. 시리즈 충성 독자층 형성으로 신권 수요 안정'
-      },
-      series: [
-        { label: '1권', val: 2100 }, { label: '2권', val: 2450 },
-        { label: '3권', val: 2780 }, { label: '4권', val: 3050 },
-        { label: '5권(예측)', val: 3200, forecast: true }
-      ]
+    series: [
+      {label:'1권',val:4102},{label:'2권',val:4530},{label:'3권',val:4780},
+      {label:'4권',val:4980},{label:'5권',val:5241},{label:'6권(예측)',val:5765,forecast:true}
+    ]
+  },
+  '9791172461942': {
+    title: '흔한남매 세계사 탐험대 6',
+    author: '흔한남매 원작 / 신명환 그림',
+    publisher: '미래엔',
+    category: '아동 학습만화',
+    pubDate: '2026-05-29',
+    stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
+    grade: 'intensive',
+    prev1m: {
+      prevTitle: '흔한남매 세계사 탐험대 5',
+      pubDate: '2025-11-28',
+      sales1m: 3_847, salesTotal: 5_241,
+      comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
     },
-    '9791172469876': {
-      title: '첫 번째 빛',
-      author: '이새봄',
-      publisher: '문학동네',
-      category: '한국소설',
-      stock: 80, incoming: 30, forecast: 1200, recommend: 1100,
-      grade: 'normal',
-      prev1m: {
-        prevTitle: '이새봄 - 두 번째 계절',
-        pubDate: '2025-03-10',
-        sales1m: 520,
-        salesTotal: 1_050,
-        comment: '1개월 판매 비율 50% · 중장기 판매 비중이 높아 안정 발주 권장'
-      },
-      authorRep: {
-        repTitle: '두 번째 계절 (전작)',
-        pubDate: '2025-03-10',
-        sales1m: 520,
-        salesTotal: 1_050,
-        ratio: 50,
-        comment: '중장기 판매 패턴. 초도 소량 → 반응 보고 추가 발주 전략 유효'
-      },
-      series: [
-        { label: '데뷔작', val: 980 }, { label: '두 번째 작', val: 1050 },
-        { label: '세 번째(예측)', val: 1200, forecast: true }
-      ]
-    }
-  };
-
-  let currentBook = null;
-  let stepsVisible = true;
-
-
-  function selectBook(isbn, title) {
-    document.getElementById('isbnInput').value = isbn;
+    authorRep: {
+      repTitle: '흔한남매 20권 (대표 베스트)',
+      pubDate: '2024-03-15',
+      sales1m: 4_320, salesTotal: 12_850, ratio: 34,
+      comment: '시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
+    },
+    series: [
+      {label:'1권',val:4102},{label:'2권',val:4530},{label:'3권',val:4780},
+      {label:'4권',val:4980},{label:'5권',val:5241},{label:'6권(예측)',val:5765,forecast:true}
+    ]
+  },
+  '9791172461234': {
+    title: '마법사 연대기 5권',
+    author: '박민준',
+    publisher: '황금가지',
+    category: '판타지',
+    stock: 150, incoming: 50, forecast: 3200, recommend: 3000,
+    grade: 'expand',
+    prev1m: {
+      prevTitle: '마법사 연대기 4',
+      pubDate: '2025-08-15',
+      sales1m: 1_820, salesTotal: 3_050,
+      comment: '출간 첫 달 60% 집중 판매 → 확대 발주 후 추가 대응 권장'
+    },
+    authorRep: {
+      repTitle: '마법사 연대기 1권 (시리즈 최고)',
+      pubDate: '2022-05-10',
+      sales1m: 2_100, salesTotal: 9_200, ratio: 23,
+      comment: '데뷔작 최고 판매 기록. 시리즈 충성 독자층 형성으로 신권 수요 안정'
+    },
+    series: [
+      {label:'1권',val:2100},{label:'2권',val:2450},{label:'3권',val:2780},
+      {label:'4권',val:3050},{label:'5권(예측)',val:3200,forecast:true}
+    ]
+  },
+  '9791172469876': {
+    title: '첫 번째 빛',
+    author: '이새봄',
+    publisher: '문학동네',
+    category: '한국소설',
+    stock: 80, incoming: 30, forecast: 1200, recommend: 1100,
+    grade: 'normal',
+    prev1m: {
+      prevTitle: '이새봄 - 두 번째 계절',
+      pubDate: '2025-03-10',
+      sales1m: 520, salesTotal: 1_050,
+      comment: '1개월 판매 비율 50% · 중장기 판매 비중이 높아 안정 발주 권장'
+    },
+    authorRep: {
+      repTitle: '두 번째 계절 (전작)',
+      pubDate: '2025-03-10',
+      sales1m: 520, salesTotal: 1_050, ratio: 50,
+      comment: '중장기 판매 패턴. 초도 소량 → 반응 보고 추가 발주 전략 유효'
+    },
+    series: [
+      {label:'데뷔작',val:980},{label:'두번째',val:1050},{label:'세번째(예측)',val:1200,forecast:true}
+    ]
   }
+};
 
-  async function fetchNaverBook(isbn) {
-    // 로딩 상태 먼저 표시
-    document.getElementById('naverInterest').classList.remove('hidden');
-    document.getElementById('naverTitle').textContent = '조회 중...';
-    document.getElementById('naverSearchCount').textContent = '—';
+const GRADE = {
+  intensive: { label:'🔴 집중 발주', cls:'grade-intensive' },
+  expand:    { label:'🟡 확대 발주', cls:'grade-expand' },
+  normal:    { label:'🟢 일반 발주', cls:'grade-normal' },
+};
 
-    try {
-      const res = await fetch(`/api/search?isbn=${isbn}`);
-      if (!res.ok) {
-        document.getElementById('naverTitle').textContent = 'API 연결 오류';
-        document.getElementById('naverComment').textContent = '네이버 API 응답 오류 · 잠시 후 다시 시도해주세요';
-        return;
-      }
-      const { item, searchCount } = await res.json();
-      if (!item) {
-        document.getElementById('naverTitle').textContent = '도서 정보 없음 (ISBN 미등록)';
-        document.getElementById('naverComment').textContent = '네이버 도서에 등록되지 않은 ISBN입니다';
-        return;
-      }
+let currentIsbn = null;
+let coverCache = {};
 
-      // 출간일 파싱
-      const pd = item.pubdate || '';
-      const pubStr = pd.length === 8
-        ? `${pd.slice(0,4)}.${pd.slice(4,6)}.${pd.slice(6,8)}`
-        : pd;
-
-      // 출간 상태 판별
-      const today = new Date();
-      const pubDate = pd.length === 8
-        ? new Date(+pd.slice(0,4), +pd.slice(4,6)-1, +pd.slice(6,8))
-        : null;
-      const isPre    = pubDate && pubDate > today;
-      const isRecent = pubDate && (today - pubDate) < 30 * 24 * 60 * 60 * 1000;
-
-      const statusEl = document.getElementById('naverStatus');
-      if (isPre) {
-        statusEl.textContent = '🟡 예약판매 중';
-        statusEl.style.cssText = 'background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;';
-      } else if (isRecent) {
-        statusEl.textContent = '🟢 출간 직후';
-        statusEl.style.cssText = 'background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;';
-      } else {
-        statusEl.textContent = '⚪ 출간';
-        statusEl.style.cssText = 'background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;';
-      }
-
-      // 검색량 코멘트
-      const countLabel = searchCount > 5000 ? '관심도 매우 높음 — 초도 발주 확대 권장'
-                       : searchCount > 1000 ? '관심도 높음 — 출간 전 수요 확인됨'
-                       : searchCount > 300  ? '관심도 보통 — 일반 발주 수준'
-                       : '관심도 낮음 — 보수적 발주 권장';
-
-      document.getElementById('naverTitle').textContent        = item.title.replace(/<[^>]+>/g,'');
-      document.getElementById('naverPublisher').textContent    = item.publisher || '—';
-      document.getElementById('naverPubdate').textContent      = pubStr || '—';
-      document.getElementById('naverSearchCount').textContent  = searchCount.toLocaleString() + '건';
-      document.getElementById('naverComment').textContent      =
-        `네이버 검색 ${searchCount.toLocaleString()}건 · ${countLabel}`;
-      document.getElementById('naverInterest').classList.remove('hidden');
-
-      // 책표지 이미지
-      if (item.image) {
-        const cover = document.getElementById('bookCover');
-        const placeholder = document.getElementById('bookCoverPlaceholder');
-        cover.src = item.image;
-        cover.style.display = 'block';
-        if (placeholder) placeholder.style.display = 'none';
-      }
-
-    } catch(e) {
-      console.warn('Naver API 오류:', e);
-      document.getElementById('naverTitle').textContent = '연결 실패';
-      document.getElementById('naverComment').textContent = `오류: ${e.message}`;
-    }
-  }
-
-  function startAnalysis() {
-    const isbn = document.getElementById('isbnInput').value.trim().replace(/-/g, '');
-    const book = BOOKS[isbn];
-    if (!book) {
-      alert('등록된 ISBN이 아닙니다. 예시 도서를 선택해 주세요.');
-      return;
-    }
-    currentBook = book;
-    fetchNaverBook(isbn);
-    runAnalysis(book);
-  }
-
-  function runAnalysis(book) {
-    // 숨기기 초기화
-    document.querySelectorAll('.result-section').forEach(el => el.classList.remove('visible'));
-
-    // 도서 정보
-    document.getElementById('bookTitle').textContent = book.title;
-    document.getElementById('bookAuthor').textContent = book.author;
-    document.getElementById('bookPublisher').textContent = book.publisher;
-    document.getElementById('bookCategory').textContent = book.category;
-
-    // KPI
-    updateKPI(book);
-
-    // 발주 등급
-    updateGrade(book.grade);
-
-    // 시리즈 차트
-    updateSeriesChart(book.series);
-
-    // AI 의견
-    updateAIOpinion(book);
-
-    // 실시간 순위
-    updateRankSection(book);
-
-    // Step 순차 표시
-    animateSteps(book);
-
-    // 섹션 순차 표시
-    const sections = ['bookInfo', 'kpiSection', 'gradeSection', 'chartSection', 'aiSection', 'actionSection'];
-    sections.forEach((id, i) => {
-      setTimeout(() => {
-        document.getElementById(id).classList.add('visible');
-      }, 200 + i * 150);
-    });
-
-    // 신뢰도 링 애니메이션
-    setTimeout(() => animateTrustRing(87), 800);
-  }
-
-  function updateKPI(book) {
-    const gradeLabel = { intensive: '🔴 집중 발주', expand: '🟡 확대 발주', normal: '🟢 일반 발주' };
-    const gradeClass = { intensive: 'grade-intensive', expand: 'grade-expand', normal: 'grade-normal' };
-
-    // 직전 시리즈 30일 판매량 배너
-    const p = book.prev1m;
-    const ratio = Math.round((p.sales1m / p.salesTotal) * 100);
-
-    // 출간일 → 30일 기간 계산
-    const pubParts = p.pubDate.split('-');
-    const pubDateObj = new Date(+pubParts[0], +pubParts[1]-1, +pubParts[2]);
-    const end30 = new Date(pubDateObj); end30.setDate(end30.getDate() + 30);
-    const fmt = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-    const periodStr = `${fmt(pubDateObj)} ~ ${fmt(end30)}`;
-
-    document.getElementById('prevTitleLabel').textContent = p.prevTitle;
-    document.getElementById('prevPubDate').textContent = `출간일 ${p.pubDate.replace(/-/g, '.')}`;
-    document.getElementById('prev1mPeriod').textContent = '· ' + periodStr;
-    document.getElementById('prev1mSales').textContent = p.sales1m.toLocaleString();
-    document.getElementById('prevTotalSales').textContent = '누적 ' + p.salesTotal.toLocaleString() + '권';
-    document.getElementById('prev1mRatio').textContent = `첫 달 집중률 ${ratio}%`;
-    document.getElementById('prev1mComment').textContent = p.comment;
-
-    // 저자 대표작 카드
-    const ar = book.authorRep;
-    if (ar) {
-      document.getElementById('authorRepTitle').textContent = ar.repTitle;
-      document.getElementById('authorRepPub').textContent = `출간 ${ar.pubDate.replace(/-/g,'.')}`;
-      document.getElementById('authorRepSales').textContent = ar.salesTotal.toLocaleString();
-      document.getElementById('authorRep1m').textContent = `30일 ${ar.sales1m.toLocaleString()}권`;
-      document.getElementById('authorRepRatio').textContent = `초기 집중률 ${ar.ratio}%`;
-      document.getElementById('authorRepComment').textContent = ar.comment;
-    }
-
-    // KPI 카드 (ID로 직접 참조)
-    document.getElementById('kpiStock').innerHTML    = `${book.stock.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
-    document.getElementById('kpiIncoming').innerHTML = `${book.incoming.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
-    document.getElementById('kpiForecast').innerHTML = `${book.forecast.toLocaleString()}<span class="text-sm font-normal text-gray-400 ml-1">권</span>`;
-    document.getElementById('kpiRecommend').innerHTML= `${book.recommend.toLocaleString()}<span class="text-sm font-normal text-red-400 ml-1">권</span>`;
-    document.getElementById('gradeInlineLabel').textContent = gradeLabel[book.grade];
-  }
-
-  function updateGrade(grade) {
-    const gradeItems = document.querySelectorAll('#gradeSection .flex.items-center.gap-3.p-3');
-    gradeItems.forEach((item, i) => {
-      const grades = ['intensive', 'expand', 'normal'];
-      const isActive = grades[i] === grade;
-      item.className = `flex items-center gap-3 p-3 rounded-xl ${isActive ? 'bg-red-50 border-2 border-red-200' : 'bg-gray-50'}`;
-      const tag = item.querySelector('.tag');
-      if (tag) tag.remove();
-      if (isActive) {
-        const t = document.createElement('span');
-        t.className = 'tag bg-red-600 text-white';
-        t.textContent = '현재';
-        item.appendChild(t);
-      }
-    });
-  }
-
-  function updateSeriesChart(series) {
-    const container = document.getElementById('seriesChartContainer');
-    container.innerHTML = '';
-    const maxVal = Math.max(...series.map(s => s.val));
-    series.forEach(s => {
-      const pct = Math.round((s.val / maxVal) * 100);
-      const isForecast = s.forecast;
-      container.innerHTML += `
-        <div>
-          <div class="flex justify-between text-xs mb-0.5">
-            <span class="${isForecast ? 'font-semibold text-gray-700' : 'text-gray-500'}">${s.label}${isForecast ? ' <span class="tag bg-red-100 text-red-600 ml-1" style="font-size:10px;">예측</span>' : ''}</span>
-            <span class="${isForecast ? 'font-bold text-red-600' : 'text-gray-600'} text-xs">${s.val.toLocaleString()}</span>
+// ── 테이블 렌더링 ──
+function renderTable() {
+  const tbody = document.getElementById('bookTableBody');
+  tbody.innerHTML = '';
+  Object.entries(BOOKS).forEach(([isbn, book]) => {
+    const g = GRADE[book.grade];
+    const ratio = Math.round((book.prev1m.sales1m / book.prev1m.salesTotal) * 100);
+    const tr = document.createElement('tr');
+    tr.className = 'book-row';
+    tr.dataset.isbn = isbn;
+    tr.innerHTML = `
+      <td>
+        <div class="book-info-cell">
+          <div class="book-thumb" id="thumb-${isbn}">📚</div>
+          <div>
+            <div class="book-title-text" style="max-width:180px;">${book.title}</div>
+            <div class="book-meta-text">${book.publisher} · ${isbn}</div>
           </div>
-          <div class="bg-gray-100 rounded h-5 overflow-hidden">
-            <div class="series-bar ${isForecast ? 'forecast' : ''}" style="width:${pct}%;height:100%;font-size:11px;padding:0 6px;">${s.val.toLocaleString()}</div>
-          </div>
-        </div>`;
-    });
-  }
-
-  function updateAIOpinion(book) {
-    const opinions = {
-      intensive: `<p>${book.title} 시리즈는 출간 시마다 안정적인 판매를 기록하며 지속적인 성장세를 보여왔습니다.</p>
-        <p>저자 브랜드 인지도와 <span class="text-yellow-300 font-semibold">${book.category} 카테고리의 성장세</span>를 고려할 때, 초기 물량 확보가 매우 중요합니다.</p>
-        <p>현재 재고(${book.stock}권)와 입고 예정(${book.incoming}권)을 감안하면 추가 발주가 필수적이며, 추천 발주량은 <span class="text-red-300 font-bold">${book.recommend.toLocaleString()}권</span>입니다.</p>`,
-      expand: `<p>${book.title}은(는) 안정적인 판매 흐름을 보이며 전작 대비 성장이 예상됩니다.</p>
-        <p><span class="text-yellow-300 font-semibold">수요 증가 추세</span>를 반영하여 기존 발주량 대비 확대 발주를 권장합니다.</p>
-        <p>추천 발주량은 <span class="text-red-300 font-bold">${book.recommend.toLocaleString()}권</span>입니다.</p>`,
-      normal: `<p>${book.title}은(는) 시장 내 안정적인 위치를 유지하고 있습니다.</p>
-        <p>전기 실적 기준으로 <span class="text-yellow-300 font-semibold">안정적인 발주</span>가 적합합니다.</p>
-        <p>추천 발주량은 <span class="text-red-300 font-bold">${book.recommend.toLocaleString()}권</span>입니다.</p>`
-    };
-    document.getElementById('aiOpinionText').innerHTML = opinions[book.grade];
-    document.getElementById('orderBookName').value = book.title;
-    document.getElementById('orderQty').value = book.recommend;
-  }
-
-  function animateSteps(book) {
-    const gradeLabel = { intensive: '🔴 집중 발주', expand: '🟡 확대 발주', normal: '🟢 일반 발주' };
-    const gradeClass = { intensive: 'grade-intensive', expand: 'grade-expand', normal: 'grade-normal' };
-    const p = book.prev1m;
-    const ratio = Math.round((p.sales1m / p.salesTotal) * 100);
-
-    // 출간일 → 30일 구간
-    const pp = p.pubDate.split('-');
-    const ppDate = new Date(+pp[0], +pp[1]-1, +pp[2]);
-    const ppEnd  = new Date(ppDate); ppEnd.setDate(ppEnd.getDate() + 30);
-    const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
-
-    // 시리즈 평균
-    const prevBooks = book.series.filter(s => !s.forecast);
-    const avg = Math.round(prevBooks.reduce((a, b) => a + b.val, 0) / prevBooks.length);
-
-    const steps = [
-      {
-        tag: '저자 조회',
-        color: 'blue',
-        text: `대표작 『${p.prevTitle}』포함 시리즈 ${prevBooks.length}권 판매 데이터 확인. ` +
-              `시리즈 권별 판매 평균 ${avg.toLocaleString()}권 / ` +
-              `직전권 『${p.prevTitle}』누적 ${p.salesTotal.toLocaleString()}권`
-      },
-      {
-        tag: '시리즈 조회',
-        color: 'blue',
-        text: `직전권 『${p.prevTitle}』출간일 ${p.pubDate} 기준 ` +
-              `출간 후 30일(${fmt(ppDate)}~${fmt(ppEnd)}) 판매 ${p.sales1m.toLocaleString()}권, ` +
-              `누적 대비 ${ratio}% 집중`
-      },
-      {
-        tag: '분야 분석',
-        color: 'green',
-        text: `'${book.category}' 분야 성장 확인. YoY +15.3%, 분야 배율 1.1 적용. ` +
-              `경쟁 신간 동월 출간 여부 검토 → 수요 분산 5~8% 반영`
-      },
-      {
-        tag: '판매 예측',
-        color: 'purple',
-        text: `직전권 30일 ${p.sales1m.toLocaleString()}권 × 시리즈 추세 × 분야 배율 1.1 = 예상 ${book.forecast.toLocaleString()}권`
-      },
-      {
-        tag: '발주 추천',
-        color: 'red',
-        text: `${gradeLabel[book.grade]}. 예측 ${book.forecast.toLocaleString()}권 – 재고 ${book.stock}권 – 입고예정 ${book.incoming}권 ` +
-              `= 순 필요 ${(book.forecast - book.stock - book.incoming).toLocaleString()}권 → 안전재고 포함 권장 ${book.recommend.toLocaleString()}권`
-      }
-    ];
-
-    const colorMap = {
-      blue:   { bg: 'bg-blue-100',   text: 'text-blue-700'   },
-      amber:  { bg: 'bg-amber-100',  text: 'text-amber-700'  },
-      green:  { bg: 'bg-green-100',  text: 'text-green-700'  },
-      purple: { bg: 'bg-purple-100', text: 'text-purple-700' },
-      red:    { bg: 'bg-red-100',    text: 'text-red-700'    },
-    };
-
-    const container = document.getElementById('agentStepList');
-    container.innerHTML = '';
-    steps.forEach((s, i) => {
-      const c = colorMap[s.color];
-      const row = document.createElement('div');
-      row.className = 'analysis-row opacity-0';
-      row.style.transition = 'opacity 0.35s';
-      row.innerHTML = `
-        <div class="w-6 h-6 rounded-full ${c.bg} ${c.text} flex items-center justify-center text-xs font-bold shrink-0" style="min-width:24px">${i+1}</div>
-        <p class="text-sm text-gray-700 leading-relaxed">
-          <span class="font-bold text-gray-900">[${s.tag}]</span> ${s.text}
-        </p>`;
-      container.appendChild(row);
-      setTimeout(() => { row.style.opacity = '1'; }, 300 + i * 220);
-    });
-
-    // 발주 근거
-    document.getElementById('agentReasonText').textContent =
-      `예측 ${book.forecast.toLocaleString()}권 – 재고 ${book.stock}권 – 입고예정 ${book.incoming}권 ` +
-      `= 순 발주 필요 ${(book.forecast - book.stock - book.incoming).toLocaleString()}권 → 안전재고 반영 → 권장 ${book.recommend.toLocaleString()}권`;
-
-    // 등급 뱃지
-    const badge = document.getElementById('gradeBadgeSmall');
-    badge.className = `grade-badge ${gradeClass[book.grade]}`;
-    badge.style.cssText = 'font-size:11px;padding:3px 10px;';
-    badge.textContent = gradeLabel[book.grade];
-  }
-
-  function animateTrustRing(pct) {
-    const ring = document.getElementById('trustRing');
-    const pctEl = document.getElementById('trustPct');
-    const circumference = 163.4;
-    const offset = circumference - (pct / 100) * circumference;
-    ring.style.strokeDashoffset = offset;
-    let count = 0;
-    const timer = setInterval(() => {
-      count++;
-      pctEl.textContent = count + '%';
-      if (count >= pct) clearInterval(timer);
-    }, 15);
-  }
-
-  function toggleReason() {
-    const aiSec = document.getElementById('aiSection');
-    stepsVisible = !stepsVisible;
-    aiSec.style.display = stepsVisible ? 'block' : 'none';
-  }
-
-  function goToOrderSystem() {
-    if (!currentBook) return;
-    const today = new Date().toLocaleDateString('ko-KR');
-    const isbn = document.getElementById('isbnInput')?.value || '';
-    const text = [
-      '[ 교보문고 AI 발주 정보 ]',
-      '─'.repeat(32),
-      `발주일: ${today}`,
-      `담당자: 신호주 (아동팀)`,
-      '',
-      `도서명: ${currentBook.title}`,
-      `ISBN: ${isbn}`,
-      `출판사: ${currentBook.publisher}`,
-      `카테고리: ${currentBook.category}`,
-      '',
-      `권장 발주량: ${currentBook.recommend.toLocaleString()}권`,
-      `예상 판매량: ${currentBook.forecast.toLocaleString()}권`,
-      `현재 재고: ${currentBook.stock.toLocaleString()}권`,
-      `입고 예정: ${currentBook.incoming.toLocaleString()}권`,
-      '─'.repeat(32),
-      '* 교보문고 AI Agent 분석 결과'
-    ].join('\n');
-
-    navigator.clipboard.writeText(text).then(() => {
-      // 버튼 피드백
-      const btn = document.querySelector('button[onclick="goToOrderSystem()"]');
-      if (btn) {
-        const orig = btn.innerHTML;
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>복사 완료!`;
-        btn.style.background = '#16a34a';
-        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
-      }
-    }).catch(() => {
-      // clipboard API 실패 시 대체
-      prompt('아래 내용을 복사하세요 (Ctrl+A → Ctrl+C)', text);
-    });
-  }
-
-  function openOrderForm() {
-    document.getElementById('orderModal').classList.add('open');
-  }
-
-  function closeOrderForm() {
-    document.getElementById('orderModal').classList.remove('open');
-  }
-
-  function downloadOrder() {
-    const bookName = document.getElementById('orderBookName').value;
-    const isbn = document.getElementById('orderIsbn').value;
-    const qty = document.getElementById('orderQty').value;
-    const date = new Date().toLocaleDateString('ko-KR');
-
-    const content = `교보문고 AI 발주서\n${'='.repeat(40)}\n발주일: ${date}\n담당자: 신호주\n\n도서명: ${bookName}\nISBN: ${isbn}\n발주 유형: 집중 발주\n권장 발주량: ${parseInt(qty).toLocaleString()}권\nAI 신뢰도: 87%\n\n발주 근거:\n시리즈 5권 대비 +10% 성장 예측\n아동 학습만화 카테고리 YoY +15.3%\n저자 브랜드 인지도 반영\n안전재고 55권 포함\n\n${'='.repeat(40)}\n* 본 발주서는 교보문고 AI Agent가 생성했습니다.`;
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `발주서_${bookName}_${date.replace(/\./g, '')}.txt`;
-    a.click();
-    closeOrderForm();
-    alert(`발주서가 생성되었습니다!\n📦 ${bookName} · ${parseInt(qty).toLocaleString()}권`);
-  }
-
-  // ── 실시간 순위 ──────────────────────────────────
-  const RANK_DATA = {
-    '아동 학습만화': {
-      kyobo: [
-        { title: '흔한남매 세계사 탐험대 6', author: '진서', change: 'new',  highlight: true },
-        { title: '마법천자문 54권',           author: '박시백', change: 'up2' },
-        { title: '살아남기 시리즈 45',        author: '곰돌이 co.', change: 'same' },
-        { title: '흔한남매 세계사 탐험대 5',  author: '진서', change: 'down1' },
-        { title: '그리스 로마 신화 60',       author: '박시백', change: 'up3' },
-        { title: '놓지마 과학 32',            author: '신태훈', change: 'down2' },
-        { title: '어메이징 사이언스 16',      author: '이현세', change: 'up1' },
-        { title: '역사 탐정단 12',            author: '김진', change: 'same' },
-        { title: '수학도둑 77',               author: '송도수', change: 'down1' },
-        { title: '과학탐험대 지구 8',         author: '강은진', change: 'up2' },
-      ],
-      yes24: [
-        { title: '흔한남매 세계사 탐험대 6', author: '진서', change: 'new',  highlight: true },
-        { title: '살아남기 시리즈 45',        author: '곰돌이 co.', change: 'up1' },
-        { title: '마법천자문 54권',           author: '박시백', change: 'down1' },
-        { title: '그리스 로마 신화 60',       author: '박시백', change: 'up2' },
-        { title: '흔한남매 세계사 탐험대 5',  author: '진서', change: 'same' },
-        { title: '수학도둑 77',               author: '송도수', change: 'up4' },
-        { title: '놓지마 과학 32',            author: '신태훈', change: 'down3' },
-        { title: '역사 탐정단 12',            author: '김진', change: 'up1' },
-        { title: '어메이징 사이언스 16',      author: '이현세', change: 'same' },
-        { title: '미래 탐험대 3',             author: '홍길동', change: 'new' },
-      ],
-      aladin: [
-        { title: '흔한남매 세계사 탐험대 6', author: '진서', change: 'new',  highlight: true },
-        { title: '그리스 로마 신화 60',       author: '박시백', change: 'up1' },
-        { title: '살아남기 시리즈 45',        author: '곰돌이 co.', change: 'up2' },
-        { title: '마법천자문 54권',           author: '박시백', change: 'down2' },
-        { title: '수학도둑 77',               author: '송도수', change: 'up3' },
-        { title: '흔한남매 세계사 탐험대 5',  author: '진서', change: 'down1' },
-        { title: '어메이징 사이언스 16',      author: '이현세', change: 'up2' },
-        { title: '놓지마 과학 32',            author: '신태훈', change: 'same' },
-        { title: '역사 탐정단 12',            author: '김진', change: 'down2' },
-        { title: '코딩탐험대 5',              author: '이정은', change: 'new' },
-      ],
-    },
-    '판타지': {
-      kyobo: [
-        { title: '마법사 연대기 5권', author: '박민준', change: 'new', highlight: true },
-        { title: '드래곤 라자 리마스터', author: '이영도', change: 'up1' },
-        { title: '달빛조각사 58권', author: '남희성', change: 'same' },
-        { title: '전지적 독자 시점 7', author: '싱숑', change: 'down1' },
-        { title: '나 혼자만 레벨업 11', author: '추공', change: 'up2' },
-        { title: '천마신군 귀환 4', author: '미천', change: 'up3' },
-        { title: '검술명가 막내아들 9', author: '검술', change: 'down2' },
-        { title: '회귀자의 마법은 특별해 6', author: '유소야', change: 'same' },
-        { title: '아카데미의 천재 마법사 5', author: '저자', change: 'up1' },
-        { title: '빙의 황녀 3', author: '하리', change: 'new' },
-      ],
-      yes24: [
-        { title: '마법사 연대기 5권', author: '박민준', change: 'new', highlight: true },
-        { title: '전지적 독자 시점 7', author: '싱숑', change: 'up2' },
-        { title: '드래곤 라자 리마스터', author: '이영도', change: 'down1' },
-        { title: '나 혼자만 레벨업 11', author: '추공', change: 'up1' },
-        { title: '달빛조각사 58권', author: '남희성', change: 'same' },
-        { title: '천마신군 귀환 4', author: '미천', change: 'up4' },
-        { title: '검술명가 막내아들 9', author: '검술', change: 'down1' },
-        { title: '빙의 황녀 3', author: '하리', change: 'new' },
-        { title: '회귀자의 마법은 특별해 6', author: '유소야', change: 'down2' },
-        { title: '아카데미의 천재 마법사 5', author: '저자', change: 'same' },
-      ],
-      aladin: [
-        { title: '마법사 연대기 5권', author: '박민준', change: 'new', highlight: true },
-        { title: '나 혼자만 레벨업 11', author: '추공', change: 'up3' },
-        { title: '전지적 독자 시점 7', author: '싱숑', change: 'up1' },
-        { title: '달빛조각사 58권', author: '남희성', change: 'down1' },
-        { title: '드래곤 라자 리마스터', author: '이영도', change: 'same' },
-        { title: '아카데미의 천재 마법사 5', author: '저자', change: 'up2' },
-        { title: '천마신군 귀환 4', author: '미천', change: 'down2' },
-        { title: '검술명가 막내아들 9', author: '검술', change: 'up1' },
-        { title: '빙의 황녀 3', author: '하리', change: 'new' },
-        { title: '회귀자의 마법은 특별해 6', author: '유소야', change: 'same' },
-      ],
-    },
-    '한국소설': {
-      kyobo: [
-        { title: '첫 번째 빛', author: '이새봄', change: 'new', highlight: true },
-        { title: '채식주의자', author: '한강', change: 'up2' },
-        { title: '아몬드', author: '손원평', change: 'same' },
-        { title: '82년생 김지영', author: '조남주', change: 'down1' },
-        { title: '달러구트 꿈 백화점 3', author: '이미예', change: 'up1' },
-        { title: '불편한 편의점 2', author: '김호연', change: 'down2' },
-        { title: '시선으로부터', author: '정세랑', change: 'up3' },
-        { title: '나의 아름다운 이웃', author: '최진영', change: 'same' },
-        { title: '파친코', author: '이민진', change: 'up1' },
-        { title: '연남동 빌라 사람들', author: '임경선', change: 'new' },
-      ],
-      yes24: [
-        { title: '첫 번째 빛', author: '이새봄', change: 'new', highlight: true },
-        { title: '아몬드', author: '손원평', change: 'up1' },
-        { title: '채식주의자', author: '한강', change: 'down1' },
-        { title: '달러구트 꿈 백화점 3', author: '이미예', change: 'up2' },
-        { title: '82년생 김지영', author: '조남주', change: 'same' },
-        { title: '파친코', author: '이민진', change: 'up3' },
-        { title: '불편한 편의점 2', author: '김호연', change: 'down3' },
-        { title: '시선으로부터', author: '정세랑', change: 'up1' },
-        { title: '연남동 빌라 사람들', author: '임경선', change: 'new' },
-        { title: '나의 아름다운 이웃', author: '최진영', change: 'same' },
-      ],
-      aladin: [
-        { title: '첫 번째 빛', author: '이새봄', change: 'new', highlight: true },
-        { title: '달러구트 꿈 백화점 3', author: '이미예', change: 'up1' },
-        { title: '채식주의자', author: '한강', change: 'up2' },
-        { title: '아몬드', author: '손원평', change: 'down1' },
-        { title: '파친코', author: '이민진', change: 'up4' },
-        { title: '82년생 김지영', author: '조남주', change: 'same' },
-        { title: '시선으로부터', author: '정세랑', change: 'up2' },
-        { title: '불편한 편의점 2', author: '김호연', change: 'down2' },
-        { title: '나의 아름다운 이웃', author: '최진영', change: 'up1' },
-        { title: '연남동 빌라 사람들', author: '임경선', change: 'new' },
-      ],
-    },
-  };
-
-  let currentStore = 'kyobo';
-  let currentCategory = '';
-
-  function renderRank(store) {
-    currentStore = store;
-    // 탭 스타일
-    ['kyobo','yes24','aladin'].forEach(s => {
-      const el = document.getElementById('tab-' + s);
-      if (el) el.className = 'rank-tab ' + (s === store ? 'active-tab' : '') + ' text-xs px-3 py-1.5 rounded-lg font-semibold transition-all';
-    });
-
-    const data = (RANK_DATA[currentCategory] || {})[store] || [];
-    const list = document.getElementById('rankList');
-    if (!list) return;
-    list.innerHTML = '';
-
-    data.forEach((item, i) => {
-      const rank = i + 1;
-      const numClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : 'normal';
-
-      let changeHtml = '';
-      if (item.change === 'new') {
-        changeHtml = '<span class="rank-change new">NEW</span>';
-      } else if (item.change === 'same') {
-        changeHtml = '<span class="rank-change same">-</span>';
-      } else if (item.change.startsWith('up')) {
-        changeHtml = `<span class="rank-change up">▲${item.change.slice(2)}</span>`;
-      } else if (item.change.startsWith('down')) {
-        changeHtml = `<span class="rank-change down">▽${item.change.slice(4)}</span>`;
-      }
-
-      const row = document.createElement('div');
-      row.className = 'rank-row' + (item.highlight ? ' rank-highlight' : '');
-      row.innerHTML = `
-        <div class="rank-num ${numClass}">${rank}</div>
-        <div class="flex-1 min-w-0">
-          <p class="text-xs font-semibold text-gray-800 truncate${item.highlight ? ' text-red-700' : ''}">${item.title}</p>
-          <p class="text-xs text-gray-400">${item.author}</p>
         </div>
-        ${changeHtml}`;
-      list.appendChild(row);
-    });
-
-    // 타임스탬프
-    const now = new Date();
-    const ts = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
-    const el = document.getElementById('rankTimestamp');
-    if (el) el.textContent = ts;
-  }
-
-  function switchRank(store) { renderRank(store); }
-
-  function updateRankSection(book) {
-    currentCategory = book.category;
-    // 카테고리 데이터 없으면 기본값
-    if (!RANK_DATA[currentCategory]) {
-      currentCategory = Object.keys(RANK_DATA)[0];
-    }
-    renderRank('kyobo');
-  }
-  // ── 순위 끝 ──────────────────────────────────────
-
-  function resetAnalysis() {
-    document.getElementById('isbnInput').value = '';
-    document.querySelectorAll('.result-section').forEach(el => el.classList.remove('visible'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // 버튼 클릭 + 엔터키
-  document.getElementById('searchBtn').addEventListener('click', startAnalysis);
-  document.getElementById('isbnInput').addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') startAnalysis();
+      </td>
+      <td><div class="metric-num">${book.stock.toLocaleString()}</div><div class="metric-sub">권</div></td>
+      <td><div class="metric-num" style="color:#1d4ed8;">${book.prev1m.sales1m.toLocaleString()}</div><div class="metric-sub">권 (집중률 ${ratio}%)</div></td>
+      <td><div class="metric-num" style="color:#dc2626;">${book.recommend.toLocaleString()}</div><div class="metric-sub">권</div></td>
+      <td><span class="grade-chip ${g.cls}">${g.label}</span></td>
+      <td>
+        <button class="action-btn-sm btn-green" onclick="event.stopPropagation();selectBook('${isbn}')">분석</button>
+      </td>`;
+    tr.addEventListener('click', () => selectBook(isbn));
+    tbody.appendChild(tr);
   });
+}
+
+// ── 도서 선택 & 분석 패널 ──
+function selectBook(isbn) {
+  const book = BOOKS[isbn];
+  if (!book) return;
+  currentIsbn = isbn;
+
+  // 행 하이라이트
+  document.querySelectorAll('.book-row').forEach(r => r.classList.remove('selected'));
+  const row = document.querySelector(`tr[data-isbn="${isbn}"]`);
+  if (row) row.classList.add('selected');
+
+  // ISBN 입력창 동기화
+  document.getElementById('isbnInput').value = isbn;
+
+  renderPanel(isbn, book);
+  fetchNaverCover(isbn);
+}
+
+function renderPanel(isbn, book) {
+  const g = GRADE[book.grade];
+  const p = book.prev1m;
+  const ar = book.authorRep;
+  const ratio = Math.round((p.sales1m / p.salesTotal) * 100);
+
+  // 시리즈 차트
+  const maxVal = Math.max(...book.series.map(s => s.val));
+  const seriesHTML = book.series.map(s => {
+    const pct = Math.round((s.val / maxVal) * 100);
+    return `<div class="series-row">
+      <div class="series-label">${s.label}</div>
+      <div class="series-bar-wrap">
+        <div class="series-bar-fill ${s.forecast ? 'forecast' : ''}" style="width:${pct}%">
+          <span class="series-val">${s.val.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // AI 사고 과정
+  const prevBooks = book.series.filter(s => !s.forecast);
+  const avg = Math.round(prevBooks.reduce((a,b) => a+b.val, 0) / prevBooks.length);
+  const steps = [
+    { color:'#2563eb', bg:'#dbeafe', tag:'저자조회', text:`대표작 『${p.prevTitle}』포함 시리즈 ${prevBooks.length}권. 평균 ${avg.toLocaleString()}권 / 직전권 누적 ${p.salesTotal.toLocaleString()}권` },
+    { color:'#7c3aed', bg:'#ede9fe', tag:'시리즈조회', text:`직전권 출간 후 30일 판매 ${p.sales1m.toLocaleString()}권 (누적 대비 ${ratio}% 집중)` },
+    { color:'#16a34a', bg:'#dcfce7', tag:'분야분석', text:`'${book.category}' YoY +15.3% · 분야 배율 1.1 적용` },
+    { color:'#d97706', bg:'#fef3c7', tag:'판매예측', text:`직전 30일 ${p.sales1m.toLocaleString()}권 × 추세 × 분야배율 = 예측 ${book.forecast.toLocaleString()}권` },
+    { color:'#dc2626', bg:'#fee2e2', tag:'발주추천', text:`${g.label} · 예측 ${book.forecast.toLocaleString()} - 재고 ${book.stock} - 입고 ${book.incoming} + 안전재고 = 권장 ${book.recommend.toLocaleString()}권` },
+  ];
+  const stepsHTML = steps.map((s, i) => `
+    <div class="step-row">
+      <div class="step-num" style="background:${s.bg};color:${s.color};">${i+1}</div>
+      <div style="font-size:12px;color:#374151;line-height:1.5;">
+        <span style="font-weight:700;color:#111827;">[${s.tag}]</span> ${s.text}
+      </div>
+    </div>`).join('');
+
+  // AI 의견
+  const aiTexts = {
+    intensive: `${book.title} 시리즈는 출간마다 안정적 성장세를 기록합니다. 직전권 30일 ${p.sales1m.toLocaleString()}권은 강한 초기 수요를 확인시켜 주며, ${book.category} 분야 YoY 성장을 감안할 때 권장 발주량 <span style="color:#4ade80;font-weight:800;">${book.recommend.toLocaleString()}권</span> 확보가 필수입니다.`,
+    expand: `${book.title}은 안정적 판매 흐름을 보이며 전작 대비 성장이 예상됩니다. 수요 증가 추세를 반영해 <span style="color:#4ade80;font-weight:800;">${book.recommend.toLocaleString()}권</span> 확대 발주를 권장합니다.`,
+    normal: `${book.title}은 중장기 판매 패턴을 보입니다. 초도 <span style="color:#4ade80;font-weight:800;">${book.recommend.toLocaleString()}권</span> 안정 발주 후 반응 보고 추가 대응을 권장합니다.`,
+  };
+
+  document.getElementById('analysisPanel').innerHTML = `
+    <!-- 도서 정보 -->
+    <div class="panel-card">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <img id="panelCover" src="" alt="" style="width:56px;height:78px;border-radius:6px;object-fit:cover;background:#f3f4f6;display:none;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+        <div id="panelCoverPlaceholder" style="width:56px;height:78px;border-radius:6px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">📚</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:800;color:#111827;line-height:1.3;margin-bottom:4px;">${book.title}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">${book.author}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px;">${book.publisher} · ${book.category}</div>
+          <span class="grade-chip ${g.cls}">${g.label}</span>
+          <span style="font-size:11px;color:#9ca3af;margin-left:8px;">${isbn}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 핵심 지표: 직전권 + 저자대표작 -->
+    <div class="hero-metric">
+      <div class="hero-box dark-blue" style="flex:1;">
+        <div class="hero-box-label">직전권 30일 판매</div>
+        <div class="hero-box-value">${p.sales1m.toLocaleString()}</div>
+        <div class="hero-box-sub">누적 ${p.salesTotal.toLocaleString()}권 · 집중률 ${ratio}%</div>
+        <div class="hero-box-title">『${p.prevTitle}』${p.pubDate}</div>
+      </div>
+      <div class="hero-box dark-purple" style="flex:1;">
+        <div class="hero-box-label">저자 대표작 누적</div>
+        <div class="hero-box-value">${ar.salesTotal.toLocaleString()}</div>
+        <div class="hero-box-sub">30일 ${ar.sales1m.toLocaleString()}권 · 집중률 ${ar.ratio}%</div>
+        <div class="hero-box-title">『${ar.repTitle}』</div>
+      </div>
+    </div>
+
+    <!-- 권장 발주 배너 -->
+    <div class="recommend-banner">
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:1px;">AI 권장 발주량</div>
+        <div style="font-size:30px;font-weight:900;color:white;line-height:1.1;">${book.recommend.toLocaleString()}<span style="font-size:14px;font-weight:500;margin-left:4px;">권</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">예측 ${book.forecast.toLocaleString()} · 재고 ${book.stock} · 입고 ${book.incoming}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;">신뢰도</div>
+        <div style="font-size:28px;font-weight:900;color:#bbf7d0;">87%</div>
+        <button onclick="copyOrder('${isbn}')" style="margin-top:8px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);">📋 발주정보 복사</button>
+      </div>
+    </div>
+
+    <!-- AI 신뢰도 -->
+    <div class="panel-card">
+      <div class="panel-label">AI 예측 신뢰도</div>
+      <div class="trust-row">
+        <div style="font-size:11px;color:#6b7280;width:60px;flex-shrink:0;">시리즈</div>
+        <div class="trust-bar-wrap"><div class="trust-bar-fill" style="width:0%" id="tr1"></div></div>
+        <div style="font-size:11px;font-weight:700;color:#16a34a;width:28px;text-align:right;">95%</div>
+      </div>
+      <div class="trust-row">
+        <div style="font-size:11px;color:#6b7280;width:60px;flex-shrink:0;">카테고리</div>
+        <div class="trust-bar-wrap"><div class="trust-bar-fill amber" style="width:0%" id="tr2"></div></div>
+        <div style="font-size:11px;font-weight:700;color:#d97706;width:28px;text-align:right;">75%</div>
+      </div>
+      <div class="trust-row" style="margin-bottom:0;">
+        <div style="font-size:11px;color:#6b7280;width:60px;flex-shrink:0;">시장동향</div>
+        <div class="trust-bar-wrap"><div class="trust-bar-fill" style="width:0%" id="tr3"></div></div>
+        <div style="font-size:11px;font-weight:700;color:#16a34a;width:28px;text-align:right;">88%</div>
+      </div>
+    </div>
+
+    <!-- 시리즈 추이 -->
+    <div class="panel-card">
+      <div class="panel-label">시리즈 판매 추이</div>
+      ${seriesHTML}
+    </div>
+
+    <!-- AI 분석 근거 -->
+    <div class="panel-card">
+      <div class="panel-label">AI 분석 근거</div>
+      <div style="margin-bottom:10px;">${stepsHTML}</div>
+      <div class="ai-summary">
+        <p>${aiTexts[book.grade]}</p>
+      </div>
+    </div>
+
+    <!-- 네이버 관심도 (로딩 중) -->
+    <div id="naverStrip" class="naver-strip" style="display:none;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="#03c75a" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <span style="font-size:11px;font-weight:700;color:#03c75a;">네이버 출간 전 관심도</span>
+      <span id="naverStatus" style="font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;"></span>
+      <span id="naverTitle" style="font-size:11px;color:#374151;font-weight:600;"></span>
+      <span style="color:#d1d5db;">·</span>
+      <span id="naverPubdate" style="font-size:11px;color:#9ca3af;"></span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:#9ca3af;">검색량</span>
+        <span id="naverSearchCount" style="font-size:16px;font-weight:900;color:#03c75a;"></span>
+      </div>
+      <div style="width:100%;padding-top:6px;border-top:1px solid #dcfce7;font-size:11px;color:#6b7280;" id="naverComment"></div>
+    </div>
+  `;
+
+  // 신뢰도 바 애니메이션
+  setTimeout(() => {
+    document.getElementById('tr1').style.width = '95%';
+    document.getElementById('tr2').style.width = '75%';
+    document.getElementById('tr3').style.width = '88%';
+  }, 100);
+}
+
+// ── Naver API ──
+async function fetchNaverCover(isbn) {
+  try {
+    const res = await fetch(`/api/search?isbn=${isbn}`);
+    if (!res.ok) return;
+    const { item } = await res.json();
+    if (!item) return;
+
+    // 책표지 (테이블 + 패널)
+    if (item.image) {
+      const thumb = document.getElementById(`thumb-${isbn}`);
+      if (thumb) { thumb.style.backgroundImage = `url(${item.image})`; thumb.textContent = ''; thumb.style.backgroundSize = 'cover'; thumb.style.backgroundPosition = 'center'; }
+      const panelCover = document.getElementById('panelCover');
+      const placeholder = document.getElementById('panelCoverPlaceholder');
+      if (panelCover) { panelCover.src = item.image; panelCover.style.display = 'block'; }
+      if (placeholder) placeholder.style.display = 'none';
+      coverCache[isbn] = item.image;
+    }
+
+    // 네이버 관심도
+    const res2 = await fetch(`/api/search?isbn=${isbn}`);
+    const { searchCount } = await res2.json();
+    const strip = document.getElementById('naverStrip');
+    if (!strip) return;
+    strip.style.display = 'flex';
+
+    const pd = item.pubdate || '';
+    const pubStr = pd.length === 8 ? `${pd.slice(0,4)}.${pd.slice(4,6)}.${pd.slice(6,8)}` : pd;
+    const today = new Date();
+    const pubDate = pd.length === 8 ? new Date(+pd.slice(0,4), +pd.slice(4,6)-1, +pd.slice(6,8)) : null;
+    const isPre = pubDate && pubDate > today;
+    const isRecent = pubDate && (today - pubDate) < 30*24*60*60*1000;
+
+    const statusEl = document.getElementById('naverStatus');
+    if (isPre) { statusEl.textContent='🟡 예약판매'; statusEl.style.cssText='background:#fef3c7;color:#d97706;'; }
+    else if (isRecent) { statusEl.textContent='🟢 출간직후'; statusEl.style.cssText='background:#dcfce7;color:#16a34a;'; }
+    else { statusEl.textContent='⚪ 출간'; statusEl.style.cssText='background:#f3f4f6;color:#6b7280;'; }
+
+    document.getElementById('naverTitle').textContent = item.title.replace(/<[^>]+>/g,'');
+    document.getElementById('naverPubdate').textContent = pubStr;
+    document.getElementById('naverSearchCount').textContent = (searchCount||0).toLocaleString()+'건';
+    const lvl = searchCount>5000?'관심도 매우 높음 — 초도 발주 확대 권장':searchCount>1000?'관심도 높음 — 출간 전 수요 확인됨':searchCount>300?'관심도 보통 — 일반 발주 수준':'관심도 낮음 — 보수적 발주 권장';
+    document.getElementById('naverComment').textContent = `네이버 검색 ${(searchCount||0).toLocaleString()}건 · ${lvl}`;
+  } catch(e) { console.warn('Naver API:', e); }
+}
+
+// ── 발주정보 복사 ──
+function copyOrder(isbn) {
+  const book = BOOKS[isbn];
+  if (!book) return;
+  const today = new Date().toLocaleDateString('ko-KR');
+  const text = [
+    '[ 교보문고 AI 발주 정보 ]',
+    '─'.repeat(30),
+    `발주일: ${today}  담당: 신호주 (아동팀)`,
+    `도서명: ${book.title}`,
+    `ISBN: ${isbn}  출판사: ${book.publisher}`,
+    `권장 발주량: ${book.recommend.toLocaleString()}권`,
+    `예상 판매량: ${book.forecast.toLocaleString()}권`,
+    `현재 재고: ${book.stock.toLocaleString()}권  입고예정: ${book.incoming.toLocaleString()}권`,
+    '─'.repeat(30),
+    '* 교보문고 AI Agent 분석 결과'
+  ].join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ 복사완료!';
+    setTimeout(() => { btn.textContent = '📋 발주정보 복사'; }, 2000);
+  }).catch(() => prompt('복사하세요 (Ctrl+A → Ctrl+C)', text));
+}
+
+// ── ISBN 검색 ──
+function startAnalysis() {
+  const isbn = document.getElementById('isbnInput').value.trim().replace(/-/g,'');
+  if (!BOOKS[isbn]) { alert('등록된 ISBN이 아닙니다.\n\n등록된 ISBN:\n' + Object.keys(BOOKS).join('\n')); return; }
+  selectBook(isbn);
+}
+
+// ── 사이드바 네비 ──
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Init ──
+renderTable();
+
+document.getElementById('searchBtn').addEventListener('click', startAnalysis);
+document.getElementById('isbnInput').addEventListener('keyup', e => { if (e.key === 'Enter') startAnalysis(); });
 </script>
 </body>
 </html>
