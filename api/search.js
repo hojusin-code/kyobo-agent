@@ -5,8 +5,8 @@ export default async function handler(req, res) {
   const { isbn } = req.query;
   if (!isbn) return res.status(400).json({ error: 'isbn required' });
 
-  const clientId     = process.env.NAVER_CLIENT_ID;
-  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  const clientId     = 'LQiBBpg9tPtr0CU8q6EK';
+  const clientSecret = 'aEVIAXnb7M';
 
   try {
     // ISBN으로 도서 정보 조회
