@@ -172,6 +172,27 @@
     .step-tag { font-weight:700; color:#111; }
     .ai-summary-box { background:#F8FAFF; border:1.5px solid #DBEAFE; border-radius:8px; padding:12px 14px; margin-top:10px; font-size:12px; color:#374151; line-height:1.7; }
 
+    /* ── HOT SEARCH ── */
+    .hot-search-card { background:white; border-radius:12px; padding:16px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.07); margin-top:12px; }
+    .hot-search-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .hot-search-title { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:800; color:#111; }
+    .hot-live-dot { width:7px; height:7px; border-radius:50%; background:var(--kyobo-red); animation:pulse 1.5s infinite; flex-shrink:0; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .hot-search-time { font-size:10px; color:#9CA3AF; }
+    .hot-item { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid #F9FAFB; }
+    .hot-item:last-child { border-bottom:none; }
+    .hot-rank { width:20px; text-align:center; font-size:13px; font-weight:900; flex-shrink:0; }
+    .hot-rank.r1 { color:var(--kyobo-red); }
+    .hot-rank.r2 { color:#D97706; }
+    .hot-rank.r3 { color:#2563EB; }
+    .hot-rank.r4,.hot-rank.r5 { color:#9CA3AF; }
+    .hot-keyword { flex:1; font-size:13px; font-weight:600; color:#111; }
+    .hot-change { font-size:10px; font-weight:700; }
+    .hot-change.up   { color:#E60012; }
+    .hot-change.down { color:#2563EB; }
+    .hot-change.new  { background:#FEE2E2; color:#E60012; padding:1px 5px; border-radius:3px; }
+    .hot-change.same { color:#9CA3AF; }
+
     /* ── GRADE CHIP ── */
     .grade-chip { display:inline-flex; align-items:center; font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; }
     .g-intensive { background:#FEE2E2; color:var(--kyobo-red); }
@@ -326,7 +347,8 @@
   <!-- Bottom Row: Recommend + Detail -->
   <div class="bottom-row hidden" id="bottomRow">
 
-    <!-- Recommend -->
+    <!-- Left: Recommend + Hot Search -->
+    <div style="display:flex;flex-direction:column;gap:0;">
     <div class="recommend-card">
       <div class="rec-label">AI 권장 발주량</div>
       <div class="rec-value" id="recValue">—<span class="rec-unit">권</span></div>
@@ -339,6 +361,19 @@
         <button class="copy-btn" id="copyBtn" onclick="copyOrder()">📋 발주정보 복사</button>
       </div>
     </div>
+
+    <!-- Hot Search -->
+    <div class="hot-search-card">
+      <div class="hot-search-header">
+        <div class="hot-search-title">
+          <div class="hot-live-dot"></div>
+          교보문고 <span id="hotSearchCategory" style="color:var(--kyobo-red);">분야</span> 실시간 인기검색어
+        </div>
+        <span class="hot-search-time" id="hotSearchTime"></span>
+      </div>
+      <div id="hotSearchList"></div>
+    </div>
+    </div><!-- /left col -->
 
     <!-- Trust + Series -->
     <div style="display:flex;flex-direction:column;gap:12px;">
@@ -472,6 +507,65 @@ const GRADE_MAP = {
 
 let currentIsbn = null;
 
+// 분야별 실시간 인기검색어 (교보문고 분야 데이터 기반 더미)
+const HOT_KEYWORDS = {
+  '아동 학습만화': [
+    { kw:'흔한남매',     change:'up',   delta:'+2' },
+    { kw:'마법천자문',   change:'same', delta:'—'  },
+    { kw:'설민석 세계사',change:'new',  delta:'NEW'},
+    { kw:'who 시리즈',   change:'down', delta:'-1' },
+    { kw:'살아남기',     change:'up',   delta:'+3' },
+  ],
+  '판타지': [
+    { kw:'전지적 독자시점', change:'up',   delta:'+1' },
+    { kw:'나 혼자만 레벨업', change:'same', delta:'—'  },
+    { kw:'달빛조각사',    change:'new',  delta:'NEW'},
+    { kw:'마법사 연대기', change:'up',   delta:'+2' },
+    { kw:'오버로드',      change:'down', delta:'-2' },
+  ],
+  '한국소설': [
+    { kw:'채식주의자',   change:'up',   delta:'+1' },
+    { kw:'파친코',       change:'same', delta:'—'  },
+    { kw:'82년생 김지영',change:'down', delta:'-1' },
+    { kw:'아몬드',       change:'new',  delta:'NEW'},
+    { kw:'달러구트',     change:'up',   delta:'+2' },
+  ],
+  'default': [
+    { kw:'베스트셀러',   change:'up',   delta:'+1' },
+    { kw:'신간도서',     change:'same', delta:'—'  },
+    { kw:'스테디셀러',   change:'up',   delta:'+2' },
+    { kw:'추천도서',     change:'new',  delta:'NEW'},
+    { kw:'화제의 책',    change:'down', delta:'-1' },
+  ],
+};
+
+function renderHotSearch(category) {
+  const list = HOT_KEYWORDS[category] || HOT_KEYWORDS['default'];
+  const rankCls = ['r1','r2','r3','r4','r5'];
+  const rankIcon = ['🥇','🥈','🥉','4','5'];
+
+  document.getElementById('hotSearchCategory').textContent = category;
+
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('hotSearchTime').textContent = `${hh}:${mm} 기준`;
+
+  document.getElementById('hotSearchList').innerHTML = list.map((item, i) => {
+    let changeHtml = '';
+    if (item.change === 'new')  changeHtml = `<span class="hot-change new">NEW</span>`;
+    else if (item.change === 'up')   changeHtml = `<span class="hot-change up">▲ ${item.delta}</span>`;
+    else if (item.change === 'down') changeHtml = `<span class="hot-change down">▼ ${item.delta.replace('-','')}</span>`;
+    else changeHtml = `<span class="hot-change same">—</span>`;
+
+    return `<div class="hot-item">
+      <div class="hot-rank ${rankCls[i]}">${i < 3 ? rankIcon[i] : i+1}</div>
+      <div class="hot-keyword">${item.kw}</div>
+      ${changeHtml}
+    </div>`;
+  }).join('');
+}
+
 function show(id)  { document.getElementById(id).classList.remove('hidden'); }
 function hide(id)  { document.getElementById(id).classList.add('hidden'); }
 
@@ -587,6 +681,9 @@ function startAnalysis() {
     normal:   `『${book.title}』은 중장기 판매 패턴을 보입니다. 초도 <strong>${book.recommend.toLocaleString()}권</strong> 안정 발주 후 반응을 보고 추가 대응을 권장합니다.`,
   };
   document.getElementById('aiSummary').innerHTML = summaryMap[book.grade];
+
+  // Hot Search
+  renderHotSearch(book.category);
 
   // Naver
   fetchNaver(isbn);
