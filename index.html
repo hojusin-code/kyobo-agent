@@ -712,7 +712,6 @@
       </div>
     </div>
   </div>
-  <!-- stepSection ID 유지 (toggleSteps 호환) -->
   <div id="stepSection" style="display:none;"></div>
 
   <!-- 액션 버튼 -->
@@ -722,13 +721,17 @@
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         다시 분석
       </button>
-      <button onclick="toggleSteps()" class="action-btn btn-outline">
+      <button onclick="toggleReason()" class="action-btn btn-outline">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         근거 보기
       </button>
-      <button onclick="openOrderForm()" class="action-btn btn-primary">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        발주서 생성
+      <!-- 통합유통 시스템 연결 버튼 -->
+      <button onclick="goToOrderSystem()" class="action-btn btn-primary">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          <path d="M6 8h.01M6 11h.01M9 8h6M9 11h6"/>
+        </svg>
+        통합유통 발주
       </button>
     </div>
   </div>
@@ -914,11 +917,24 @@
   }
 
   async function fetchNaverBook(isbn) {
+    // 로딩 상태 먼저 표시
+    document.getElementById('naverInterest').classList.remove('hidden');
+    document.getElementById('naverTitle').textContent = '조회 중...';
+    document.getElementById('naverSearchCount').textContent = '—';
+
     try {
       const res = await fetch(`/api/search?isbn=${isbn}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        document.getElementById('naverTitle').textContent = 'API 연결 오류';
+        document.getElementById('naverComment').textContent = '네이버 API 응답 오류 · 잠시 후 다시 시도해주세요';
+        return;
+      }
       const { item, searchCount } = await res.json();
-      if (!item) return;
+      if (!item) {
+        document.getElementById('naverTitle').textContent = '도서 정보 없음 (ISBN 미등록)';
+        document.getElementById('naverComment').textContent = '네이버 도서에 등록되지 않은 ISBN입니다';
+        return;
+      }
 
       // 출간일 파싱
       const pd = item.pubdate || '';
@@ -962,6 +978,8 @@
 
     } catch(e) {
       console.warn('Naver API 오류:', e);
+      document.getElementById('naverTitle').textContent = '연결 실패';
+      document.getElementById('naverComment').textContent = `오류: ${e.message}`;
     }
   }
 
@@ -1205,10 +1223,19 @@
     }, 15);
   }
 
-  function toggleSteps() {
-    const stepSec = document.getElementById('stepSection');
+  function toggleReason() {
+    const aiSec = document.getElementById('aiSection');
     stepsVisible = !stepsVisible;
-    stepSec.style.display = stepsVisible ? 'block' : 'none';
+    aiSec.style.display = stepsVisible ? 'block' : 'none';
+  }
+
+  function goToOrderSystem() {
+    // 교보문고 통합유통 시스템 연결
+    const url = 'https://kyobo-distribution.co.kr'; // 실제 URL로 교체
+    if (currentBook) {
+      alert(`📦 통합유통 시스템으로 이동합니다.\n\n도서: ${currentBook.title}\n권장 발주량: ${currentBook.recommend.toLocaleString()}권`);
+    }
+    // window.open(url, '_blank'); // 실제 URL 연결 시 주석 해제
   }
 
   function openOrderForm() {
