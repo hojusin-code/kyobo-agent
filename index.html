@@ -728,10 +728,9 @@
       <!-- 통합유통 시스템 연결 버튼 -->
       <button onclick="goToOrderSystem()" class="action-btn btn-primary">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
-          <path d="M6 8h.01M6 11h.01M9 8h6M9 11h6"/>
+          <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
         </svg>
-        통합유통 발주
+        발주정보 복사
       </button>
     </div>
   </div>
@@ -1230,12 +1229,41 @@
   }
 
   function goToOrderSystem() {
-    // 교보문고 통합유통 시스템 연결
-    const url = 'https://kyobo-distribution.co.kr'; // 실제 URL로 교체
-    if (currentBook) {
-      alert(`📦 통합유통 시스템으로 이동합니다.\n\n도서: ${currentBook.title}\n권장 발주량: ${currentBook.recommend.toLocaleString()}권`);
-    }
-    // window.open(url, '_blank'); // 실제 URL 연결 시 주석 해제
+    if (!currentBook) return;
+    const today = new Date().toLocaleDateString('ko-KR');
+    const isbn = document.getElementById('isbnInput')?.value || '';
+    const text = [
+      '[ 교보문고 AI 발주 정보 ]',
+      '─'.repeat(32),
+      `발주일: ${today}`,
+      `담당자: 신호주 (아동팀)`,
+      '',
+      `도서명: ${currentBook.title}`,
+      `ISBN: ${isbn}`,
+      `출판사: ${currentBook.publisher}`,
+      `카테고리: ${currentBook.category}`,
+      '',
+      `권장 발주량: ${currentBook.recommend.toLocaleString()}권`,
+      `예상 판매량: ${currentBook.forecast.toLocaleString()}권`,
+      `현재 재고: ${currentBook.stock.toLocaleString()}권`,
+      `입고 예정: ${currentBook.incoming.toLocaleString()}권`,
+      '─'.repeat(32),
+      '* 교보문고 AI Agent 분석 결과'
+    ].join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      // 버튼 피드백
+      const btn = document.querySelector('button[onclick="goToOrderSystem()"]');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>복사 완료!`;
+        btn.style.background = '#16a34a';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+      }
+    }).catch(() => {
+      // clipboard API 실패 시 대체
+      prompt('아래 내용을 복사하세요 (Ctrl+A → Ctrl+C)', text);
+    });
   }
 
   function openOrderForm() {
