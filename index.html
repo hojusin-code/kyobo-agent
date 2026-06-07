@@ -416,30 +416,65 @@
   <!-- 핵심 벤치마크 배너 -->
   <div id="kpiSection" class="result-section mb-4">
 
-    <!-- 직전 시리즈 1개월 판매량 배너 (컴팩트) -->
-    <div class="mb-3 rounded-xl px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-2" style="background:#1e293b;border:1px solid #2563EB33;">
-      <div class="flex items-center gap-2 shrink-0">
-        <span class="text-xs text-blue-300 font-semibold">📊 직전권 30일 판매</span>
-      </div>
-      <div class="flex items-center gap-1 text-xs text-gray-400">
-        <span id="prevTitleLabel" class="text-blue-200 font-semibold">—</span>
-        <span class="text-gray-600 mx-1">·</span>
-        <span id="prevPubDate" class="text-gray-400">출간일 —</span>
-        <span class="text-gray-600 mx-1">·</span>
-        <span id="prev1mPeriod" class="text-gray-500">—</span>
-      </div>
-      <div class="flex items-center gap-3 ml-auto">
-        <div class="text-right">
-          <span id="prev1mSales" class="text-2xl font-black text-yellow-300">—</span>
-          <span class="text-xs text-yellow-400 ml-1">권</span>
+    <!-- ★ 핵심 판매 지표 (가장 크게 강조) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <!-- 직전권 30일 판매 -->
+      <div class="rounded-2xl p-5" style="background:linear-gradient(135deg,#1e293b,#1e3a5f);border:1.5px solid #3b82f633;">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <p class="text-xs text-blue-300 font-bold uppercase tracking-wider mb-0.5">핵심 발주 기준</p>
+            <p class="text-sm text-white font-bold">직전권 출간 후 <span class="text-yellow-300">30일</span> 판매량</p>
+          </div>
+          <span class="text-xs bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 px-2 py-1 rounded-lg font-bold whitespace-nowrap">초도 기준</span>
         </div>
-        <div class="text-right">
-          <p id="prevTotalSales" class="text-xs text-gray-400">누적 —</p>
-          <p id="prev1mRatio" class="text-xs text-orange-300">—</p>
+        <div class="flex items-end gap-4 mb-3">
+          <div>
+            <p id="prev1mSales" class="text-5xl font-black text-yellow-300 leading-none">—</p>
+            <p class="text-xs text-yellow-400/70 mt-1">권 / 30일</p>
+          </div>
+          <div class="pb-1">
+            <p id="prevTotalSales" class="text-sm text-gray-300 font-semibold">누적 —</p>
+            <p id="prev1mRatio" class="text-xs text-orange-300 mt-0.5">—</p>
+          </div>
+        </div>
+        <div class="border-t border-white/10 pt-2">
+          <p id="prevTitleLabel" class="text-xs text-blue-200 font-semibold mb-0.5">—</p>
+          <p id="prevPubDate" class="text-xs text-gray-400 inline">출간일 — </p>
+          <p id="prev1mPeriod" class="text-xs text-gray-500 inline">· —</p>
+        </div>
+        <div class="mt-2 rounded-lg px-3 py-1.5 bg-white/5">
+          <p id="prev1mComment" class="text-xs text-gray-300 leading-relaxed">—</p>
         </div>
         <div id="prev1mBadge"></div>
       </div>
-      <p id="prev1mComment" class="w-full text-xs text-gray-400 pt-1 border-t border-white/10">—</p>
+
+      <!-- 저자 대표작 판매 -->
+      <div class="rounded-2xl p-5" style="background:linear-gradient(135deg,#1a1f2e,#1e2d3d);border:1.5px solid #8b5cf633;">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <p class="text-xs text-purple-300 font-bold uppercase tracking-wider mb-0.5">저자 판매 레퍼런스</p>
+            <p class="text-sm text-white font-bold">저자 대표작 <span class="text-purple-300">판매 실적</span></p>
+          </div>
+          <span class="text-xs bg-purple-400/20 text-purple-300 border border-purple-400/30 px-2 py-1 rounded-lg font-bold">저자 지표</span>
+        </div>
+        <div class="flex items-end gap-4 mb-3">
+          <div>
+            <p id="authorRepSales" class="text-5xl font-black text-purple-300 leading-none">—</p>
+            <p class="text-xs text-purple-400/70 mt-1">권 누적</p>
+          </div>
+          <div class="pb-1">
+            <p id="authorRep1m" class="text-sm text-gray-300 font-semibold">30일 —</p>
+            <p id="authorRepRatio" class="text-xs text-pink-300 mt-0.5">—</p>
+          </div>
+        </div>
+        <div class="border-t border-white/10 pt-2">
+          <p id="authorRepTitle" class="text-xs text-purple-200 font-semibold mb-0.5">—</p>
+          <p id="authorRepPub" class="text-xs text-gray-400">—</p>
+        </div>
+        <div class="mt-2 rounded-lg px-3 py-1.5 bg-white/5">
+          <p id="authorRepComment" class="text-xs text-gray-300 leading-relaxed">—</p>
+        </div>
+      </div>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 kpi-grid mb-3">
@@ -541,15 +576,15 @@
 
   <!-- 시리즈 차트 + 실시간 순위 -->
   <div id="chartSection" class="result-section mb-4">
-  <div class="grid md:grid-cols-5 gap-4">
-  <!-- 시리즈 판매 비교 (좌, 3칸) -->
-  <div class="md:col-span-3 section-card">
-    <div class="section-title">
+  <div class="grid md:grid-cols-5 gap-3">
+  <!-- 시리즈 판매 비교 (좌, 2칸) -->
+  <div class="md:col-span-2 section-card" style="padding:16px 18px;">
+    <div class="section-title" style="margin-bottom:10px;font-size:13px;">
       <span class="dot"></span>
-      시리즈 판매 비교
+      시리즈 판매 추이
       <span class="ml-auto text-xs text-gray-400 font-normal">단위: 권</span>
     </div>
-    <div class="space-y-4">
+    <div class="space-y-2">
       <div>
         <div class="flex justify-between text-sm mb-1">
           <span class="text-gray-600">세계사 탐험대 1권</span>
@@ -605,11 +640,11 @@
         </div>
       </div>
     </div>
-    <p class="text-xs text-gray-400 mt-4 text-right">* 시리즈 권당 평균 성장률 +9.7% 반영</p>
+    <p class="text-xs text-gray-400 mt-2 text-right">* 권당 평균 성장률 +9.7%</p>
   </div>
 
-  <!-- 인터넷서점 실시간 순위 (우, 2칸) -->
-  <div class="md:col-span-2 section-card flex flex-col">
+  <!-- 인터넷서점 실시간 순위 (우, 3칸) -->
+  <div class="md:col-span-3 section-card flex flex-col">
     <div class="section-title mb-3">
       <span class="dot"></span>
       분야 실시간 검색순위
@@ -791,7 +826,15 @@
         pubDate: '2025-11-28',
         sales1m: 3_847,
         salesTotal: 5_241,
-        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 연말 성수기 보정 필요'
+        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
+      },
+      authorRep: {
+        repTitle: '흔한남매 20권 (대표 베스트)',
+        pubDate: '2024-03-15',
+        sales1m: 4_320,
+        salesTotal: 12_850,
+        ratio: 34,
+        comment: '시리즈 전체 20권 중 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
       },
       series: [
         { label: '1권', val: 4102 }, { label: '2권', val: 4530 },
@@ -812,7 +855,15 @@
         pubDate: '2025-11-28',
         sales1m: 3_847,
         salesTotal: 5_241,
-        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 연말 성수기 보정 필요'
+        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초도 발주량 결정의 핵심 기준'
+      },
+      authorRep: {
+        repTitle: '흔한남매 20권 (대표 베스트)',
+        pubDate: '2024-03-15',
+        sales1m: 4_320,
+        salesTotal: 12_850,
+        ratio: 34,
+        comment: '시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인'
       },
       series: [
         { label: '1권', val: 4102 }, { label: '2권', val: 4530 },
@@ -834,6 +885,14 @@
         salesTotal: 3_050,
         comment: '출간 첫 달 60% 집중 판매 → 확대 발주 후 추가 대응 권장'
       },
+      authorRep: {
+        repTitle: '마법사 연대기 1권 (시리즈 최고)',
+        pubDate: '2022-05-10',
+        sales1m: 2_100,
+        salesTotal: 9_200,
+        ratio: 23,
+        comment: '데뷔작 최고 판매 기록. 시리즈 충성 독자층 형성으로 신권 수요 안정'
+      },
       series: [
         { label: '1권', val: 2100 }, { label: '2권', val: 2450 },
         { label: '3권', val: 2780 }, { label: '4권', val: 3050 },
@@ -853,6 +912,14 @@
         sales1m: 520,
         salesTotal: 1_050,
         comment: '1개월 판매 비율 50% · 중장기 판매 비중이 높아 안정 발주 권장'
+      },
+      authorRep: {
+        repTitle: '두 번째 계절 (전작)',
+        pubDate: '2025-03-10',
+        sales1m: 520,
+        salesTotal: 1_050,
+        ratio: 50,
+        comment: '중장기 판매 패턴. 초도 소량 → 반응 보고 추가 발주 전략 유효'
       },
       series: [
         { label: '데뷔작', val: 980 }, { label: '두 번째 작', val: 1050 },
@@ -1013,12 +1080,22 @@
 
     document.getElementById('prevTitleLabel').textContent = p.prevTitle;
     document.getElementById('prevPubDate').textContent = `출간일 ${p.pubDate.replace(/-/g, '.')}`;
-    document.getElementById('prev1mPeriod').textContent = periodStr;
+    document.getElementById('prev1mPeriod').textContent = '· ' + periodStr;
     document.getElementById('prev1mSales').textContent = p.sales1m.toLocaleString();
-    document.getElementById('prevTotalSales').textContent = p.salesTotal.toLocaleString() + '권';
-    document.getElementById('prev1mRatio').textContent = `누적의 ${ratio}%`;
-    document.getElementById('prev1mComment').textContent = `[${p.prevTitle}] ${p.comment}`;
-    document.getElementById('prev1mBadge').classList.remove('hidden');
+    document.getElementById('prevTotalSales').textContent = '누적 ' + p.salesTotal.toLocaleString() + '권';
+    document.getElementById('prev1mRatio').textContent = `첫 달 집중률 ${ratio}%`;
+    document.getElementById('prev1mComment').textContent = p.comment;
+
+    // 저자 대표작 카드
+    const ar = book.authorRep;
+    if (ar) {
+      document.getElementById('authorRepTitle').textContent = ar.repTitle;
+      document.getElementById('authorRepPub').textContent = `출간 ${ar.pubDate.replace(/-/g,'.')}`;
+      document.getElementById('authorRepSales').textContent = ar.salesTotal.toLocaleString();
+      document.getElementById('authorRep1m').textContent = `30일 ${ar.sales1m.toLocaleString()}권`;
+      document.getElementById('authorRepRatio').textContent = `초기 집중률 ${ar.ratio}%`;
+      document.getElementById('authorRepComment').textContent = ar.comment;
+    }
 
     // KPI 카드
     const kpiSection = document.getElementById('kpiSection');
@@ -1056,12 +1133,12 @@
       const isForecast = s.forecast;
       container.innerHTML += `
         <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="${isForecast ? 'font-semibold text-gray-700' : 'text-gray-600'}">${s.label}${isForecast ? ' <span class="tag bg-red-100 text-red-600 ml-1">예측</span>' : ''}</span>
-            <span class="${isForecast ? 'font-bold text-red-600' : 'font-semibold text-gray-700'}">${s.val.toLocaleString()}권</span>
+          <div class="flex justify-between text-xs mb-0.5">
+            <span class="${isForecast ? 'font-semibold text-gray-700' : 'text-gray-500'}">${s.label}${isForecast ? ' <span class="tag bg-red-100 text-red-600 ml-1" style="font-size:10px;">예측</span>' : ''}</span>
+            <span class="${isForecast ? 'font-bold text-red-600' : 'text-gray-600'} text-xs">${s.val.toLocaleString()}</span>
           </div>
-          <div class="bg-gray-100 rounded-lg h-8 overflow-hidden">
-            <div class="series-bar ${isForecast ? 'forecast' : ''}" style="width:${pct}%">${s.val.toLocaleString()}</div>
+          <div class="bg-gray-100 rounded h-5 overflow-hidden">
+            <div class="series-bar ${isForecast ? 'forecast' : ''}" style="width:${pct}%;height:100%;font-size:11px;padding:0 6px;">${s.val.toLocaleString()}</div>
           </div>
         </div>`;
     });
