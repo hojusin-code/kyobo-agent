@@ -774,14 +774,15 @@
       author: '진서 / 흔한남매 원작 / 팀키즈 그림',
       publisher: '주니어김영사',
       category: '아동 학습만화',
+      pubDate: '2026-05-29',
       stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
       grade: 'intensive',
       prev1m: {
-        prevTitle: '세계사 탐험대 5권',
+        prevTitle: '흔한남매 세계사 탐험대 5',
         pubDate: '2025-11-28',
         sales1m: 3_847,
         salesTotal: 5_241,
-        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초기 재고 확보가 핵심'
+        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 연말 성수기 보정 필요'
       },
       series: [
         { label: '1권', val: 4102 }, { label: '2권', val: 4530 },
@@ -794,14 +795,15 @@
       author: '흔한남매 원작 / 신명환 그림',
       publisher: '미래엔',
       category: '아동 학습만화',
+      pubDate: '2026-05-29',
       stock: 320, incoming: 100, forecast: 5765, recommend: 5400,
       grade: 'intensive',
       prev1m: {
-        prevTitle: '세계사 탐험대 5권',
+        prevTitle: '흔한남매 세계사 탐험대 5',
         pubDate: '2025-11-28',
         sales1m: 3_847,
         salesTotal: 5_241,
-        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 초기 재고 확보가 핵심'
+        comment: '출간 첫 달에 누적의 73%가 집중 판매됨 → 연말 성수기 보정 필요'
       },
       series: [
         { label: '1권', val: 4102 }, { label: '2권', val: 4530 },
@@ -817,7 +819,7 @@
       stock: 150, incoming: 50, forecast: 3200, recommend: 3000,
       grade: 'expand',
       prev1m: {
-        prevTitle: '마법사 연대기 4권',
+        prevTitle: '마법사 연대기 4',
         pubDate: '2025-08-15',
         sales1m: 1_820,
         salesTotal: 3_050,
@@ -837,7 +839,7 @@
       stock: 80, incoming: 30, forecast: 1200, recommend: 1100,
       grade: 'normal',
       prev1m: {
-        prevTitle: '두 번째 계절',
+        prevTitle: '이새봄 - 두 번째 계절',
         pubDate: '2025-03-10',
         sales1m: 520,
         salesTotal: 1_050,
@@ -993,51 +995,131 @@
     document.getElementById('orderQty').value = book.recommend;
   }
 
+  // 출간월 → 계절 성수기 분석
+  function getSeasonInfo(pubDateStr) {
+    const month = parseInt(pubDateStr.split('-')[1]);
+    const seasons = {
+      1:  { label: '1월 (설날·신학기 준비)', type: 'normal',  adj: 1.00, note: '설날 특수 소폭 있으나 평월 수준' },
+      2:  { label: '2월 (신학기 직전)',       type: 'high',    adj: 1.05, note: '신학기 준비 수요로 소폭 상승' },
+      3:  { label: '3월 (신학기 성수기)',     type: 'peak',    adj: 1.15, note: '신학기 성수기 — 30일 판매량 상향 보정 필요' },
+      4:  { label: '4월 (신학기 성수기)',     type: 'peak',    adj: 1.12, note: '신학기 지속 — 높은 판매 유지' },
+      5:  { label: '5월 (어린이날 성수기)',   type: 'peak',    adj: 1.20, note: '어린이날·어버이날 특수 — 연중 최고 성수기' },
+      6:  { label: '6월 (방학 전 비수기)',    type: 'low',     adj: 0.90, note: '방학 전 소강기 — 30일 판매량 낮게 측정됨' },
+      7:  { label: '7월 (여름방학)',          type: 'high',    adj: 1.08, note: '여름방학 성수기 시작 — 판매 상승' },
+      8:  { label: '8월 (여름방학 성수기)',   type: 'high',    adj: 1.10, note: '여름방학 절정 — 학습물 수요 높음' },
+      9:  { label: '9월 (2학기 신학기)',      type: 'normal',  adj: 1.02, note: '2학기 시작 — 소폭 수요 발생' },
+      10: { label: '10월 (독서의 달)',        type: 'high',    adj: 1.08, note: '독서의 달 캠페인 효과 — 판매 상승' },
+      11: { label: '11월 (연말 성수기 진입)', type: 'high',    adj: 1.10, note: '연말 성수기 진입 — 크리스마스 선물 수요 시작' },
+      12: { label: '12월 (연말·크리스마스)', type: 'peak',    adj: 1.18, note: '크리스마스·연말 — 선물 수요 최고조' },
+    };
+    return seasons[month];
+  }
+
   function animateSteps(book) {
     const gradeLabel = { intensive: '🔴 집중 발주', expand: '🟡 확대 발주', normal: '🟢 일반 발주' };
     const gradeClass = { intensive: 'grade-intensive', expand: 'grade-expand', normal: 'grade-normal' };
     const p = book.prev1m;
     const ratio = Math.round((p.sales1m / p.salesTotal) * 100);
+    const prevSeason = getSeasonInfo(p.pubDate);
+    const newSeason  = book.pubDate ? getSeasonInfo(book.pubDate) : null;
+
+    // 출간일 → 30일 구간
+    const pp = p.pubDate.split('-');
+    const ppDate = new Date(+pp[0], +pp[1]-1, +pp[2]);
+    const ppEnd  = new Date(ppDate); ppEnd.setDate(ppEnd.getDate() + 30);
+    const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
+
+    // 계절 보정 설명
+    const adjPct = Math.round((prevSeason.adj - 1) * 100);
+    const adjSign = adjPct >= 0 ? `+${adjPct}` : `${adjPct}`;
+    const adjLabel = prevSeason.type === 'peak'   ? '성수기 상향 보정' :
+                     prevSeason.type === 'high'   ? '준성수기 보정' :
+                     prevSeason.type === 'low'    ? '비수기 하향 보정' : '평월 (보정 없음)';
+
+    // 직전권 보정 후 기준 판매량
+    const adjusted = Math.round(p.sales1m / prevSeason.adj);
+
+    // 신간 계절 보정 텍스트
+    const newSeasonNote = newSeason
+      ? ` / 신간 출간 예정월: ${newSeason.label} (${newSeason.note})`
+      : '';
+
+    // 시리즈 평균
+    const prevBooks = book.series.filter(s => !s.forecast);
+    const avg = Math.round(prevBooks.reduce((a, b) => a + b.val, 0) / prevBooks.length);
 
     const steps = [
       {
         tag: '저자 조회',
-        text: `대표작 『${book.title.split(' ')[0]}』시리즈 판매 데이터 확인. 시리즈 평균 ${Math.round(book.series.filter(s=>!s.forecast).reduce((a,b)=>a+b.val,0)/book.series.filter(s=>!s.forecast).length).toLocaleString()}권, 직전 1개월 ${p.sales1m.toLocaleString()}권`
+        color: 'blue',
+        text: `대표작 『${p.prevTitle}』포함 시리즈 ${prevBooks.length}권 판매 데이터 확인. ` +
+              `시리즈 권별 판매 평균 ${avg.toLocaleString()}권 / ` +
+              `직전권 『${p.prevTitle}』누적 ${p.salesTotal.toLocaleString()}권`
       },
       {
         tag: '시리즈 조회',
-        text: `시리즈 ${book.series.filter(s=>!s.forecast).length}권 분석. 직전권 『${p.prevTitle}』출간일(${p.pubDate}) 기준 30일 판매 ${p.sales1m.toLocaleString()}권, 누적 ${p.salesTotal.toLocaleString()}권 (30일 집중율 ${ratio}%)`
+        color: 'blue',
+        text: `직전권 『${p.prevTitle}』출간일 ${p.pubDate} (${prevSeason.label}) 기준 ` +
+              `출간 후 30일(${fmt(ppDate)}~${fmt(ppEnd)}) 판매 ${p.sales1m.toLocaleString()}권, ` +
+              `누적 대비 ${ratio}% 집중. ` +
+              `출간 시점: ${adjLabel} (계수 ${prevSeason.adj}) → ` +
+              `계절 보정 후 기준값 ${adjusted.toLocaleString()}권`
+      },
+      {
+        tag: '출간 시점 판단',
+        color: 'amber',
+        text: `직전권 출간월: ${prevSeason.label} → ${prevSeason.note}.${newSeasonNote} ` +
+              `${prevSeason.type === 'peak' ? '성수기 판매량이므로 실제 수요 대비 과대 측정 가능 → 보정치 적용.' :
+                prevSeason.type === 'low'  ? '비수기 판매량이므로 실제 수요 대비 과소 측정 가능 → 상향 보정 적용.' :
+                '준성수기 판매량, 소폭 보정 적용.'}`
       },
       {
         tag: '분야 분석',
-        text: `'${book.category}' 분야 성장세 확인. 카테고리 YoY +15.3%, 분야 배율 1.1 적용`
+        color: 'green',
+        text: `'${book.category}' 분야 성장 확인. YoY +15.3%, 분야 배율 1.1 적용. ` +
+              `경쟁 신간 동월 출간 여부 검토 → 수요 분산 5~8% 반영`
       },
       {
         tag: '판매 예측',
-        text: `예상 ${book.forecast.toLocaleString()}권 (직전권 30일 ${p.sales1m.toLocaleString()}권 × 추세 보합 × 분야 1.1)`
+        color: 'purple',
+        text: `보정 기준값 ${adjusted.toLocaleString()}권 × 시리즈 추세 × 분야 배율 1.1 = 예상 ${book.forecast.toLocaleString()}권`
       },
       {
         tag: '발주 추천',
-        text: `${gradeLabel[book.grade]} (시장 주목도 높음. 초도 물량 확보 필수.) → 권장 ${book.recommend.toLocaleString()}권`
+        color: 'red',
+        text: `${gradeLabel[book.grade]}. 예측 ${book.forecast.toLocaleString()}권 – 재고 ${book.stock}권 – 입고예정 ${book.incoming}권 ` +
+              `= 순 필요 ${(book.forecast - book.stock - book.incoming).toLocaleString()}권 → 안전재고 포함 권장 ${book.recommend.toLocaleString()}권`
       }
     ];
+
+    const colorMap = {
+      blue:   { bg: 'bg-blue-100',   text: 'text-blue-700'   },
+      amber:  { bg: 'bg-amber-100',  text: 'text-amber-700'  },
+      green:  { bg: 'bg-green-100',  text: 'text-green-700'  },
+      purple: { bg: 'bg-purple-100', text: 'text-purple-700' },
+      red:    { bg: 'bg-red-100',    text: 'text-red-700'    },
+    };
 
     const container = document.getElementById('agentStepList');
     container.innerHTML = '';
     steps.forEach((s, i) => {
+      const c = colorMap[s.color];
       const row = document.createElement('div');
       row.className = 'analysis-row opacity-0';
-      row.style.transition = 'opacity 0.3s';
+      row.style.transition = 'opacity 0.35s';
       row.innerHTML = `
-        <div class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold shrink-0" style="min-width:24px">${i+1}</div>
-        <p class="text-sm text-gray-700"><span class="font-bold text-gray-900">[${s.tag}]</span> ${s.text}</p>`;
+        <div class="w-6 h-6 rounded-full ${c.bg} ${c.text} flex items-center justify-center text-xs font-bold shrink-0" style="min-width:24px">${i+1}</div>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          <span class="font-bold text-gray-900">[${s.tag}]</span> ${s.text}
+        </p>`;
       container.appendChild(row);
-      setTimeout(() => { row.style.opacity = '1'; }, 300 + i * 200);
+      setTimeout(() => { row.style.opacity = '1'; }, 300 + i * 220);
     });
 
-    // 발주 근거 텍스트
+    // 발주 근거
     document.getElementById('agentReasonText').textContent =
-      `예측 판매량 ${book.forecast.toLocaleString()}권 – 현재 재고 ${book.stock}권 – 입고 예정 ${book.incoming}권 = 순 발주 필요 ${(book.forecast - book.stock - book.incoming).toLocaleString()}권 → 안전재고 반영 → ${book.recommend.toLocaleString()}권`;
+      `예측 ${book.forecast.toLocaleString()}권 – 재고 ${book.stock}권 – 입고예정 ${book.incoming}권 ` +
+      `= 순 발주 필요 ${(book.forecast - book.stock - book.incoming).toLocaleString()}권 → 안전재고 반영 → 권장 ${book.recommend.toLocaleString()}권`;
 
     // 등급 뱃지
     const badge = document.getElementById('gradeBadgeSmall');
