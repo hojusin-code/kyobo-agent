@@ -456,47 +456,18 @@
     </div>
   </div>
 
-  <!-- 발주 등급 + 신뢰도 -->
-  <div id="gradeSection" class="result-section grid md:grid-cols-2 gap-4 mb-6">
-    <!-- 발주 등급 -->
-    <div class="section-card">
-      <div class="section-title">
-        <span class="dot"></span>
-        발주 등급
-      </div>
-      <div class="space-y-3">
-        <div class="flex items-center gap-3 p-3 rounded-xl bg-red-50 border-2 border-red-200">
-          <span class="text-2xl">🔴</span>
-          <div class="flex-1">
-            <p class="font-bold text-red-700">집중 발주</p>
-            <p class="text-xs text-red-500">예상 수요 대비 재고 부족 우려 · 즉시 대량 발주 필요</p>
-          </div>
-          <span class="tag bg-red-600 text-white">현재</span>
-        </div>
-        <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-          <span class="text-2xl">🟡</span>
-          <div class="flex-1">
-            <p class="font-semibold text-gray-600">확대 발주</p>
-            <p class="text-xs text-gray-400">수요 증가 예상 · 기존 발주량 대비 20~50% 증량</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-          <span class="text-2xl">🟢</span>
-          <div class="flex-1">
-            <p class="font-semibold text-gray-600">일반 발주</p>
-            <p class="text-xs text-gray-400">수요 안정적 · 전기 실적 기준 발주</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 신뢰도 -->
+  <!-- 신뢰도 + 발주 등급(하단 작게) -->
+  <div id="gradeSection" class="result-section mb-6">
     <div class="section-card">
       <div class="section-title">
         <span class="dot"></span>
         AI 예측 신뢰도
+        <span class="ml-auto flex items-center gap-2 text-xs text-gray-400 font-normal">
+          발주 등급
+          <span id="gradeBadgeSmall" class="grade-badge grade-intensive" style="font-size:11px;padding:3px 10px;">🔴 집중 발주</span>
+        </span>
       </div>
-      <div class="flex items-center gap-6 mb-4">
+      <div class="flex items-center gap-6">
         <div class="relative" style="width:100px;height:100px;">
           <svg width="100" height="100" class="progress-ring">
             <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="10"/>
@@ -526,6 +497,15 @@
             <div class="trust-bar"><div class="trust-fill" style="width:88%"></div></div>
           </div>
         </div>
+      </div>
+      <!-- 발주 등급 기준 - 하단 작게 -->
+      <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-3 flex-wrap">
+        <span class="text-xs text-gray-400">등급 기준</span>
+        <span class="text-xs text-gray-500 flex items-center gap-1">🔴 <span class="font-semibold text-gray-600">집중</span> 재고 부족 · 즉시 대량 발주</span>
+        <span class="text-gray-300 text-xs">|</span>
+        <span class="text-xs text-gray-500 flex items-center gap-1">🟡 <span class="font-semibold text-gray-600">확대</span> 수요 증가 · 20~50% 증량</span>
+        <span class="text-gray-300 text-xs">|</span>
+        <span class="text-xs text-gray-500 flex items-center gap-1">🟢 <span class="font-semibold text-gray-600">일반</span> 안정 · 전기 실적 기준</span>
       </div>
     </div>
   </div>
@@ -668,102 +648,16 @@
     </div>
   </div>
 
-  <!-- Agent 사고 과정 (Step) -->
+  <!-- Agent 사고 과정 -->
   <div id="stepSection" class="result-section section-card mb-6">
     <div class="section-title">
       <span class="dot"></span>
       Agent 사고 과정
     </div>
-    <div class="space-y-3">
-      <div class="step-card done" id="step1">
-        <div class="flex items-start gap-3">
-          <div class="step-icon">✓</div>
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs font-bold text-green-600 uppercase">STEP 1</span>
-              <span class="text-xs text-gray-400">완료</span>
-            </div>
-            <p class="font-semibold text-gray-800 text-sm">저자 판매 이력 분석</p>
-            <p class="text-xs text-gray-500 mt-1">흔한남매 시리즈 누적 데이터 로딩 → 시리즈별 판매 트렌드 산출</p>
-            <div class="flex gap-2 mt-2">
-              <span class="chip bg-green-50 text-green-700">데이터 5건 확인</span>
-              <span class="chip bg-green-50 text-green-700">성장률 +9.7%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-card done" id="step2">
-        <div class="flex items-start gap-3">
-          <div class="step-icon">✓</div>
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs font-bold text-green-600 uppercase">STEP 2</span>
-              <span class="text-xs text-gray-400">완료</span>
-            </div>
-            <p class="font-semibold text-gray-800 text-sm">시리즈 판매 흐름 분석</p>
-            <p class="text-xs text-gray-500 mt-1">권별 판매량 비교 → 상승 추세 확인 → 다음 권 예측</p>
-            <div class="flex gap-2 mt-2">
-              <span class="chip bg-green-50 text-green-700">선형 회귀 적용</span>
-              <span class="chip bg-green-50 text-green-700">추세 상승 확인</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-card done" id="step3">
-        <div class="flex items-start gap-3">
-          <div class="step-icon">✓</div>
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs font-bold text-green-600 uppercase">STEP 3</span>
-              <span class="text-xs text-gray-400">완료</span>
-            </div>
-            <p class="font-semibold text-gray-800 text-sm">카테고리 성장률 분석</p>
-            <p class="text-xs text-gray-500 mt-1">아동 학습만화 카테고리 YoY 성장률 산출 → 시장 환경 반영</p>
-            <div class="flex gap-2 mt-2">
-              <span class="chip bg-green-50 text-green-700">카테고리 +15.3% YoY</span>
-              <span class="chip bg-amber-50 text-amber-700">경쟁 신간 2종</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-card done" id="step4">
-        <div class="flex items-start gap-3">
-          <div class="step-icon">✓</div>
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs font-bold text-green-600 uppercase">STEP 4</span>
-              <span class="text-xs text-gray-400">완료</span>
-            </div>
-            <p class="font-semibold text-gray-800 text-sm">판매량 예측</p>
-            <p class="text-xs text-gray-500 mt-1">시리즈 추세 × 카테고리 성장률 × 경쟁 보정 → 최종 예측</p>
-            <div class="flex gap-2 mt-2">
-              <span class="chip bg-blue-50 text-blue-700">기준: 5,241 × 1.097</span>
-              <span class="chip bg-blue-50 text-blue-700">예측: 5,765권</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-card done" id="step5">
-        <div class="flex items-start gap-3">
-          <div class="step-icon">✓</div>
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs font-bold text-green-600 uppercase">STEP 5</span>
-              <span class="text-xs text-gray-400">완료</span>
-            </div>
-            <p class="font-semibold text-gray-800 text-sm">발주 추천 생성</p>
-            <p class="text-xs text-gray-500 mt-1">예측 판매량 – 현재 재고 – 입고 예정 = 순 발주 필요량 산출</p>
-            <div class="flex gap-2 mt-2">
-              <span class="chip bg-red-50 text-red-700">5,765 – 320 – 100 = 5,345</span>
-              <span class="chip bg-red-50 text-red-700">안전재고 반영 → 5,400권</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div id="agentStepList" class="space-y-0"></div>
+    <div class="mt-4 pt-3 border-t border-gray-100">
+      <p class="text-xs text-gray-400">발주 수량 추천 근거</p>
+      <p id="agentReasonText" class="text-xs text-gray-600 mt-1"></p>
     </div>
   </div>
 
@@ -997,7 +891,7 @@
     updateAIOpinion(book);
 
     // Step 순차 표시
-    animateSteps();
+    animateSteps(book);
 
     // 섹션 순차 표시
     const sections = ['bookInfo', 'kpiSection', 'gradeSection', 'chartSection', 'aiSection', 'stepSection', 'actionSection'];
@@ -1099,16 +993,57 @@
     document.getElementById('orderQty').value = book.recommend;
   }
 
-  function animateSteps() {
-    const steps = document.querySelectorAll('.step-card');
+  function animateSteps(book) {
+    const gradeLabel = { intensive: '🔴 집중 발주', expand: '🟡 확대 발주', normal: '🟢 일반 발주' };
+    const gradeClass = { intensive: 'grade-intensive', expand: 'grade-expand', normal: 'grade-normal' };
+    const p = book.prev1m;
+    const ratio = Math.round((p.sales1m / p.salesTotal) * 100);
+
+    const steps = [
+      {
+        tag: '저자 조회',
+        text: `대표작 『${book.title.split(' ')[0]}』시리즈 판매 데이터 확인. 시리즈 평균 ${Math.round(book.series.filter(s=>!s.forecast).reduce((a,b)=>a+b.val,0)/book.series.filter(s=>!s.forecast).length).toLocaleString()}권, 직전 1개월 ${p.sales1m.toLocaleString()}권`
+      },
+      {
+        tag: '시리즈 조회',
+        text: `시리즈 ${book.series.filter(s=>!s.forecast).length}권 분석. 직전권 『${p.prevTitle}』출간일(${p.pubDate}) 기준 30일 판매 ${p.sales1m.toLocaleString()}권, 누적 ${p.salesTotal.toLocaleString()}권 (30일 집중율 ${ratio}%)`
+      },
+      {
+        tag: '분야 분석',
+        text: `'${book.category}' 분야 성장세 확인. 카테고리 YoY +15.3%, 분야 배율 1.1 적용`
+      },
+      {
+        tag: '판매 예측',
+        text: `예상 ${book.forecast.toLocaleString()}권 (직전권 30일 ${p.sales1m.toLocaleString()}권 × 추세 보합 × 분야 1.1)`
+      },
+      {
+        tag: '발주 추천',
+        text: `${gradeLabel[book.grade]} (시장 주목도 높음. 초도 물량 확보 필수.) → 권장 ${book.recommend.toLocaleString()}권`
+      }
+    ];
+
+    const container = document.getElementById('agentStepList');
+    container.innerHTML = '';
     steps.forEach((s, i) => {
-      s.classList.remove('done', 'active');
-      s.classList.add('active');
-      setTimeout(() => {
-        s.classList.remove('active');
-        s.classList.add('done');
-      }, 400 + i * 300);
+      const row = document.createElement('div');
+      row.className = 'analysis-row opacity-0';
+      row.style.transition = 'opacity 0.3s';
+      row.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold shrink-0" style="min-width:24px">${i+1}</div>
+        <p class="text-sm text-gray-700"><span class="font-bold text-gray-900">[${s.tag}]</span> ${s.text}</p>`;
+      container.appendChild(row);
+      setTimeout(() => { row.style.opacity = '1'; }, 300 + i * 200);
     });
+
+    // 발주 근거 텍스트
+    document.getElementById('agentReasonText').textContent =
+      `예측 판매량 ${book.forecast.toLocaleString()}권 – 현재 재고 ${book.stock}권 – 입고 예정 ${book.incoming}권 = 순 발주 필요 ${(book.forecast - book.stock - book.incoming).toLocaleString()}권 → 안전재고 반영 → ${book.recommend.toLocaleString()}권`;
+
+    // 등급 뱃지
+    const badge = document.getElementById('gradeBadgeSmall');
+    badge.className = `grade-badge ${gradeClass[book.grade]}`;
+    badge.style.cssText = 'font-size:11px;padding:3px 10px;';
+    badge.textContent = gradeLabel[book.grade];
   }
 
   function animateTrustRing(pct) {
