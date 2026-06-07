@@ -358,7 +358,7 @@
       ISBN 도서 조회
     </div>
     <div class="flex gap-3 mb-4">
-      <input id="isbnInput" type="text" class="isbn-input" placeholder="ISBN을 입력하세요 (예: 9791172461942)" maxlength="20" onkeydown="if(event.key==='Enter') startAnalysis()" />
+      <input id="isbnInput" type="text" class="isbn-input" placeholder="ISBN을 입력하세요 (예: 9791172461942)" maxlength="20" />
       <button onclick="startAnalysis()" class="action-btn btn-primary whitespace-nowrap">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         분석하기
@@ -930,6 +930,15 @@
 
   let currentBook = null;
   let stepsVisible = true;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('isbnInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault();
+        startAnalysis();
+      }
+    });
+  });
 
   function selectBook(isbn, title) {
     document.getElementById('isbnInput').value = isbn;
