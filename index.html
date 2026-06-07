@@ -931,13 +931,11 @@
   let currentBook = null;
   let stepsVisible = true;
 
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('isbnInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.keyCode === 13) {
-        e.preventDefault();
-        startAnalysis();
-      }
-    });
+  document.getElementById('isbnInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      e.preventDefault();
+      startAnalysis();
+    }
   });
 
   function selectBook(isbn, title) {
