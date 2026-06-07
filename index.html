@@ -576,90 +576,41 @@
     <p class="text-xs text-gray-400 mt-4 text-right">* 시리즈 권당 평균 성장률 +9.7% 반영</p>
   </div>
 
-  <!-- AI 분석 요약 + 의견 -->
-  <div id="aiSection" class="result-section grid md:grid-cols-2 gap-4 mb-6">
-    <!-- 분석 요약 -->
+  <!-- AI 분석 통합 카드 -->
+  <div id="aiSection" class="result-section mb-6">
     <div class="section-card">
       <div class="section-title">
         <span class="dot"></span>
-        AI 분석 요약
-      </div>
-      <div class="space-y-2">
-        <div class="analysis-row">
-          <span class="text-green-500 text-lg">✓</span>
-          <div>
-            <p class="text-sm font-semibold text-gray-800">전작 판매량 5,241권</p>
-            <p class="text-xs text-gray-400">5권 기준 시리즈 최고 실적</p>
-          </div>
-        </div>
-        <div class="analysis-row">
-          <span class="text-green-500 text-lg">✓</span>
-          <div>
-            <p class="text-sm font-semibold text-gray-800">저자 브랜드 인지도 높음</p>
-            <p class="text-xs text-gray-400">흔한남매 시리즈 누적 판매 2백만 부 이상</p>
-          </div>
-        </div>
-        <div class="analysis-row">
-          <span class="text-green-500 text-lg">✓</span>
-          <div>
-            <p class="text-sm font-semibold text-gray-800">아동 학습만화 분야 성장세</p>
-            <p class="text-xs text-gray-400">전년 동기 대비 카테고리 +15.3% 성장</p>
-          </div>
-        </div>
-        <div class="analysis-row">
-          <span class="text-green-500 text-lg">✓</span>
-          <div>
-            <p class="text-sm font-semibold text-gray-800">시리즈 판매 흐름 안정적</p>
-            <p class="text-xs text-gray-400">권당 평균 +9.7% 지속 성장</p>
-          </div>
-        </div>
-        <div class="analysis-row">
-          <span class="text-amber-500 text-lg">!</span>
-          <div>
-            <p class="text-sm font-semibold text-gray-800">경쟁 신간 2종 동월 출간</p>
-            <p class="text-xs text-gray-400">수요 분산 가능성 5~8% 반영</p>
-          </div>
+        AI 분석 및 발주 근거
+        <div class="ml-auto flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+          <span class="text-xs text-gray-400 font-normal">신뢰도 87% · 시리즈 데이터 기반</span>
         </div>
       </div>
-      <div class="mt-4 p-3 bg-red-50 rounded-xl border border-red-100">
-        <p class="text-sm font-bold text-red-700">→ 집중 발주 권장</p>
-        <p class="text-xs text-red-500">예상 판매량은 전작 대비 약 10% 증가할 것으로 판단</p>
-      </div>
-    </div>
 
-    <!-- AI 의견 -->
-    <div class="ai-opinion-card">
-      <div class="flex items-center gap-2 mb-4">
-        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm">🤖</div>
-        <div>
-          <p class="text-sm font-bold text-white">AI Agent 의견</p>
-          <p class="text-xs text-blue-300">발주 의사결정 지원</p>
+      <!-- Agent 사고 과정 (번호 리스트) -->
+      <div id="agentStepList" class="space-y-0 mb-4"></div>
+
+      <!-- 발주 근거 한 줄 -->
+      <div class="py-3 border-t border-gray-100">
+        <p class="text-xs text-gray-400 mb-1">발주 수량 산출 근거</p>
+        <p id="agentReasonText" class="text-xs text-gray-600"></p>
+      </div>
+
+      <!-- AI 의견 (하단 다크 박스) -->
+      <div class="rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #1e293b, #1a2744);">
+        <div class="px-4 py-3 flex items-center gap-2 border-b border-white/10">
+          <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs">🤖</div>
+          <p class="text-xs font-bold text-white">AI Agent 종합 의견</p>
         </div>
-      </div>
-      <div id="aiOpinionText" class="text-sm text-gray-200 leading-relaxed space-y-3">
-        <p>흔한남매 세계사 탐험대 시리즈는 1~5권 모두 출간 직후 안정적인 판매를 기록하며, 권당 약 9.7%의 지속적인 성장세를 보여왔습니다.</p>
-        <p>특히 저자 브랜드 인지도와 아동 역사 학습만화 카테고리의 전년 대비 15% 이상 성장세를 고려할 때, <span class="text-yellow-300 font-semibold">초기 물량 확보가 매우 중요</span>합니다.</p>
-        <p>현재 재고(320권)와 입고 예정(100권)을 감안하면 실수요 충족을 위해 추가 발주가 필수적이며, 추천 발주량은 <span class="text-red-300 font-bold">5,400권</span>입니다.</p>
-      </div>
-      <div class="mt-4 pt-4 border-t border-white/10 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-        <span class="text-xs text-gray-400">신뢰도 87% · 시리즈 5종 데이터 기반 분석</span>
+        <div class="px-4 py-3">
+          <div id="aiOpinionText" class="text-sm text-gray-200 leading-relaxed space-y-2"></div>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- Agent 사고 과정 -->
-  <div id="stepSection" class="result-section section-card mb-6">
-    <div class="section-title">
-      <span class="dot"></span>
-      Agent 사고 과정
-    </div>
-    <div id="agentStepList" class="space-y-0"></div>
-    <div class="mt-4 pt-3 border-t border-gray-100">
-      <p class="text-xs text-gray-400">발주 수량 추천 근거</p>
-      <p id="agentReasonText" class="text-xs text-gray-600 mt-1"></p>
-    </div>
-  </div>
+  <!-- stepSection ID 유지 (toggleSteps 호환) -->
+  <div id="stepSection" style="display:none;"></div>
 
   <!-- 액션 버튼 -->
   <div id="actionSection" class="result-section mb-10">
@@ -896,7 +847,7 @@
     animateSteps(book);
 
     // 섹션 순차 표시
-    const sections = ['bookInfo', 'kpiSection', 'gradeSection', 'chartSection', 'aiSection', 'stepSection', 'actionSection'];
+    const sections = ['bookInfo', 'kpiSection', 'gradeSection', 'chartSection', 'aiSection', 'actionSection'];
     sections.forEach((id, i) => {
       setTimeout(() => {
         document.getElementById(id).classList.add('visible');
