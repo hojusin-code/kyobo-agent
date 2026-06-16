@@ -11,6 +11,21 @@
     :root { --red:#E60012; --navy:#0F1F3D; --kyobo:#003189; }
     body { margin:0; background:#EEF0F5; height:100vh; overflow:hidden; }
 
+    /* ── 전체 너비 제한 (PC만) ── */
+    @media (min-width: 769px) {
+      body { background:#D0D4DC; }
+      .header, .workspace {
+        max-width:1440px; margin-left:auto; margin-right:auto;
+        border-radius:0;
+      }
+      .header { border-radius:0 0 0 0; }
+      #appWrap {
+        max-width:1440px; margin:0 auto;
+        box-shadow:0 4px 32px rgba(0,0,0,0.13);
+        background:#EEF0F5;
+      }
+    }
+
     /* ── HEADER ── */
     .header {
       background:var(--kyobo); padding:0 24px; height:48px;
@@ -393,6 +408,7 @@
   </style>
 </head>
 <body>
+<div id="appWrap">
 
 <!-- HEADER -->
 <header class="header">
@@ -422,7 +438,28 @@
         </svg>
         조회
       </button>
-      <button class="analyze-btn" id="analyzeBtn" style="margin-top:6px;">발주 분석 시작</button>
+
+      <!-- 제목 조회 -->
+      <div style="margin-top:10px;">
+        <div class="panel-label" style="margin-bottom:4px;">제목으로 조회</div>
+        <div style="display:flex;gap:5px;">
+          <input id="titleInput" class="isbn-input" type="text" placeholder="도서명 입력 (일부 가능)" style="flex:1;" />
+          <button class="search-btn" style="margin-top:0;width:auto;padding:0 12px;" onclick="searchByTitle()">조회</button>
+        </div>
+        <div id="titleResults" style="display:none;margin-top:6px;max-height:140px;overflow-y:auto;border:1.5px solid #E5E7EB;border-radius:7px;"></div>
+      </div>
+
+      <!-- 저자 조회 -->
+      <div style="margin-top:10px;">
+        <div class="panel-label" style="margin-bottom:4px;">저자로 조회</div>
+        <div style="display:flex;gap:5px;">
+          <input id="authorInput" class="isbn-input" type="text" placeholder="저자명 입력 (일부 가능)" style="flex:1;" />
+          <button class="search-btn" style="margin-top:0;width:auto;padding:0 12px;" onclick="searchByAuthor()">조회</button>
+        </div>
+        <div id="authorResults" style="display:none;margin-top:6px;max-height:140px;overflow-y:auto;border:1.5px solid #E5E7EB;border-radius:7px;"></div>
+      </div>
+
+      <button class="analyze-btn" id="analyzeBtn" style="margin-top:10px;">발주 분석 시작</button>
       <div class="quick-row">
         <button class="quick-btn" onclick="quickTest('9788936434120')">소년이 온다 (한강)</button>
         <button class="quick-btn" onclick="quickTest('9788936434595')">채식주의자 (한강)</button>
@@ -1173,9 +1210,63 @@ const hide = id => $(id).classList.add('hidden');
 
 function quickTest(isbn){ $('isbnInput').value = isbn; doSearch(); }
 
+function renderSearchResults(containerId, results){
+  const el = $(containerId);
+  if(!results.length){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.innerHTML = results.map(b=>`
+    <div onclick="selectSearchResult('${b.isbn}')" style="padding:8px 11px;cursor:pointer;border-bottom:1px solid #F3F4F6;transition:background .1s;"
+         onmouseover="this.style.background='#F0F4FF'" onmouseout="this.style.background='white'">
+      <div style="font-size:12px;font-weight:800;color:#111;">${b.title}</div>
+      <div style="font-size:10px;color:#6B7280;margin-top:1px;">${b.author} · ${b.publisher} · <span style="color:var(--kyobo);">${b.category}</span></div>
+    </div>`).join('');
+}
+
+function selectSearchResult(isbn){
+  $('isbnInput').value = isbn;
+  $('titleResults').style.display='none';
+  $('authorResults').style.display='none';
+  $('titleInput').value='';
+  $('authorInput').value='';
+  doSearch();
+}
+
+function searchByTitle(){
+  const q = $('titleInput').value.trim();
+  if(!q) return;
+  const results = Object.entries(BOOKS)
+    .filter(([,b])=>b.title.includes(q))
+    .map(([isbn,b])=>({...b, isbn}));
+  if(!results.length){ alert('검색 결과가 없습니다.'); return; }
+  if(results.length===1){ selectSearchResult(results[0].isbn); return; }
+  renderSearchResults('titleResults', results);
+}
+
+function searchByAuthor(){
+  const q = $('authorInput').value.trim();
+  if(!q) return;
+  const results = Object.entries(BOOKS)
+    .filter(([,b])=>b.author.includes(q))
+    .map(([isbn,b])=>({...b, isbn}));
+  if(!results.length){ alert('검색 결과가 없습니다.'); return; }
+  if(results.length===1){ selectSearchResult(results[0].isbn); return; }
+  renderSearchResults('authorResults', results);
+}
+
+// 엔터키 지원
+document.addEventListener('DOMContentLoaded',()=>{
+  $('titleInput').addEventListener('keyup', e=>{ if(e.key==='Enter') searchByTitle(); });
+  $('authorInput').addEventListener('keyup', e=>{ if(e.key==='Enter') searchByAuthor(); });
+});
+
 function doSearch(){
-  const isbn = $('isbnInput').value.trim().replace(/-/g,'');
-  if(!BOOKS[isbn]){ alert('등록된 ISBN이 아닙니다.\n\n'+Object.keys(BOOKS).join('\n')); return; }
+  const raw = $('isbnInput').value.trim().replace(/-/g,'');
+  // 지수표기(9.79E+12) 입력 방어
+  const isbn = raw.includes('E') || raw.includes('e') ? '' : raw;
+  if(!isbn || !BOOKS[isbn]){
+    alert(`❌ 조회 실패\n\n입력값: "${raw}"\n\n제목 또는 저자 검색을 이용하거나,\n왼쪽 빠른 버튼으로 테스트해보세요.`);
+    return;
+  }
   currentIsbn = isbn;
   const book = BOOKS[isbn];
   show('coverRow');
@@ -1287,13 +1378,71 @@ function startAnalysis(){
   // AI 사고 과정
   const prevBooks = book.series.filter(s=>!s.forecast);
   const avg = Math.round(prevBooks.reduce((a,b)=>a+b.val,0)/prevBooks.length);
-  const trustAvg = Math.round((95+75+88)/3);
+
+  // ── 시장 Agent: 카테고리별 성장률 + 시장 특성 ──
+  const MARKET_DATA = {
+    '소설':        { growth:+8.2,  trend:'상승', note:'한국문학 재조명 트렌드 지속, 영상화 IP 연계 수요 증가' },
+    '한국소설':    { growth:+8.2,  trend:'상승', note:'한국문학 재조명 트렌드 지속, 영상화 IP 연계 수요 증가' },
+    '경제경영':    { growth:+12.7, trend:'강세', note:'AI·투자 관련 도서 수요 급증, 직장인 자기투자 심리 반영' },
+    '인문':        { growth:+6.1,  trend:'안정', note:'스테디셀러 중심 안정 수요, 교양 독서 관심 꾸준' },
+    '자기계발':    { growth:+9.4,  trend:'상승', note:'MZ세대 성장 콘텐츠 소비 확대, 유튜브 연계 도서 강세' },
+    '아동':        { growth:+18.3, trend:'급성장', note:'학부모 교육 관심 증가, 시리즈 완결 수요 집중' },
+    '아동 학습만화':{ growth:+18.3, trend:'급성장', note:'학부모 교육 관심 증가, 시리즈 완결 수요 집중' },
+    '만화':        { growth:+22.1, trend:'급성장', note:'웹툰 원작 단행본 수요 폭발, 10~30대 소비층 확대' },
+    '판타지':      { growth:+22.1, trend:'급성장', note:'웹툰 원작 단행본 수요 폭발, 10~30대 소비층 확대' },
+  };
+  const mkt = MARKET_DATA[book.category] || { growth:+7.0, trend:'보통', note:'전체 도서 시장 평균 성장 수준' };
+  const mktSign = mkt.growth >= 0 ? '+' : '';
+  const mktColor = mkt.growth >= 15 ? '#16A34A' : mkt.growth >= 8 ? '#0E7490' : '#6B7280';
+  const mktText = `${book.category} 분야 성장률 <b style="color:${mktColor};">${mktSign}${mkt.growth}%</b> (${mkt.trend})<br><span style="font-size:10.5px;color:#374151;">・${mkt.note}</span>`;
+
+  // ── 리스크 Agent: 실제 데이터 기반 위험 요소 계산 ──
+  const ratio2wVal = Math.round((p.sales2w / p.salesTotal) * 100); // 2주 집중률
+  const stockCoverage = book.stock > 0 ? Math.round(book.stock / Math.max(1, Math.round(p.sales2w/14))) : 0; // 현재 재고로 버틸 수 있는 일수
+  const seriesGrowth = prevBooks.length >= 2
+    ? Math.round(((prevBooks[prevBooks.length-1].val - prevBooks[0].val) / prevBooks[0].val) * 100)
+    : 0; // 시리즈 판매 성장률
+  const overOrderRisk = week1 > p.salesTotal * 0.6; // 권장발주가 누적판매의 60% 초과 시 과대발주 위험
+
+  // 위험 요소별 판단
+  const risks = [];
+  const safes = [];
+
+  if(stockCoverage < 3)       risks.push(`재고 ${stockCoverage}일치 — 품절 위험 높음`);
+  else if(stockCoverage < 7)  risks.push(`재고 ${stockCoverage}일치 — 추가 발주 권장`);
+  else                        safes.push(`재고 ${stockCoverage}일치 확보 — 단기 품절 위험 낮음`);
+
+  if(ratio2wVal >= 50)        safes.push(`초기 2주 집중률 ${ratio2wVal}% — 초도 발주 중요`);
+  else if(ratio2wVal >= 35)   safes.push(`2주 집중률 ${ratio2wVal}% — 중기 분산 판매`);
+  else                        risks.push(`2주 집중률 ${ratio2wVal}% 낮음 — 장기 재고 관리 필요`);
+
+  if(seriesGrowth >= 10)      safes.push(`시리즈 판매 ${seriesGrowth}% 성장 중 — 신권 수요 긍정적`);
+  else if(seriesGrowth >= 0)  safes.push(`시리즈 판매 안정적 유지`);
+  else                        risks.push(`시리즈 판매 ${Math.abs(seriesGrowth)}% 하락 추세 — 신권 수요 주의`);
+
+  if(overOrderRisk)           risks.push(`권장 발주량이 누적 판매 대비 과다 — 반품 리스크 검토 필요`);
+  else                        safes.push(`권장 발주량 적정 수준`);
+
+  const riskLevel = risks.length === 0 ? '낮음' : risks.length === 1 ? '보통' : '높음';
+  const riskColor = risks.length === 0 ? '#16A34A' : risks.length === 1 ? '#D97706' : '#E60012';
+  const riskItems = [
+    ...risks.map(r=>`<span style="color:#B91C1C;">⚠ ${r}</span>`),
+    ...safes.map(s=>`<span style="color:#065F46;">✓ ${s}</span>`)
+  ].join('<br>');
+  const riskText = `${riskItems}<br><span style="font-weight:800;">최종 위험도 : <span style="color:${riskColor};">${riskLevel}</span></span>`;
+
+  // ── 신뢰도: 에이전트별 계산 ──
+  const trust1 = Math.min(99, 70 + Math.round(prevBooks.length * 5));       // 저자: 시리즈 권수 많을수록 높음
+  const trust2 = Math.min(99, 60 + Math.round(ratio2wVal * 0.7));           // 시리즈: 2주 집중률 반영
+  const trust3 = Math.min(99, 50 + Math.round(Math.abs(mkt.growth) * 2));   // 시장: 성장률 크면 데이터 명확
+  const trustAvg = Math.round((trust1 + trust2 + trust3) / 3);
+
   const steps = [
     {color:'#1E40AF',bg:'#DBEAFE',tag:'👤 저자 Agent',   text:`대표작 포함 시리즈 ${prevBooks.length}권 · 평균 판매량 ${avg.toLocaleString()}권 확인`},
-    {color:'#7C3AED',bg:'#EDE9FE',tag:'📚 시리즈 Agent', text:`직전권 판매량 ${p.sales2w.toLocaleString()}권 · 누적 판매량 ${p.salesTotal.toLocaleString()}권 확인`},
-    {color:'#16A34A',bg:'#DCFCE7',tag:'📈 시장 Agent',   text:`${book.category} 성장률 +15.3% · 시장 가중치 반영`},
-    {color:'#D97706',bg:'#FEF3C7',tag:'⚠️ 리스크 Agent', text:`반대 시나리오 검토 완료<br><span style="color:#92400E;font-size:10.5px;">・경쟁 신간 영향 없음&nbsp;&nbsp;・시리즈 이탈률 낮음&nbsp;&nbsp;・과대예측 위험 제한적</span><br><span style="font-weight:800;">최종 위험도 : <span style="color:#D97706;">낮음</span></span>`},
-    {color:'#E60012',bg:'#FEE2E2',tag:'🎯 발주 의사결정 Agent',text:`<span style="font-weight:800;color:#9B1C1C;">종합 판단 결과</span><br>예상 판매량 : <b>${Math.round(book.forecast/2).toLocaleString()}권</b> (2주)&nbsp;&nbsp;권장 발주량 : <b>${week1.toLocaleString()}권</b> (2주)<br>품절 위험도 : <b style="color:#E60012;">높음</b>&nbsp;&nbsp;AI 신뢰도 : <b>${trustAvg}%</b><br><span style="color:#9B1C1C;font-weight:800;font-size:10.5px;">판단 근거</span><br><span style="color:#7F1D1D;font-size:10.5px;">・직전권 판매량 우수&nbsp;&nbsp;・시리즈 판매 성장 지속&nbsp;&nbsp;・시장 성장률 반영&nbsp;&nbsp;・리스크 검토 완료</span>`},
+    {color:'#7C3AED',bg:'#EDE9FE',tag:'📚 시리즈 Agent', text:`직전권 판매량 ${p.sales2w.toLocaleString()}권 · 누적 판매량 ${p.salesTotal.toLocaleString()}권 · 2주 집중률 ${ratio2wVal}%`},
+    {color:'#16A34A',bg:'#DCFCE7',tag:'📈 시장 Agent',   text:mktText},
+    {color:'#D97706',bg:'#FEF3C7',tag:'⚠️ 리스크 Agent', text:riskText},
+    {color:'#E60012',bg:'#FEE2E2',tag:'🎯 발주 의사결정 Agent',text:`<span style="font-weight:800;color:#9B1C1C;">종합 판단 결과</span><br>예상 판매량 : <b>${Math.round(book.forecast/2).toLocaleString()}권</b> (2주)&nbsp;&nbsp;권장 발주량 : <b>${week1.toLocaleString()}권</b> (2주)<br>품절 위험도 : <b style="color:${riskColor};">${riskLevel}</b>&nbsp;&nbsp;AI 신뢰도 : <b>${trustAvg}%</b><br><span style="color:#9B1C1C;font-weight:800;font-size:10.5px;">판단 근거</span><br><span style="color:#7F1D1D;font-size:10.5px;">・직전권 ${ratio2wVal}% 집중률&nbsp;&nbsp;・시장 ${mktSign}${mkt.growth}% 성장&nbsp;&nbsp;・위험도 ${riskLevel}&nbsp;&nbsp;・재고 ${stockCoverage}일치</span>`},
   ];
   $('agentSteps').innerHTML = steps.map((s,i)=>`
     <div class="step-item">
@@ -1534,5 +1683,6 @@ function loadUploadedBook(isbn) {
   doSearch();
 }
 </script>
+</div><!-- #appWrap -->
 </body>
 </html>
