@@ -431,6 +431,17 @@
       </div>
     </div>
 
+    <!-- 엑셀 업로드 -->
+    <div>
+      <div class="panel-label">판매 데이터 업로드</div>
+      <label for="excelUpload" style="display:block; border:1.5px dashed #CBD5E1; border-radius:7px; padding:10px; text-align:center; cursor:pointer; color:#64748B; font-size:11px; font-weight:600; background:#F8FAFC; transition:all 0.15s;" id="uploadLabel">
+        📂 CSV / 엑셀 파일 선택
+      </label>
+      <input type="file" id="excelUpload" accept=".csv,.xlsx,.xls" style="display:none;" />
+      <div id="uploadStatus" style="font-size:11px; margin-top:6px; color:#64748B;"></div>
+      <div id="uploadedList" style="margin-top:6px; max-height:160px; overflow-y:auto;"></div>
+    </div>
+
     <div id="coverRow" class="hidden">
       <div class="cover-row">
         <img id="bookCover" src="" alt="책 표지" />
@@ -1271,6 +1282,109 @@ $('searchBtn').addEventListener('click', doSearch);
 $('isbnInput').addEventListener('keyup', e=>{ if(e.key==='Enter') doSearch(); });
 $('analyzeBtn').addEventListener('click', startAnalysis);
 initIssueMain();
+
+// ── 엑셀/CSV 업로드 ──
+let uploadedSalesData = [];
+
+function normalizeISBN(val) {
+  if (!val) return '';
+  const str = String(val).trim();
+  if (/e/i.test(str)) return Math.round(Number(str)).toString().padStart(13,'0');
+  return str.replace(/-/g,'').padStart(13,'0');
+}
+
+document.getElementById('excelUpload').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const status = document.getElementById('uploadStatus');
+  const list   = document.getElementById('uploadedList');
+  status.textContent = '읽는 중...';
+
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const text = ev.target.result;
+      const lines = text.split('\n').filter(l => l.trim());
+      const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+
+      // 컬럼 인덱스 자동 탐색
+      const idx = {
+        date:   header.findIndex(h => h.includes('매출일자')),
+        isbn:   header.findIndex(h => h.includes('상품코드')),
+        name:   header.findIndex(h => h.includes('상품명')),
+        price:  header.findIndex(h => h.includes('정가')),
+        pub:    header.findIndex(h => h.includes('출판사')),
+        pubdate:header.findIndex(h => h.includes('출판일자')),
+        author: header.findIndex(h => h.includes('저자명')),
+        qty:    header.findIndex(h => h.includes('판매수량')),
+        type:   header.findIndex(h => h.includes('판매구분')),
+      };
+
+      uploadedSalesData = [];
+      const isbnMap = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g,''));
+        const isbn = normalizeISBN(cols[idx.isbn]);
+        if (!isbn || isbn.length !== 13) continue;
+        const qty = parseInt(cols[idx.qty]) || 0;
+        if (!isbnMap[isbn]) {
+          isbnMap[isbn] = {
+            isbn,
+            name:    cols[idx.name]   || '',
+            pub:     cols[idx.pub]    || '',
+            author:  cols[idx.author] || '',
+            pubdate: cols[idx.pubdate]|| '',
+            price:   cols[idx.price]  || '',
+            qty: 0, returns: 0,
+          };
+        }
+        if (cols[idx.type] === '반품') isbnMap[isbn].returns += Math.abs(qty);
+        else isbnMap[isbn].qty += qty;
+      }
+
+      uploadedSalesData = Object.values(isbnMap);
+
+      // 리스트 표시
+      status.innerHTML = `<span style="color:#16A34A;font-weight:700;">✓ ${uploadedSalesData.length}종 로드 완료</span>`;
+      list.innerHTML = uploadedSalesData.map(d => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:3px;background:#F8FAFC;border-radius:5px;border:1px solid #E5E7EB;cursor:pointer;"
+             onclick="loadUploadedBook('${d.isbn}')">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#111;">${d.name.slice(0,20)}${d.name.length>20?'…':''}</div>
+            <div style="font-size:10px;color:#9CA3AF;">${d.isbn} · 판매 ${d.qty}권</div>
+          </div>
+          <div style="font-size:11px;font-weight:800;color:var(--kyobo);">조회</div>
+        </div>`).join('');
+
+      document.getElementById('uploadLabel').style.borderColor = '#16A34A';
+      document.getElementById('uploadLabel').style.color = '#16A34A';
+      document.getElementById('uploadLabel').textContent = `✓ ${file.name}`;
+    } catch(err) {
+      status.innerHTML = `<span style="color:var(--red);">오류: ${err.message}</span>`;
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+});
+
+function loadUploadedBook(isbn) {
+  const d = uploadedSalesData.find(b => b.isbn === isbn);
+  if (!d) return;
+  $('isbnInput').value = isbn;
+
+  // BOOKS에 임시 데이터 주입
+  if (!BOOKS[isbn]) {
+    BOOKS[isbn] = {
+      title: d.name, author: d.author, publisher: d.pub,
+      category: '기타', grade: 'normal',
+      stock: 0, incoming: 0, forecast: d.qty * 2, recommend: d.qty,
+      prev2w: { sales2w: d.qty, salesTotal: d.qty, prevTitle: d.name, pubDate: d.pubdate, comment: '업로드 데이터 기준' },
+      authorRep: { salesTotal: d.qty, sales2w: d.qty, ratio: 100, repTitle: d.name, pubDate: d.pubdate, comment: '' },
+      series: [{ label: '현재권', val: d.qty, forecast: false }],
+    };
+  }
+  doSearch();
+}
 </script>
 </body>
 </html>
