@@ -424,10 +424,10 @@
       </button>
       <button class="analyze-btn" id="analyzeBtn" style="margin-top:6px;">발주 분석 시작</button>
       <div class="quick-row">
-        <button class="quick-btn" onclick="quickTest('9791173326516')">흔한남매 세계탐험대 6 (주니어김영사)</button>
-        <button class="quick-btn" onclick="quickTest('9791172461942')">흔한남매 세계탐험대 6 (미래엔)</button>
-        <button class="quick-btn" onclick="quickTest('9791172461234')">마법사 연대기 5권</button>
-        <button class="quick-btn" onclick="quickTest('9791172469876')">첫 번째 빛</button>
+        <button class="quick-btn" onclick="quickTest('9788936434120')">소년이 온다 (한강)</button>
+        <button class="quick-btn" onclick="quickTest('9788936434595')">채식주의자 (한강)</button>
+        <button class="quick-btn" onclick="quickTest('9791173473968')">흔한남매 19</button>
+        <button class="quick-btn" onclick="quickTest('9788954789585')">EBS 수능특강 영어(2025)</button>
       </div>
     </div>
 
@@ -732,41 +732,96 @@
 })();
 
 const BOOKS = {
-  '9791173326516': {
-    title:'흔한남매 세계사 탐험대 6 이슬람 세계', author:'흔한남매', publisher:'주니어김영사', category:'아동 학습만화',
-    stock:320, incoming:100, forecast:5765, recommend:5400, grade:'intensive',
-    prev2w:{ prevTitle:'흔한남매 세계사 탐험대 5', pubDate:'2025.11.28', sales2w:2810, salesTotal:5241,
-      comment:'출간 2주 만에 누적의 54%가 집중 판매 → 초도 발주량 결정의 핵심 기준' },
-    authorRep:{ repTitle:'흔한남매 20권', pubDate:'2024.03.15', sales2w:3100, salesTotal:12850, ratio:24,
-      comment:'시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인' },
-    series:[{label:'1권',val:4102},{label:'2권',val:4530},{label:'3권',val:4780},{label:'4권',val:4980},{label:'5권',val:5241},{label:'6권(예측)',val:5765,forecast:true}]
+  /* ── 실제 판매 데이터 기반 (test_data.csv, 대구점 2025년) ── */
+  '9788936434120': {
+    title:'소년이 온다', author:'한강', publisher:'창비', category:'소설',
+    stock:50, incoming:20, forecast:2800, recommend:2700, grade:'intensive',
+    prev2w:{ prevTitle:'채식주의자', pubDate:'2022.03.28', sales2w:83, salesTotal:1697,
+      comment:'노벨문학상 수상 이후 장기 스테디셀러 · 2주 집중률 5%의 안정적 중장기 판매' },
+    authorRep:{ repTitle:'채식주의자', pubDate:'2022.03.28', sales2w:83, salesTotal:1697, ratio:5,
+      comment:'한강 작가 대표작. 노벨상 수상 후 전 작품 동반 상승 중' },
+    series:[{label:'채식주의자',val:1697},{label:'작별하지않는다',val:941},{label:'소년이온다',val:2649},{label:'신작(예측)',val:2800,forecast:true}]
   },
-  '9791172461942': {
-    title:'흔한남매 세계사 탐험대 6', author:'흔한남매', publisher:'미래엔', category:'아동 학습만화',
-    stock:320, incoming:100, forecast:5765, recommend:5400, grade:'intensive',
-    prev2w:{ prevTitle:'흔한남매 세계사 탐험대 5', pubDate:'2025.11.28', sales2w:2810, salesTotal:5241,
-      comment:'출간 2주 만에 누적의 54%가 집중 판매 → 초도 발주량 결정의 핵심 기준' },
-    authorRep:{ repTitle:'흔한남매 20권', pubDate:'2024.03.15', sales2w:3100, salesTotal:12850, ratio:24,
-      comment:'시리즈 전체 최고 판매권. 저자 브랜드 파워로 신권 초도 수요 견인' },
-    series:[{label:'1권',val:4102},{label:'2권',val:4530},{label:'3권',val:4780},{label:'4권',val:4980},{label:'5권',val:5241},{label:'6권(예측)',val:5765,forecast:true}]
+  '9788936434595': {
+    title:'채식주의자', author:'한강', publisher:'창비', category:'소설',
+    stock:30, incoming:10, forecast:1800, recommend:1700, grade:'intensive',
+    prev2w:{ prevTitle:'작별하지 않는다', pubDate:'2021.09.09', sales2w:31, salesTotal:941,
+      comment:'노벨상 수상 후 역주행 판매 · 2주 집중률 3%의 장기 스테디셀러' },
+    authorRep:{ repTitle:'소년이 온다', pubDate:'2014.05.19', sales2w:65, salesTotal:2649, ratio:2,
+      comment:'한강 저자 최다 판매작. 노벨문학상 수상으로 전 작품 판매 동반 상승' },
+    series:[{label:'작별하지않는다',val:941},{label:'채식주의자',val:1697},{label:'소년이온다',val:2649},{label:'신작(예측)',val:1800,forecast:true}]
   },
-  '9791172461234': {
-    title:'마법사 연대기 5권', author:'박민준', publisher:'황금가지', category:'판타지',
-    stock:150, incoming:50, forecast:3200, recommend:3000, grade:'expand',
-    prev2w:{ prevTitle:'마법사 연대기 4', pubDate:'2025.08.15', sales2w:1310, salesTotal:3050,
-      comment:'출간 2주 43% 집중 판매 → 확대 발주 후 추가 대응 권장' },
-    authorRep:{ repTitle:'마법사 연대기 1권', pubDate:'2022.05.10', sales2w:1500, salesTotal:9200, ratio:16,
-      comment:'데뷔작 최고 판매. 시리즈 충성 독자층 형성으로 신권 수요 안정' },
-    series:[{label:'1권',val:2100},{label:'2권',val:2450},{label:'3권',val:2780},{label:'4권',val:3050},{label:'5권(예측)',val:3200,forecast:true}]
+  '9788954682152': {
+    title:'작별하지 않는다', author:'한강', publisher:'문학동네', category:'소설',
+    stock:25, incoming:10, forecast:1000, recommend:950, grade:'expand',
+    prev2w:{ prevTitle:'채식주의자', pubDate:'2022.03.28', sales2w:83, salesTotal:1697,
+      comment:'직전작 대비 판매 규모 55% · 2주 31권으로 꾸준한 수요' },
+    authorRep:{ repTitle:'소년이 온다', pubDate:'2014.05.19', sales2w:65, salesTotal:2649, ratio:2,
+      comment:'한강 저자 수상 이후 전 작품 안정적 판매 유지' },
+    series:[{label:'채식주의자',val:1697},{label:'작별하지않는다',val:941},{label:'소년이온다',val:2649},{label:'신작(예측)',val:1000,forecast:true}]
   },
-  '9791172469876': {
-    title:'첫 번째 빛', author:'이새봄', publisher:'문학동네', category:'한국소설',
-    stock:80, incoming:30, forecast:1200, recommend:1100, grade:'normal',
-    prev2w:{ prevTitle:'두 번째 계절', pubDate:'2025.03.10', sales2w:380, salesTotal:1050,
-      comment:'2주 판매 36% · 중장기 비중 높아 안정 발주 권장' },
-    authorRep:{ repTitle:'두 번째 계절', pubDate:'2025.03.10', sales2w:380, salesTotal:1050, ratio:36,
-      comment:'중장기 판매 패턴. 초도 소량 → 반응 보고 추가 발주 전략 유효' },
-    series:[{label:'데뷔작',val:980},{label:'두번째',val:1050},{label:'세번째(예측)',val:1200,forecast:true}]
+  '9791173473968': {
+    title:'흔한남매 19', author:'흔한남매', publisher:'미래엔아이세움', category:'아동',
+    stock:80, incoming:30, forecast:980, recommend:920, grade:'expand',
+    prev2w:{ prevTitle:'흔한남매 18', pubDate:'2024.12.18', sales2w:0, salesTotal:762,
+      comment:'18권 누적 762권 기준 · 시리즈 안정 판매 패턴 유지' },
+    authorRep:{ repTitle:'흔한남매 18', pubDate:'2024.12.18', sales2w:0, salesTotal:762, ratio:0,
+      comment:'장기 인기 시리즈. 신권 출간 시 초기 집중 발주 후 안정 유지 전략' },
+    series:[{label:'17권',val:680},{label:'18권',val:762},{label:'19권',val:934},{label:'20권(예측)',val:980,forecast:true}]
+  },
+  '9791173114038': {
+    title:'흔한남매 18', author:'흔한남매', publisher:'미래엔아이세움', category:'아동',
+    stock:40, incoming:15, forecast:810, recommend:760, grade:'normal',
+    prev2w:{ prevTitle:'흔한남매 17', pubDate:'2024.09.01', sales2w:0, salesTotal:680,
+      comment:'17권 대비 12% 성장 · 시리즈 꾸준한 우상향 추세' },
+    authorRep:{ repTitle:'흔한남매 19', pubDate:'2025.04.18', sales2w:0, salesTotal:934, ratio:0,
+      comment:'최신권 기준 시리즈 최고 판매 · 저자 브랜드 파워 강함' },
+    series:[{label:'16권',val:620},{label:'17권',val:680},{label:'18권',val:762},{label:'19권(예측)',val:810,forecast:true}]
+  },
+  '9788954789585': {
+    title:'EBS 수능특강 영어(2025)', author:'EBS교육방송 편집부', publisher:'EBS한국교육방송공사', category:'중고학습',
+    stock:60, incoming:20, forecast:1400, recommend:1300, grade:'expand',
+    prev2w:{ prevTitle:'EBS 수능특강 영어(2024)', pubDate:'2024.01.31', sales2w:0, salesTotal:1100,
+      comment:'전년 대비 20% 성장 · 수능시즌 집중 판매 후 소멸하는 패턴' },
+    authorRep:{ repTitle:'EBS 수능특강 국어독서(2025)', pubDate:'2025.01.31', sales2w:0, salesTotal:1307, ratio:0,
+      comment:'EBS 수능특강 시리즈 전체 안정적 판매 · 출간 직후 초기 집중 발주 중요' },
+    series:[{label:'2023년',val:980},{label:'2024년',val:1100},{label:'2025년',val:1322},{label:'2026년(예측)',val:1400,forecast:true}]
+  },
+  '9788954789554': {
+    title:'EBS 수능특강 국어 독서(2025)', author:'EBS교육방송 편집부', publisher:'EBS한국교육방송공사', category:'중고학습',
+    stock:55, incoming:20, forecast:1380, recommend:1280, grade:'expand',
+    prev2w:{ prevTitle:'EBS 수능특강 국어 독서(2024)', pubDate:'2024.01.31', sales2w:0, salesTotal:1050,
+      comment:'전년 대비 24% 성장 · 수능 시즌 초기 집중 발주 후 소멸 패턴' },
+    authorRep:{ repTitle:'EBS 수능특강 영어(2025)', pubDate:'2025.01.31', sales2w:0, salesTotal:1322, ratio:0,
+      comment:'EBS 수능 시리즈 동반 판매 · 과목별 동시 발주 권장' },
+    series:[{label:'2023년',val:920},{label:'2024년',val:1050},{label:'2025년',val:1307},{label:'2026년(예측)',val:1380,forecast:true}]
+  },
+  '9791169851053': {
+    title:'어른의 행복은 조용하다', author:'태수', publisher:'페이지2북스', category:'자기계발',
+    stock:20, incoming:10, forecast:1100, recommend:1050, grade:'expand',
+    prev2w:{ prevTitle:'어른의 행복은 조용하다(초판)', pubDate:'2024.11.04', sales2w:3, salesTotal:1069,
+      comment:'2주 3권의 꾸준한 스테디셀러 패턴 · 장기 판매 지속 예상' },
+    authorRep:{ repTitle:'어른의 행복은 조용하다', pubDate:'2024.11.04', sales2w:3, salesTotal:1069, ratio:0,
+      comment:'페이지2북스 에세이 스테디셀러 · 입소문 기반 지속 판매' },
+    series:[{label:'1쇄',val:320},{label:'누적',val:1069},{label:'신작(예측)',val:1100,forecast:true}]
+  },
+  '9791193506516': {
+    title:'초역 부처의 말', author:'코이케 류노스케', publisher:'포레스트북스', category:'인문',
+    stock:35, incoming:10, forecast:1650, recommend:1580, grade:'intensive',
+    prev2w:{ prevTitle:'초역 부처의 말(초판)', pubDate:'2024.05.30', sales2w:0, salesTotal:1599,
+      comment:'2주 집중 0 · 완전한 중장기 스테디셀러 패턴 · 연간 균등 판매' },
+    authorRep:{ repTitle:'초역 부처의 말', pubDate:'2024.05.30', sales2w:0, salesTotal:1599, ratio:0,
+      comment:'불교 인문 스테디셀러 · 꾸준한 입소문 판매로 장기 보유 필요' },
+    series:[{label:'초판',val:800},{label:'개정판',val:1599},{label:'신판(예측)',val:1650,forecast:true}]
+  },
+  '9788994893501': {
+    title:'정치가 왜 이래?', author:'홍준표', publisher:'실크로드', category:'정치/사회',
+    stock:30, incoming:10, forecast:1150, recommend:1100, grade:'expand',
+    prev2w:{ prevTitle:'정치가 왜 이래?(초판)', pubDate:'2025.01.24', sales2w:0, salesTotal:1108,
+      comment:'출간 직후 집중 판매 후 안정기 진입 · 정치 이슈에 따라 변동 가능' },
+    authorRep:{ repTitle:'정치가 왜 이래?', pubDate:'2025.01.24', sales2w:0, salesTotal:1108, ratio:0,
+      comment:'정치인 저자 특성상 이슈 연동 판매 · 탄력적 발주 대응 필요' },
+    series:[{label:'초판',val:1108},{label:'신작(예측)',val:1150,forecast:true}]
   }
 };
 
