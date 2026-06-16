@@ -1387,7 +1387,32 @@ function parseAndRenderSalesData(rows, fileName) {
       else isbnMap[isbn].qty += qty;
     }
     uploadedSalesData = Object.values(isbnMap);
-    status.innerHTML = `<span style="color:#16A34A;font-weight:700;">✓ ${uploadedSalesData.length}종 로드 완료</span>`;
+
+    // 전체 ISBN을 BOOKS에 자동 주입 (직접 검색 가능하도록)
+    uploadedSalesData.forEach(d => {
+      if (!BOOKS[d.isbn]) {
+        const netQty = Math.max(0, d.qty - d.returns);
+        const catMap = {'12조':'아동','15조':'소설','16조':'시/에세이','21조':'인문','23조':'정치/사회','24조':'경제/경영','25조':'과학','27조':'컴퓨터','28조':'취업/수험','29조':'요리','33조':'외국어','34조':'자기계발','35조':'초등학습','36조':'중고학습','41조':'양서','17조':'만화'};
+        const catKey = Object.keys(catMap).find(k => (d.cat||'').startsWith(k)) || '';
+        const category = catMap[catKey] || d.cat || '기타';
+        const grade = netQty >= 1000 ? 'intensive' : netQty >= 300 ? 'expand' : 'normal';
+        const forecast = Math.round(netQty * 1.1);
+        BOOKS[d.isbn] = {
+          title: d.name, author: d.author, publisher: d.pub,
+          category, grade,
+          stock: 0, incoming: 0, forecast, recommend: Math.round(forecast * 0.9),
+          prev2w: { prevTitle: d.name, pubDate: d.pubdate.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3'),
+            sales2w: d.qty2w || 0, salesTotal: netQty,
+            comment: `실제 판매 데이터 기준 · 누적 ${netQty.toLocaleString()}권` },
+          authorRep: { repTitle: d.name, pubDate: d.pubdate.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3'),
+            sales2w: d.qty2w || 0, salesTotal: netQty, ratio: netQty > 0 ? Math.round((d.qty2w||0)/netQty*100) : 0,
+            comment: '업로드 데이터 기준' },
+          series: [{ label: '실적', val: netQty }, { label: '예측', val: forecast, forecast: true }],
+        };
+      }
+    });
+
+    status.innerHTML = `<span style="color:#16A34A;font-weight:700;">✓ ${uploadedSalesData.length}종 로드 완료 · ISBN 직접 검색 가능</span>`;
     list.innerHTML = uploadedSalesData.map(d => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:3px;background:#F8FAFC;border-radius:5px;border:1px solid #E5E7EB;cursor:pointer;"
            onclick="loadUploadedBook('${d.isbn}')">
