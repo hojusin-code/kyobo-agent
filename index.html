@@ -544,14 +544,7 @@ const show = id => document.getElementById(id).classList.remove('hidden');
 function quickTest(isbn) { document.getElementById('isbnInput').value = isbn; startAnalysis(); }
 
 function startAnalysis() {
-  let raw = document.getElementById('isbnInput').value.trim().replace(/-/g,'');
-  const isbn = /e/i.test(raw)
-    ? Math.round(Number(raw)).toString().padStart(13, '0')
-    : raw.padStart(13, '0');
-  if (isbn.length !== 13 || !/^\d{13}$/.test(isbn)) {
-    alert('ISBN은 13자리 숫자여야 합니다.\n입력값: ' + raw);
-    return;
-  }
+  const isbn = document.getElementById('isbnInput').value.trim().replace(/-/g,'');
   if (!BOOKS[isbn]) { alert('등록된 ISBN이 아닙니다.\n\n' + Object.keys(BOOKS).join('\n')); return; }
   currentIsbn = isbn;
   const book = BOOKS[isbn];
