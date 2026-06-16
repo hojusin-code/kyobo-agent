@@ -1475,7 +1475,33 @@ document.getElementById('excelUpload').addEventListener('change', function(e) {
       });
       parseAndRenderSalesData(rows, file.name);
     };
-    reader.readAsText(file, 'UTF-8');
+    // EUC-KR / UTF-8 자동 감지
+    const rawReader = new FileReader();
+    rawReader.onload = function(ev2) {
+      const bytes = new Uint8Array(ev2.target.result);
+      // EUC-KR 여부: 0xA1~0xFE 범위 바이트가 있으면 EUC-KR로 시도
+      let enc = 'UTF-8';
+      for (let i = 0; i < Math.min(bytes.length, 2000); i++) {
+        if (bytes[i] >= 0xA1 && bytes[i] <= 0xFE) { enc = 'euc-kr'; break; }
+      }
+      try {
+        const text = new TextDecoder(enc).decode(ev2.target.result);
+        const lines = text.split('\n').filter(l => l.trim());
+        const rows = lines.map(line => {
+          const result = []; let cur = '', inQ = false;
+          for (const ch of line) {
+            if (ch === '"') { inQ = !inQ; }
+            else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+            else { cur += ch; }
+          }
+          result.push(cur.trim()); return result;
+        });
+        parseAndRenderSalesData(rows, file.name);
+      } catch(e) {
+        status.innerHTML = `<span style="color:var(--red);">인코딩 오류: ${e.message}</span>`;
+      }
+    };
+    rawReader.readAsArrayBuffer(file);
   }
 });
 
