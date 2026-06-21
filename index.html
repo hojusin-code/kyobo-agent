@@ -1490,7 +1490,7 @@ function startAnalysis(){
   const trendPct  = Math.round((trendFactor - 1) * 100);
   const marketPct = Math.round((marketFactor - 1) * 100);
   $('oeFormula').innerHTML =
-    `<span style="color:#6B7280;">기준 <b style="color:#374151;">${base7d.toLocaleString()}</b>권` +
+    `<span style="color:#6B7280;">기준 <b style="color:#374151;">${base7d.toLocaleString()}</b>권 <span style="font-weight:400;color:#9CA3AF;">(약 7일 판매)</span>` +
     ` × 추세 <b style="color:${trendPct>=0?'#16A34A':'#E60012'}">${trendPct>=0?'+':''}${trendPct}%</b>` +
     ` × 시장 <b style="color:#2563EB">+${marketPct}%</b> = <b style="color:#374151">${forecast7d.toLocaleString()}</b>권</span><br>` +
     `<span style="color:#9CA3AF;">− 재고 ${book.stock.toLocaleString()} − 입고 ${book.incoming.toLocaleString()}</span>` +
@@ -1510,7 +1510,7 @@ function startAnalysis(){
 
   // 발주 근거 리스트
   const reasonItems = [
-    { type:'ok',   text:`동일 시리즈 ${prevBooks.length}권 평균 판매량 ${avg.toLocaleString()}권` },
+    { type:'ok',   text:`동일 시리즈 ${prevBooks.length}권 평균 판매량 ${avg.toLocaleString()}권 (14일 기준)` },
     { type:'ok',   text:`저자 대표작 14일 판매량 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)` },
     { type:'ok',   text:`직전권 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권 (누적 ${p.salesTotal.toLocaleString()}권)` },
     { type:'ok',   text:`${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})` },
