@@ -682,9 +682,9 @@
           <div class="kh-sub" id="khRecommendSub">이번주 기준</div>
         </div>
         <div class="kpi-hero-box">
-          <div class="kh-lbl">AI 신뢰도</div>
-          <div class="kh-val" id="khTrust" style="color:#16A34A;">—%</div>
-          <div class="kh-sub" id="khTrustSub"></div>
+          <div class="kh-lbl">직전권 판매 실적</div>
+          <div style="font-size:13px;font-weight:900;color:#1E3A5F;margin-bottom:2px;">7일 <span id="khForecast2w" style="font-size:17px;color:var(--kyobo);">—</span>권</div>
+          <div style="font-size:13px;font-weight:900;color:#6B7280;">14일 <span id="khForecast4w" style="font-size:15px;color:#374151;">—</span>권</div>
         </div>
         <div class="kpi-hero-box">
           <div class="kh-lbl">품절 위험도</div>
@@ -692,9 +692,9 @@
           <div class="kh-sub" id="khRiskSub"></div>
         </div>
         <div class="kpi-hero-box">
-          <div class="kh-lbl">직전권 판매 실적</div>
-          <div style="font-size:13px;font-weight:900;color:#1E3A5F;margin-bottom:2px;">7일 <span id="khForecast2w" style="font-size:17px;color:var(--kyobo);">—</span>권</div>
-          <div style="font-size:13px;font-weight:900;color:#6B7280;">14일 <span id="khForecast4w" style="font-size:15px;color:#374151;">—</span>권</div>
+          <div class="kh-lbl">저자 대표작 (14일)</div>
+          <div class="kh-val" id="khAuthorRep" style="color:#1E3A5F;">—</div>
+          <div class="kh-sub" id="khAuthorRepSub"></div>
         </div>
       </div>
 
@@ -722,6 +722,9 @@
         <div class="oe-stat">
           <div class="oe-lbl">재고 소진 예상</div>
           <div class="oe-val" id="oeDays">—일</div>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:0 8px;">
+          <div id="oeFormula" style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;line-height:1.8;"></div>
         </div>
         <div class="oe-action">
           <div style="display:flex;flex-direction:column;gap:1px;">
@@ -1458,14 +1461,21 @@ function startAnalysis(){
   $('khForecast4w').textContent   = sales14d.toLocaleString();
 
   const trustColor = trustAvg >= 85 ? '#16A34A' : trustAvg >= 70 ? '#D97706' : '#E60012';
-  $('khTrust').textContent    = `${trustAvg}%`;
-  $('khTrust').style.color    = trustColor;
-  $('khTrustSub').textContent = trustAvg >= 85 ? '데이터 충분' : trustAvg >= 70 ? '참고 수준' : '데이터 부족';
 
   const riskColor2 = risks.length === 0 ? '#16A34A' : risks.length === 1 ? '#D97706' : '#E60012';
   $('khRisk').textContent    = riskLevel;
   $('khRisk').style.color    = riskColor2;
   $('khRiskSub').textContent = risks.length === 0 ? '안전' : `위험요소 ${risks.length}건`;
+
+  // 저자 대표작 박스
+  $('khAuthorRep').textContent    = book.authorRep.sales2w.toLocaleString() + '권';
+  $('khAuthorRepSub').textContent = `집중률 ${book.authorRep.ratio}% · ${book.authorRep.repTitle.slice(0,10)}…`;
+
+  // 발주 계산식
+  $('oeFormula').innerHTML =
+    `<span style="color:#374151;">7일 예상 <b style="color:var(--kyobo);">${sales7d.toLocaleString()}</b>권</span><br>` +
+    `<span style="color:#9CA3AF;">− 현재재고 ${book.stock.toLocaleString()}권 − 입고예정 ${book.incoming.toLocaleString()}권</span><br>` +
+    `<span style="color:var(--kyobo);font-size:13px;">= <b>${week1.toLocaleString()}</b>권</span>`;
 
   // 신뢰도 바
   ['tr1','tr2','tr3'].forEach(id=>$(id).style.width='0%');
