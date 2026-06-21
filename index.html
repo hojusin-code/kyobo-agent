@@ -1376,14 +1376,11 @@ function startAnalysis(){
 
   // ── 1. 기본 수치 계산 ──
   const ratio2w    = Math.round((p.sales2w/p.salesTotal)*100);
-  const sales7d    = Math.round(p.sales2w / 2);          // 7일(1주) 예상 판매량
-  const sales14d   = p.sales2w;                          // 14일(2주) 판매량 (직전권 실측)
+  const sales7d    = Math.round(p.sales2w / 2);   // 직전권 7일 실적
+  const sales14d   = p.sales2w;                   // 직전권 14일 실적
   const dailyAvg   = Math.round(p.sales2w / 14);
   const daysLeft   = dailyAvg > 0 ? Math.round((book.stock + book.incoming) / dailyAvg) : 99;
-
-  // 추천 발주량: 1주 예상 판매량 기준 — 현재 재고·입고 차감
-  // (신간은 2주차 판매가 1주차보다 높은 경우가 있어 2주 데이터를 수집하되, 발주는 주간 단위)
-  const week1 = Math.max(0, sales7d - book.stock - book.incoming);
+  // week1은 시리즈/시장 데이터 계산 후 아래에서 확정
 
   // ── 2. 시리즈 데이터 ──
   const prevBooks = book.series.filter(s=>!s.forecast);
@@ -1411,8 +1408,26 @@ function startAnalysis(){
   const stockCoverage = book.stock > 0 ? Math.round(book.stock / Math.max(1, Math.round(p.sales2w/14))) : 0; // 현재 재고로 버틸 수 있는 일수
   const seriesGrowth = prevBooks.length >= 2
     ? Math.round(((prevBooks[prevBooks.length-1].val - prevBooks[0].val) / prevBooks[0].val) * 100)
-    : 0; // 시리즈 판매 성장률
-  const overOrderRisk = week1 > p.salesTotal * 0.6; // 권장발주가 누적판매의 60% 초과 시 과대발주 위험
+    : 0;
+
+  // ── 보완된 예측 공식 ──
+  // ① 기준 7일: 직전권 60% + 시리즈 평균 7일 40% (시리즈 1권뿐이면 직전권 100%)
+  const seriesAvg7d = Math.round(avg / 2);
+  const base7d = prevBooks.length >= 2
+    ? Math.round(sales7d * 0.6 + seriesAvg7d * 0.4)
+    : sales7d;
+  // ② 시리즈 추세 보정 (범위: ×0.92 ~ ×1.12)
+  const trendAdj = seriesGrowth >= 10 ? 0.08 : seriesGrowth >= 5 ? 0.04 : seriesGrowth >= 0 ? 0 : seriesGrowth >= -10 ? -0.04 : -0.08;
+  const trendFactor = Math.min(1.12, Math.max(0.92, 1 + trendAdj));
+  // ③ 시장 보정 (범위: ×0.97 ~ ×1.06)
+  const marketAdj = mkt.growth >= 15 ? 0.06 : mkt.growth >= 8 ? 0.03 : mkt.growth >= 0 ? 0.01 : -0.03;
+  const marketFactor = Math.min(1.06, Math.max(0.97, 1 + marketAdj));
+  // ④ 최종 예측 7일 판매량
+  const forecast7d = Math.round(base7d * trendFactor * marketFactor);
+  // ⑤ 추천 발주량
+  const week1 = Math.max(0, forecast7d - book.stock - book.incoming);
+
+  const overOrderRisk = week1 > p.salesTotal * 0.6;
 
   // 위험 요소별 판단
   const risks = [];
@@ -1472,10 +1487,14 @@ function startAnalysis(){
   $('khAuthorRepSub').textContent = `집중률 ${book.authorRep.ratio}% · ${book.authorRep.repTitle.slice(0,10)}…`;
 
   // 발주 계산식
+  const trendPct  = Math.round((trendFactor - 1) * 100);
+  const marketPct = Math.round((marketFactor - 1) * 100);
   $('oeFormula').innerHTML =
-    `<span style="color:#374151;">7일 예상 <b style="color:var(--kyobo);">${sales7d.toLocaleString()}</b>권</span><br>` +
-    `<span style="color:#9CA3AF;">− 현재재고 ${book.stock.toLocaleString()}권 − 입고예정 ${book.incoming.toLocaleString()}권</span><br>` +
-    `<span style="color:var(--kyobo);font-size:13px;">= <b>${week1.toLocaleString()}</b>권</span>`;
+    `<span style="color:#6B7280;">기준 <b style="color:#374151;">${base7d.toLocaleString()}</b>권` +
+    ` × 추세 <b style="color:${trendPct>=0?'#16A34A':'#E60012'}">${trendPct>=0?'+':''}${trendPct}%</b>` +
+    ` × 시장 <b style="color:#2563EB">+${marketPct}%</b> = <b style="color:#374151">${forecast7d.toLocaleString()}</b>권</span><br>` +
+    `<span style="color:#9CA3AF;">− 재고 ${book.stock.toLocaleString()} − 입고 ${book.incoming.toLocaleString()}</span>` +
+    ` <span style="color:var(--kyobo);font-size:13px;font-weight:900;">= ${week1.toLocaleString()}권</span>`;
 
   // 신뢰도 바
   ['tr1','tr2','tr3'].forEach(id=>$(id).style.width='0%');
