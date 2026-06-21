@@ -1576,23 +1576,28 @@ function startAnalysis(){
   const judgeSummary = `${book.category} ${mkt.trend} · 재고${daysLeft}일치 · 위험도 ${riskLevel}`;
 
   $('anaList').innerHTML = `
-    <div class="ana-section">
-      <div class="ana-hd">📊 판매 분석</div>
-      <div class="ana-row"><span class="ana-key">직전권 7일 판매</span><span class="ana-val">${sales7d.toLocaleString()}권</span></div>
-      <div class="ana-row"><span class="ana-key">직전권 14일 판매</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>
-      <div class="ana-row"><span class="ana-key">시리즈 평균 판매량</span><span class="ana-val">${avg.toLocaleString()}권 (14일)</span></div>
-      <div class="ana-row"><span class="ana-key">14일 판매 집중도</span><span class="ana-val ${concentrationClass}">${concentrationLabel} (${ratio2w}%)</span></div>
-      <div class="ana-row"><span class="ana-key">시리즈 판매 추세</span><span class="ana-val ${seriesTrendClass}">${seriesTrend} (${seriesGrowth>=0?'+':''}${seriesGrowth}%)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
+      <div class="ana-section" style="margin-bottom:0;">
+        <div class="ana-hd">📊 판매 분석</div>
+        <div class="ana-row"><span class="ana-key">직전권 7일</span><span class="ana-val">${sales7d.toLocaleString()}권</span></div>
+        <div class="ana-row"><span class="ana-key">직전권 14일</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>
+        <div class="ana-row"><span class="ana-key">시리즈 평균</span><span class="ana-val">${avg.toLocaleString()}권 (14일)</span></div>
+        <div class="ana-row"><span class="ana-key">14일 집중도</span><span class="ana-val ${concentrationClass}">${concentrationLabel} (${ratio2w}%)</span></div>
+        <div class="ana-row"><span class="ana-key">시리즈 추세</span><span class="ana-val ${seriesTrendClass}">${seriesTrend} (${seriesGrowth>=0?'+':''}${seriesGrowth}%)</span></div>
+      </div>
+      <div class="ana-section" style="margin-bottom:0;">
+        <div class="ana-hd">📈 시장 분석</div>
+        <div class="ana-row"><span class="ana-key">${book.category} 성장률</span><span class="ana-val ${mkt.growth>=8?'pos':'warn'}">${mktSign}${mkt.growth}%</span></div>
+        <div class="ana-row"><span class="ana-key">시장 트렌드</span><span class="ana-val">${mkt.trend}</span></div>
+        <div class="ana-row"><span class="ana-key">베스트셀러</span><span class="ana-val ${bsChance==='높음'?'pos':bsChance==='보통'?'warn':'neg'}">${bsChance}</span></div>
+      </div>
     </div>
-    <div class="ana-section">
-      <div class="ana-hd">📈 시장 분석</div>
-      <div class="ana-row"><span class="ana-key">${book.category} 성장률</span><span class="ana-val ${mkt.growth>=8?'pos':'warn'}">${mktSign}${mkt.growth}%</span></div>
-      <div class="ana-row"><span class="ana-key">시장 트렌드</span><span class="ana-val">${mkt.trend}</span></div>
-      <div class="ana-row"><span class="ana-key">베스트셀러 가능성</span><span class="ana-val ${bsChance==='높음'?'pos':bsChance==='보통'?'warn':'neg'}">${bsChance}</span></div>
-    </div>
-    <div class="ana-section">
+    <div class="ana-section" style="margin-bottom:0;">
       <div class="ana-hd">🎯 최종 판단</div>
-      <div class="ana-row"><span class="ana-key">추천 발주량</span><span class="ana-val pos" style="font-size:14px;">${week1.toLocaleString()}권</span></div>
+      <div class="ana-row" style="padding:4px 4px;">
+        <span class="ana-key">추천 발주량</span>
+        <span style="font-size:20px;font-weight:900;color:var(--kyobo);">${week1.toLocaleString()}권</span>
+      </div>
       <div class="ana-row"><span class="ana-key">AI 신뢰도</span><span class="ana-val" style="color:${trustColor};">${trustAvg}%</span></div>
       <div class="ana-row"><span class="ana-key">품절 위험도</span><span class="ana-val" style="color:${riskColor2};">${riskLevel}</span></div>
       <div class="ana-row"><span class="ana-key">판단 근거</span><span class="ana-val" style="font-size:10px;color:#6B7280;">${judgeSummary}</span></div>
