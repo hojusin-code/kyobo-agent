@@ -306,10 +306,10 @@
     /* KPI 히어로 행 */
     .kpi-hero-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; flex-shrink:0; }
     .kpi-hero-main { background:var(--kyobo); border-radius:12px; padding:14px 20px; display:flex; flex-direction:column; justify-content:center; }
-    .kpi-hero-main .kh-lbl { font-size:10px; font-weight:800; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
-    .kpi-hero-main .kh-val { font-size:42px; font-weight:900; color:white; line-height:1; }
-    .kpi-hero-main .kh-unit { font-size:16px; font-weight:700; color:rgba(255,255,255,0.6); margin-left:3px; }
-    .kpi-hero-main .kh-sub { font-size:10px; color:rgba(255,255,255,0.55); margin-top:5px; font-weight:600; }
+    .kpi-hero-main .kh-lbl { font-size:12px; font-weight:800; color:rgba(255,255,255,0.75); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+    .kpi-hero-main .kh-val { font-size:64px; font-weight:900; color:white; line-height:1; }
+    .kpi-hero-main .kh-unit { font-size:22px; font-weight:700; color:rgba(255,255,255,0.7); margin-left:4px; }
+    .kpi-hero-main .kh-sub { font-size:11px; color:rgba(255,255,255,0.6); margin-top:8px; font-weight:600; }
     .kpi-hero-box { background:white; border-radius:12px; padding:12px 14px; border:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:center; }
     .kpi-hero-box .kh-lbl { font-size:10px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
     .kpi-hero-box .kh-val { font-size:22px; font-weight:900; line-height:1; }
@@ -1516,9 +1516,9 @@ function startAnalysis(){
 
   // 발주 근거 리스트
   const okItems = [
-    `동일 시리즈 ${prevBooks.length}권 평균 ${avg.toLocaleString()}권 (14일)`,
-    `저자 대표작 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)`,
     `직전권 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`,
+    `저자 대표작 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)`,
+    `동일 시리즈 ${prevBooks.length}권 평균 ${avg.toLocaleString()}권 (14일)`,
     `${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})`,
     `재고 소진 예상 ${daysLeft >= 30 ? '30일↑' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권`,
   ];
