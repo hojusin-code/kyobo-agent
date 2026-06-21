@@ -692,9 +692,9 @@
           <div class="kh-sub" id="khRiskSub"></div>
         </div>
         <div class="kpi-hero-box">
-          <div class="kh-lbl">예상 판매량</div>
-          <div style="font-size:13px;font-weight:900;color:#1E3A5F;margin-bottom:2px;">2주 <span id="khForecast2w" style="font-size:17px;color:var(--kyobo);">—</span>권</div>
-          <div style="font-size:13px;font-weight:900;color:#6B7280;">4주 <span id="khForecast4w" style="font-size:15px;color:#374151;">—</span>권</div>
+          <div class="kh-lbl">직전권 판매 실적</div>
+          <div style="font-size:13px;font-weight:900;color:#1E3A5F;margin-bottom:2px;">7일 <span id="khForecast2w" style="font-size:17px;color:var(--kyobo);">—</span>권</div>
+          <div style="font-size:13px;font-weight:900;color:#6B7280;">14일 <span id="khForecast4w" style="font-size:15px;color:#374151;">—</span>권</div>
         </div>
       </div>
 
@@ -1372,19 +1372,15 @@ function startAnalysis(){
   $('rTime').textContent = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
   // ── 1. 기본 수치 계산 ──
-  const ratio2w = Math.round((p.sales2w/p.salesTotal)*100);
-  const forecast4w = Math.round(book.forecast * 1.1);
-  const dailyAvgForDays = Math.round(p.sales2w/14);
-  const daysLeft = dailyAvgForDays > 0 ? Math.round((book.stock + book.incoming) / dailyAvgForDays) : 99;
+  const ratio2w    = Math.round((p.sales2w/p.salesTotal)*100);
+  const sales7d    = Math.round(p.sales2w / 2);          // 7일(1주) 예상 판매량
+  const sales14d   = p.sales2w;                          // 14일(2주) 판매량 (직전권 실측)
+  const dailyAvg   = Math.round(p.sales2w / 14);
+  const daysLeft   = dailyAvg > 0 ? Math.round((book.stock + book.incoming) / dailyAvg) : 99;
 
-  const wRatio   = WEEKEND_RATIO[book.category]||WEEKEND_RATIO.default;
-  const wdDaily  = Math.round((p.sales2w*(1-wRatio))/10);
-  const weDaily  = Math.round((p.sales2w*wRatio)/4);
-  const dailyAvg = Math.round(p.sales2w/14);
-  const week1Safety = wdDaily*5 + weDaily*2;
-  const week1  = Math.max(0, p.sales2w - book.stock - book.incoming + Math.round(week1Safety));
-  const week2  = Math.round(dailyAvg*7);
-  const monthly= Math.round(book.forecast*1.1);
+  // 추천 발주량: 1주 예상 판매량 기준 — 현재 재고·입고 차감
+  // (신간은 2주차 판매가 1주차보다 높은 경우가 있어 2주 데이터를 수집하되, 발주는 주간 단위)
+  const week1 = Math.max(0, sales7d - book.stock - book.incoming);
 
   // ── 2. 시리즈 데이터 ──
   const prevBooks = book.series.filter(s=>!s.forecast);
@@ -1458,8 +1454,8 @@ function startAnalysis(){
   $('oeAiVal').textContent        = week1.toLocaleString();
   $('oeAdjInput').value           = week1;
   $('reasonAmount').textContent   = week1.toLocaleString();
-  $('khForecast2w').textContent   = Math.round(book.forecast/2).toLocaleString();
-  $('khForecast4w').textContent   = forecast4w.toLocaleString();
+  $('khForecast2w').textContent   = sales7d.toLocaleString();
+  $('khForecast4w').textContent   = sales14d.toLocaleString();
 
   const trustColor = trustAvg >= 85 ? '#16A34A' : trustAvg >= 70 ? '#D97706' : '#E60012';
   $('khTrust').textContent    = `${trustAvg}%`;
@@ -1486,8 +1482,8 @@ function startAnalysis(){
   // 발주 근거 리스트
   const reasonItems = [
     { type:'ok',   text:`동일 시리즈 ${prevBooks.length}권 평균 판매량 ${avg.toLocaleString()}권` },
-    { type:'ok',   text:`저자 대표작 2주 판매량 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)` },
-    { type:'ok',   text:`직전권 2주 판매 ${p.sales2w.toLocaleString()}권 · 누적 ${p.salesTotal.toLocaleString()}권` },
+    { type:'ok',   text:`저자 대표작 14일 판매량 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)` },
+    { type:'ok',   text:`직전권 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권 (누적 ${p.salesTotal.toLocaleString()}권)` },
     { type:'ok',   text:`${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})` },
     { type:'ok',   text:`재고 소진 예상 ${daysLeft >= 30 ? '30일 이상' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권` },
     ...risks.map(r => ({ type:'warn', text:r }))
@@ -1543,9 +1539,10 @@ function startAnalysis(){
   $('anaList').innerHTML = `
     <div class="ana-section">
       <div class="ana-hd">📊 판매 분석</div>
-      <div class="ana-row"><span class="ana-key">직전 시리즈 판매량</span><span class="ana-val">${p.sales2w.toLocaleString()}권 (2주)</span></div>
-      <div class="ana-row"><span class="ana-key">시리즈 평균 판매량</span><span class="ana-val">${avg.toLocaleString()}권</span></div>
-      <div class="ana-row"><span class="ana-key">2주 판매 집중도</span><span class="ana-val ${concentrationClass}">${concentrationLabel} (${ratio2w}%)</span></div>
+      <div class="ana-row"><span class="ana-key">직전권 7일 판매</span><span class="ana-val">${sales7d.toLocaleString()}권</span></div>
+      <div class="ana-row"><span class="ana-key">직전권 14일 판매</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>
+      <div class="ana-row"><span class="ana-key">시리즈 평균 판매량</span><span class="ana-val">${avg.toLocaleString()}권 (14일)</span></div>
+      <div class="ana-row"><span class="ana-key">14일 판매 집중도</span><span class="ana-val ${concentrationClass}">${concentrationLabel} (${ratio2w}%)</span></div>
       <div class="ana-row"><span class="ana-key">시리즈 판매 추세</span><span class="ana-val ${seriesTrendClass}">${seriesTrend} (${seriesGrowth>=0?'+':''}${seriesGrowth}%)</span></div>
     </div>
     <div class="ana-section">
