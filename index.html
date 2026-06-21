@@ -679,10 +679,14 @@
 
       <!-- KPI 최상단 -->
       <div class="kpi-hero-row">
-        <div class="kpi-hero-main">
-          <div class="kh-lbl">🎯 AI 추천 발주량</div>
-          <div><span class="kh-val" id="khRecommend">—</span><span class="kh-unit">권</span></div>
-          <div class="kh-sub" id="khRecommendSub">이번주 기준</div>
+        <div class="kpi-hero-main" style="flex-direction:row;align-items:center;justify-content:space-between;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="kh-lbl">🎯 AI 추천 발주량</div>
+            <div class="kh-sub" id="khRecommendSub">이번주 기준</div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:4px;">
+            <span class="kh-val" id="khRecommend">—</span><span class="kh-unit">권</span>
+          </div>
         </div>
         <div class="kpi-hero-box">
           <div class="kh-lbl">직전권 판매 실적</div>
