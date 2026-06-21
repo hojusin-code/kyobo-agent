@@ -94,7 +94,7 @@
     .analyze-btn:hover { opacity:0.88; }
 
     /* ── RIGHT ── */
-    .right-panel { padding:14px 18px; overflow:hidden; display:flex; flex-direction:column; gap:10px; height:100%; }
+    .right-panel { padding:10px 16px; overflow:hidden; display:flex; flex-direction:column; gap:7px; height:100%; }
 
     /* 빈 상태 */
     .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; color:#C4C4C4; }
@@ -316,15 +316,17 @@
     .kpi-hero-box .kh-sub { font-size:10px; color:#9CA3AF; margin-top:4px; font-weight:600; }
 
     /* 발주 근거 카드 */
-    .reason-card { background:white; border-radius:12px; padding:14px 18px; border:2px solid var(--kyobo); box-shadow:0 2px 8px rgba(0,49,137,0.08); flex-shrink:0; }
-    .reason-head { display:flex; align-items:baseline; gap:10px; margin-bottom:10px; }
+    .reason-card { background:white; border-radius:12px; padding:10px 14px; border:2px solid var(--kyobo); box-shadow:0 2px 8px rgba(0,49,137,0.08); flex-shrink:0; }
+    .reason-head { display:flex; align-items:baseline; gap:10px; margin-bottom:8px; }
     .reason-title { font-size:12px; font-weight:800; color:#9CA3AF; text-transform:uppercase; letter-spacing:.5px; }
-    .reason-amount { font-size:28px; font-weight:900; color:var(--kyobo); line-height:1; }
-    .reason-amount-unit { font-size:14px; font-weight:700; color:var(--kyobo); }
-    .reason-list { display:flex; flex-direction:column; gap:4px; }
-    .reason-item { font-size:12px; font-weight:600; color:#1E3A5F; display:flex; align-items:flex-start; gap:7px; padding:5px 10px; background:#F0F4FF; border-radius:6px; line-height:1.4; }
-    .reason-item.warn { background:#FEF9C3; color:#854D0E; }
+    .reason-amount { font-size:26px; font-weight:900; color:var(--kyobo); line-height:1; }
+    .reason-amount-unit { font-size:13px; font-weight:700; color:var(--kyobo); }
+    .reason-list { display:grid; grid-template-columns:1fr 1fr; gap:3px; }
+    .reason-item { font-size:11px; font-weight:600; color:#1E3A5F; display:flex; align-items:flex-start; gap:6px; padding:4px 8px; background:#F0F4FF; border-radius:6px; line-height:1.4; }
     .reason-icon { flex-shrink:0; font-weight:900; }
+    .warn-badge-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .warn-badge { font-size:11px; font-weight:700; padding:5px 11px; border-radius:6px; background:#FEF9C3; color:#854D0E; display:flex; align-items:center; gap:4px; flex:1; min-width:160px; }
+    .urgency-badge { font-size:11px; font-weight:700; padding:5px 11px; border-radius:6px; display:flex; align-items:center; gap:4px; }
 
     /* 발주 실행 row */
     .order-exec-row { background:white; border-radius:12px; padding:10px 16px; border:1px solid #E5E7EB; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; align-items:center; gap:14px; flex-shrink:0; flex-wrap:wrap; }
@@ -340,9 +342,9 @@
     .oe-confirm-btn:hover { opacity:.88; }
 
     /* 4섹션 분석 */
-    .ana-section { margin-bottom:8px; }
-    .ana-hd { font-size:11px; font-weight:800; color:#1E3A5F; background:#EEF2FF; border-radius:6px; padding:5px 10px; margin-bottom:5px; }
-    .ana-row { display:flex; justify-content:space-between; align-items:center; padding:2px 6px; }
+    .ana-section { margin-bottom:5px; }
+    .ana-hd { font-size:11px; font-weight:800; color:#1E3A5F; background:#EEF2FF; border-radius:6px; padding:4px 8px; margin-bottom:3px; }
+    .ana-row { display:flex; justify-content:space-between; align-items:center; padding:1px 4px; }
     .ana-key { font-size:11px; color:#6B7280; font-weight:600; }
     .ana-val { font-size:11px; font-weight:800; color:#111; }
     .ana-val.pos { color:#16A34A; }
@@ -705,6 +707,7 @@
           <span class="reason-amount" id="reasonAmount">—</span><span class="reason-amount-unit">권</span>
         </div>
         <div class="reason-list" id="reasonList"></div>
+        <div class="warn-badge-row" id="warnBadgeRow"></div>
       </div>
 
       <!-- 발주 실행 -->
@@ -1509,20 +1512,24 @@ function startAnalysis(){
   }, 100);
 
   // 발주 근거 리스트
-  const reasonItems = [
-    { type:'ok',   text:`동일 시리즈 ${prevBooks.length}권 평균 판매량 ${avg.toLocaleString()}권 (14일 기준)` },
-    { type:'ok',   text:`저자 대표작 14일 판매량 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)` },
-    { type:'ok',   text:`직전권 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권 (누적 ${p.salesTotal.toLocaleString()}권)` },
-    { type:'ok',   text:`${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})` },
-    { type:'ok',   text:`재고 소진 예상 ${daysLeft >= 30 ? '30일 이상' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권` },
-    ...risks.map(r => ({ type:'warn', text:r }))
+  const okItems = [
+    `동일 시리즈 ${prevBooks.length}권 평균 ${avg.toLocaleString()}권 (14일)`,
+    `저자 대표작 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)`,
+    `직전권 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`,
+    `${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})`,
+    `재고 소진 예상 ${daysLeft >= 30 ? '30일↑' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권`,
   ];
-  $('reasonList').innerHTML = reasonItems.map(item =>
-    `<div class="reason-item${item.type==='warn'?' warn':''}">
-      <span class="reason-icon">${item.type==='warn' ? '⚠' : '✓'}</span>
-      <span>${item.text}</span>
-    </div>`
+  const urgencyText  = daysLeft <= 3 ? '긴급' : daysLeft <= 7 ? '높음' : daysLeft <= 14 ? '보통' : '낮음';
+  const urgencyBg    = daysLeft <= 3 ? '#FEE2E2' : daysLeft <= 7 ? '#FEF3C7' : daysLeft <= 14 ? '#FEF9C3' : '#DCFCE7';
+  const urgencyColor = daysLeft <= 3 ? '#991B1B' : daysLeft <= 7 ? '#92400E' : daysLeft <= 14 ? '#854D0E' : '#065F46';
+
+  $('reasonList').innerHTML = okItems.map(t =>
+    `<div class="reason-item"><span class="reason-icon">✓</span><span>${t}</span></div>`
   ).join('');
+
+  $('warnBadgeRow').innerHTML =
+    risks.map(r => `<div class="warn-badge">⚠ ${r}</div>`).join('') +
+    `<div class="urgency-badge" style="background:${urgencyBg};color:${urgencyColor};flex:1;min-width:120px;">🚨 발주 긴급도: <b>${urgencyText}</b></div>`;
 
   // 시리즈 차트
   const maxV = Math.max(...book.series.map(s=>s.val));
@@ -1579,13 +1586,6 @@ function startAnalysis(){
       <div class="ana-row"><span class="ana-key">${book.category} 성장률</span><span class="ana-val ${mkt.growth>=8?'pos':'warn'}">${mktSign}${mkt.growth}%</span></div>
       <div class="ana-row"><span class="ana-key">시장 트렌드</span><span class="ana-val">${mkt.trend}</span></div>
       <div class="ana-row"><span class="ana-key">베스트셀러 가능성</span><span class="ana-val ${bsChance==='높음'?'pos':bsChance==='보통'?'warn':'neg'}">${bsChance}</span></div>
-    </div>
-    <div class="ana-section">
-      <div class="ana-hd">📦 재고 분석</div>
-      <div class="ana-row"><span class="ana-key">현재 재고</span><span class="ana-val">${book.stock.toLocaleString()}권</span></div>
-      <div class="ana-row"><span class="ana-key">입고 예정</span><span class="ana-val">${book.incoming.toLocaleString()}권 (D+3)</span></div>
-      <div class="ana-row"><span class="ana-key">재고 소진 예상</span><span class="ana-val ${urgencyClass}">${daysLeft>=30?'30일↑':daysLeft+'일'}</span></div>
-      <div class="ana-row"><span class="ana-key">발주 긴급도</span><span class="ana-val ${urgencyClass}">${urgency}</span></div>
     </div>
     <div class="ana-section">
       <div class="ana-hd">🎯 최종 판단</div>
