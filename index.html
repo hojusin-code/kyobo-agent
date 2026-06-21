@@ -325,8 +325,8 @@
     .reason-item { font-size:11px; font-weight:600; color:#1E3A5F; display:flex; align-items:flex-start; gap:6px; padding:4px 8px; background:#F0F4FF; border-radius:6px; line-height:1.4; }
     .reason-icon { flex-shrink:0; font-weight:900; }
     .warn-badge-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-    .warn-badge { font-size:11px; font-weight:700; padding:5px 11px; border-radius:6px; background:#FEF9C3; color:#854D0E; display:flex; align-items:center; gap:4px; flex:1; min-width:160px; }
-    .urgency-badge { font-size:11px; font-weight:700; padding:5px 11px; border-radius:6px; display:flex; align-items:center; gap:4px; }
+    .warn-badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; background:#FEF9C3; color:#854D0E; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+    .urgency-badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
 
     /* 발주 실행 row */
     .order-exec-row { background:white; border-radius:12px; padding:10px 16px; border:1px solid #E5E7EB; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; align-items:center; gap:14px; flex-shrink:0; flex-wrap:wrap; }
@@ -1529,7 +1529,7 @@ function startAnalysis(){
 
   $('warnBadgeRow').innerHTML =
     risks.map(r => `<div class="warn-badge">⚠ ${r}</div>`).join('') +
-    `<div class="urgency-badge" style="background:${urgencyBg};color:${urgencyColor};flex:1;min-width:120px;">🚨 발주 긴급도: <b>${urgencyText}</b></div>`;
+    `<div class="urgency-badge" style="background:${urgencyBg};color:${urgencyColor};">🚨 발주 긴급도: <b>${urgencyText}</b></div>`;
 
   // 시리즈 차트
   const maxV = Math.max(...book.series.map(s=>s.val));
