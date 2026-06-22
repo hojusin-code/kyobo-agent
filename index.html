@@ -266,25 +266,40 @@
     .ich-stat { font-size:10px; color:rgba(255,255,255,.65); font-weight:600; }
     .ich-stat strong { color:white; font-weight:900; }
     .issue-list-wrap { flex:1; overflow-y:auto; min-height:0; }
-    .issue-book-item { background:white; border-radius:8px; padding:10px 13px; margin-bottom:5px; box-shadow:0 1px 3px rgba(0,0,0,.06); cursor:pointer; transition:all .15s; border-left:3px solid #E5E7EB; }
-    .issue-book-item:hover { border-left-color:var(--kyobo); box-shadow:0 2px 8px rgba(0,0,0,.12); transform:translateX(2px); }
+    /* ── 이슈 테이블 헤더 ── */
+    .ib-table-hd { display:grid; grid-template-columns:28px 1fr 64px 56px 56px 72px 60px; gap:0 8px; padding:5px 12px 5px 10px; font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.5px; text-transform:uppercase; border-bottom:2px solid #E5E7EB; margin-bottom:4px; }
+    /* ── 이슈 리스트 아이템 (테이블 행) ── */
+    .issue-book-item { display:grid; grid-template-columns:28px 1fr 64px 56px 56px 72px 60px; gap:0 8px; align-items:center; background:white; border-radius:8px; padding:9px 12px 9px 10px; margin-bottom:3px; box-shadow:0 1px 2px rgba(0,0,0,.05); cursor:pointer; transition:all .13s; border-left:3px solid transparent; }
+    .issue-book-item:hover { border-left-color:var(--kyobo); background:#F5F8FF; box-shadow:0 2px 8px rgba(0,0,0,.09); }
     .issue-book-item.r1 { border-left-color:var(--red); }
     .issue-book-item.r2 { border-left-color:#F59E0B; }
     .issue-book-item.r3 { border-left-color:#3B82F6; }
-    .ib-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-    .ib-rank { font-size:15px; font-weight:900; width:24px; flex-shrink:0; text-align:center; }
+    /* 순위 */
+    .ib-rank { font-size:13px; font-weight:900; text-align:center; line-height:1; }
     .ib-rank.rk1 { color:var(--red); } .ib-rank.rk2 { color:#F59E0B; } .ib-rank.rk3 { color:#3B82F6; }
-    .ib-rank.rk4,.ib-rank.rk5 { color:#9CA3AF; font-size:12px; }
-    .ib-name { font-size:12px; font-weight:800; color:#111; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .ib-score-badge { font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px; color:white; flex-shrink:0; }
+    .ib-rank.rk4, .ib-rank.rk5 { color:#CBD5E1; font-size:11px; }
+    /* 도서명 컬럼 */
+    .ib-title-col { min-width:0; }
+    .ib-name { font-size:11px; font-weight:800; color:#0F1F3D; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+    .ib-author { font-size:9px; color:#9CA3AF; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; margin-top:1px; }
+    /* 이슈점수 배지 */
+    .ib-score-badge { font-size:9px; font-weight:900; padding:2px 7px; border-radius:99px; color:white; white-space:nowrap; justify-self:start; }
     .sco-red{background:var(--red);} .sco-amber{background:#F59E0B;} .sco-blue{background:#3B82F6;} .sco-gray{background:#9CA3AF;}
-    .ib-metrics { display:flex; gap:10px; margin-bottom:4px; padding-left:32px; }
-    .ib-m { font-size:10px; color:#6B7280; font-weight:600; }
-    .ib-m strong { color:#111; font-weight:900; }
-    .ib-tags { display:flex; gap:4px; flex-wrap:wrap; padding-left:32px; }
-    .ib-tag { font-size:9px; font-weight:700; padding:1px 6px; border-radius:3px; background:#F3F4F6; color:#4B5563; }
-    .ib-tag.tp { background:#DCFCE7; color:#16A34A; }
-    .ib-tag.tw { background:#FEF3C7; color:#D97706; }
+    /* 재고량 */
+    .ib-stock { font-size:11px; font-weight:900; text-align:right; }
+    .ib-stock.low { color:var(--red); }
+    .ib-stock.ok  { color:#16A34A; }
+    /* 예상판매 */
+    .ib-forecast { font-size:11px; font-weight:900; color:#0F1F3D; text-align:right; }
+    /* AI 추천 발주 */
+    .ib-rec { display:flex; justify-content:flex-end; }
+    .ib-rec-chip { font-size:10px; font-weight:900; padding:3px 8px; border-radius:6px; background:#003189; color:white; white-space:nowrap; }
+    .ib-rec-chip.zero { background:#E5E7EB; color:#9CA3AF; }
+    /* 분석 버튼 */
+    .ib-btn { font-size:9px; font-weight:700; padding:4px 8px; border-radius:6px; background:#F0F4FF; color:var(--kyobo); border:1px solid #C7D7FF; cursor:pointer; white-space:nowrap; text-align:center; }
+    .ib-btn:hover { background:var(--kyobo); color:white; }
+    /* 태그 (hidden, kept for compat) */
+    .ib-tag { display:none; }
     .back-btn { font-size:11px; font-weight:700; color:#6B7280; background:white; border:1.5px solid #E5E7EB; border-radius:6px; padding:5px 10px; cursor:pointer; transition:all .15s; }
     .back-btn:hover { border-color:var(--kyobo); color:var(--kyobo); }
     /* 날짜 선택 */
@@ -303,54 +318,87 @@
     .ds-go:hover { opacity:.85; }
     .ds-period-tag { font-size:10px; font-weight:700; color:var(--kyobo); background:#EEF2FF; padding:2px 9px; border-radius:99px; margin-left:auto; white-space:nowrap; }
 
-    /* KPI 히어로 행 */
-    .kpi-hero-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; flex-shrink:0; }
-    .kpi-hero-main { background:var(--kyobo); border-radius:12px; padding:14px 20px; display:flex; flex-direction:column; justify-content:center; }
-    .kpi-hero-main .kh-lbl { font-size:12px; font-weight:800; color:rgba(255,255,255,0.75); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
-    .kpi-hero-main .kh-val { font-size:64px; font-weight:900; color:white; line-height:1; }
-    .kpi-hero-main .kh-unit { font-size:22px; font-weight:700; color:rgba(255,255,255,0.7); margin-left:4px; }
-    .kpi-hero-main .kh-sub { font-size:11px; color:rgba(255,255,255,0.6); margin-top:8px; font-weight:600; }
-    .kpi-hero-box { background:white; border-radius:12px; padding:12px 14px; border:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:flex; flex-direction:column; justify-content:center; }
-    .kpi-hero-box .kh-lbl { font-size:10px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
-    .kpi-hero-box .kh-val { font-size:22px; font-weight:900; line-height:1; }
-    .kpi-hero-box .kh-sub { font-size:10px; color:#9CA3AF; margin-top:4px; font-weight:600; }
+    /* ── 결과 화면 메인 그리드 ── */
+    .result-main-grid { display:grid; grid-template-columns:1fr 340px; gap:12px; flex:1; min-height:0; overflow:hidden; }
+    .result-left { display:flex; flex-direction:column; gap:10px; overflow-y:auto; min-height:0; padding-right:2px; }
+    .result-right { display:flex; flex-direction:column; gap:10px; overflow-y:auto; min-height:0; }
+
+    /* AI 추천 발주 카드 (블루) */
+    .rl-rec-card { background:var(--kyobo); border-radius:14px; padding:16px 20px; flex-shrink:0; }
+    .rl-rec-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .rl-rec-lbl { font-size:12px; font-weight:800; color:rgba(255,255,255,.75); letter-spacing:.4px; margin-bottom:4px; }
+    .rl-rec-sub { font-size:10px; color:rgba(255,255,255,.55); font-weight:600; }
+    .rl-rec-num-wrap { display:flex; align-items:baseline; gap:6px; }
+    .rl-rec-num { font-size:68px; font-weight:900; color:white; line-height:1; }
+    .rl-rec-unit { font-size:24px; font-weight:700; color:rgba(255,255,255,.7); }
+    .rl-formula-box { background:rgba(0,0,0,.18); border-radius:8px; padding:8px 12px; font-size:11px; font-weight:700; color:rgba(255,255,255,.85); line-height:1.9; }
+
+    /* 판매 데이터 3카드 */
+    .rl-sales-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex-shrink:0; }
+    .rl-sales-card { background:white; border-radius:10px; padding:12px 14px; border:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+    .rl-sales-hl { border-color:#003189; border-width:2px; background:#F0F4FF; }
+    .rls-lbl { font-size:10px; font-weight:700; color:#6B7280; margin-bottom:6px; }
+    .rls-num { display:flex; align-items:baseline; gap:3px; }
+    .rls-num span:first-child { font-size:28px; font-weight:900; color:#0F1F3D; line-height:1; }
+    .rl-sales-hl .rls-num span:first-child { color:var(--kyobo); }
+    .rls-u { font-size:13px; font-weight:700; color:#6B7280; }
+    .rls-note { font-size:9px; color:#9CA3AF; font-weight:600; margin-top:4px; }
 
     /* 발주 근거 카드 */
-    .reason-card { background:white; border-radius:12px; padding:10px 14px; border:2px solid var(--kyobo); box-shadow:0 2px 8px rgba(0,49,137,0.08); flex-shrink:0; }
-    .reason-head { display:flex; align-items:baseline; gap:10px; margin-bottom:8px; }
-    .reason-title { font-size:12px; font-weight:800; color:#9CA3AF; text-transform:uppercase; letter-spacing:.5px; }
-    .reason-amount { font-size:26px; font-weight:900; color:var(--kyobo); line-height:1; }
-    .reason-amount-unit { font-size:13px; font-weight:700; color:var(--kyobo); }
-    .reason-body { display:flex; gap:10px; align-items:stretch; }
-    .reason-list { flex:1; display:flex; flex-direction:column; gap:3px; }
-    .reason-item { font-size:11px; font-weight:600; color:#1E3A5F; display:flex; align-items:flex-start; gap:6px; padding:4px 8px; background:#F0F4FF; border-radius:6px; line-height:1.4; }
-    .reason-icon { flex-shrink:0; font-weight:900; }
-    .warn-badge-row { width:36%; display:flex; flex-direction:column; gap:6px; }
-    .warn-badge { flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px; font-weight:800; padding:8px 12px; border-radius:8px; background:#FEF9C3; color:#854D0E; line-height:1.4; }
-    .urgency-badge { flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px; font-weight:800; padding:8px 12px; border-radius:8px; line-height:1.4; }
+    .rl-reason-card { background:white; border-radius:12px; padding:12px 14px; border:2px solid #C7D7FF; box-shadow:0 1px 4px rgba(0,49,137,.06); flex-shrink:0; }
+    .rl-reason-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .rl-reason-title { font-size:12px; font-weight:800; color:#1E3A5F; }
+    .rl-reason-body { display:flex; gap:10px; align-items:stretch; }
+    .rl-reason-list { flex:1; display:flex; flex-direction:column; gap:4px; }
+    .reason-item { font-size:11px; font-weight:600; color:#1E3A5F; display:flex; align-items:flex-start; gap:7px; padding:5px 9px; background:#F0F4FF; border-radius:7px; line-height:1.45; }
+    .reason-icon { flex-shrink:0; font-weight:900; color:var(--kyobo); }
+    .rl-warn-col { width:34%; display:flex; flex-direction:column; gap:6px; }
+    .warn-badge { flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:12px; font-weight:800; padding:8px 10px; border-radius:8px; background:#FEF9C3; color:#854D0E; line-height:1.4; }
+    .urgency-badge { flex:1; display:flex; align-items:center; justify-content:center; text-align:center; font-size:12px; font-weight:800; padding:8px 10px; border-radius:8px; line-height:1.4; }
 
-    /* 발주 실행 row */
-    .order-exec-row { background:white; border-radius:12px; padding:10px 16px; border:1px solid #E5E7EB; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; align-items:center; gap:14px; flex-shrink:0; flex-wrap:wrap; }
-    .oe-stat { display:flex; flex-direction:column; gap:2px; }
-    .oe-lbl { font-size:9px; font-weight:700; color:#9CA3AF; text-transform:uppercase; }
-    .oe-val { font-size:16px; font-weight:900; color:#1E3A5F; line-height:1; }
-    .oe-divider { width:1px; height:32px; background:#E5E7EB; flex-shrink:0; }
-    .oe-action { display:flex; align-items:center; gap:8px; margin-left:auto; }
-    .oe-ai-label { font-size:10px; font-weight:700; color:#9CA3AF; }
-    .oe-ai-val { font-size:18px; font-weight:900; color:var(--kyobo); }
-    .oe-adj-input { border:2px solid var(--kyobo); border-radius:8px; padding:6px 10px; font-size:18px; font-weight:900; color:#111; width:72px; text-align:center; outline:none; font-family:inherit; }
-    .oe-confirm-btn { background:var(--kyobo); color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:900; cursor:pointer; white-space:nowrap; transition:opacity .15s; }
-    .oe-confirm-btn:hover { opacity:.88; }
+    /* 시장 동향 3카드 */
+    .rl-mkt-section { flex-shrink:0; }
+    .rl-section-hd { font-size:11px; font-weight:800; color:#374151; margin-bottom:7px; letter-spacing:.2px; }
+    .rl-mkt-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .rl-mkt-card { background:white; border-radius:10px; padding:12px 13px; border:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,.04); text-align:center; }
+    .rl-mkt-ico { font-size:20px; margin-bottom:4px; }
+    .rl-mkt-name { font-size:9px; font-weight:700; color:#9CA3AF; margin-bottom:5px; letter-spacing:.3px; }
+    .rl-mkt-val { font-size:13px; font-weight:900; color:#0F1F3D; }
+
+    /* 최종 발주 조정 */
+    .rl-order-card { background:white; border-radius:12px; padding:12px 16px; border:1px solid #E5E7EB; box-shadow:0 1px 4px rgba(0,0,0,.07); flex-shrink:0; }
+    .rl-order-stats { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .rl-os { display:flex; flex-direction:column; gap:2px; }
+    .rl-os-lbl { font-size:9px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:.4px; }
+    .rl-os-val { font-size:16px; font-weight:900; color:#1E3A5F; }
+    .rl-div { width:1px; height:30px; background:#E5E7EB; flex-shrink:0; }
+    .rl-action { display:flex; flex-direction:column; gap:4px; }
+    .rl-action-lbl { font-size:10px; font-weight:700; color:#6B7280; }
+    .rl-stepper { display:flex; align-items:center; gap:5px; }
+    .rl-step-btn { background:#F3F4F6; border:1.5px solid #E5E7EB; border-radius:6px; padding:5px 9px; font-size:12px; font-weight:800; color:#374151; cursor:pointer; transition:all .12s; }
+    .rl-step-btn:hover { background:#E5E7EB; }
+    .oe-adj-input { border:2px solid var(--kyobo); border-radius:8px; padding:5px 8px; font-size:17px; font-weight:900; color:#111; width:70px; text-align:center; outline:none; font-family:inherit; }
+    .oe-confirm-btn { background:var(--red); color:white; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:900; cursor:pointer; white-space:nowrap; transition:all .15s; box-shadow:0 2px 8px rgba(230,0,18,.35); }
+    .oe-confirm-btn:hover { background:#C8000F; box-shadow:0 4px 12px rgba(230,0,18,.45); }
+
+    /* 오른쪽 카드 공통 */
+    .rr-card { background:white; border-radius:12px; padding:13px 14px; border:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,.05); flex-shrink:0; }
+    .rr-card-title { font-size:11px; font-weight:800; color:#374151; letter-spacing:.2px; }
+    .rr-risk-badge { font-size:20px; font-weight:900; }
+    .rr-risk-sub { font-size:11px; font-weight:700; color:#6B7280; }
 
     /* 4섹션 분석 */
-    .ana-section { margin-bottom:5px; }
-    .ana-hd { font-size:11px; font-weight:800; color:#1E3A5F; background:#EEF2FF; border-radius:6px; padding:4px 8px; margin-bottom:3px; }
-    .ana-row { display:flex; justify-content:space-between; align-items:center; padding:1px 4px; }
-    .ana-key { font-size:11px; color:#6B7280; font-weight:600; }
-    .ana-val { font-size:11px; font-weight:800; color:#111; }
+    .ana-section { margin-bottom:4px; }
+    .ana-hd { font-size:10px; font-weight:800; color:#1E3A5F; background:#EEF2FF; border-radius:5px; padding:3px 7px; margin-bottom:2px; }
+    .ana-row { display:flex; justify-content:space-between; align-items:center; padding:1px 3px; }
+    .ana-key { font-size:10px; color:#6B7280; font-weight:600; }
+    .ana-val { font-size:10px; font-weight:800; color:#111; }
     .ana-val.pos { color:#16A34A; }
     .ana-val.neg { color:#E60012; }
     .ana-val.warn { color:#D97706; }
+
+    /* 구형 KPI 클래스 (레거시 호환) */
+    .kpi-hero-row, .reason-card, .order-exec-row, .bottom-grid { display:none; }
 
     /* 모바일 반응형 추가 */
     @media (max-width:768px) {
@@ -659,156 +707,180 @@
 
       <!-- 결과 헤더 -->
       <div class="result-header">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="result-book-name">『<span id="rTitle">—</span>』</span>
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <span class="result-book-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;">『<span id="rTitle">—</span>』</span>
           <span class="result-author" id="rAuthor">—</span>
           <span id="rGradeChip"></span>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
           <span class="result-time" id="rTime"></span>
-          <button class="back-btn" onclick="backToMain()">← 목록으로</button>
+          <button class="back-btn" onclick="backToMain()">← 리스트</button>
         </div>
       </div>
 
-      <!-- KPI 최상단 -->
-      <div class="kpi-hero-row">
-        <div class="kpi-hero-main" style="flex-direction:row;align-items:center;justify-content:space-between;">
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div class="kh-lbl">🎯 AI 추천 발주량</div>
-            <div class="kh-sub" id="khRecommendSub">이번주 기준</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:4px;">
-            <span class="kh-val" id="khRecommend">—</span><span class="kh-unit">권</span>
-          </div>
-        </div>
-        <div class="kpi-hero-box">
-          <div class="kh-lbl">직전권 판매 실적</div>
-          <div style="font-size:13px;font-weight:900;color:#1E3A5F;margin-bottom:2px;">7일 <span id="khForecast2w" style="font-size:17px;color:var(--kyobo);">—</span>권</div>
-          <div style="font-size:13px;font-weight:900;color:#6B7280;">14일 <span id="khForecast4w" style="font-size:15px;color:#374151;">—</span>권</div>
-        </div>
-        <div class="kpi-hero-box">
-          <div class="kh-lbl">저자 대표작 (14일)</div>
-          <div class="kh-val" id="khAuthorRep" style="color:#1E3A5F;">—</div>
-          <div class="kh-sub" id="khAuthorRepSub"></div>
-        </div>
-        <div class="kpi-hero-box">
-          <div class="kh-lbl">품절 위험도</div>
-          <div class="kh-val" id="khRisk">—</div>
-          <div class="kh-sub" id="khRiskSub"></div>
-        </div>
-      </div>
+      <!-- 메인 2컬럼 -->
+      <div class="result-main-grid">
 
-      <!-- 발주 근거 카드 -->
-      <div class="reason-card">
-        <div class="reason-head">
-          <span class="reason-title">추천 발주량</span>
-          <span class="reason-amount" id="reasonAmount">—</span><span class="reason-amount-unit">권</span>
-        </div>
-        <div class="reason-body">
-          <div class="reason-list" id="reasonList"></div>
-          <div class="warn-badge-row" id="warnBadgeRow"></div>
-        </div>
-      </div>
+        <!-- ═══ 왼쪽 ═══ -->
+        <div class="result-left">
 
-      <!-- 발주 실행 -->
-      <div class="order-exec-row">
-        <div class="oe-stat">
-          <div class="oe-lbl">현재 재고</div>
-          <div class="oe-val"><span id="oeStock">—</span>권</div>
-        </div>
-        <div class="oe-divider"></div>
-        <div class="oe-stat">
-          <div class="oe-lbl">입고 예정</div>
-          <div class="oe-val"><span id="oeIncoming">—</span>권 <span style="font-size:10px;color:#9CA3AF;">D+3</span></div>
-        </div>
-        <div class="oe-divider"></div>
-        <div class="oe-stat">
-          <div class="oe-lbl">재고 소진 예상</div>
-          <div class="oe-val" id="oeDays">—일</div>
-        </div>
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:0 8px;">
-          <div id="oeFormula" style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;line-height:1.8;"></div>
-        </div>
-        <div class="oe-action">
-          <div style="display:flex;flex-direction:column;gap:1px;">
-            <div class="oe-ai-label">AI 추천</div>
-            <div class="oe-ai-val"><span id="oeAiVal">—</span>권</div>
-          </div>
-          <div style="font-size:18px;color:#D1D5DB;font-weight:300;">→</div>
-          <div style="display:flex;flex-direction:column;gap:1px;">
-            <div class="oe-ai-label">직원 조정</div>
-            <input id="oeAdjInput" class="oe-adj-input" type="number" min="0" placeholder="수량" />
-          </div>
-          <button class="oe-confirm-btn" onclick="confirmOrder()">✓ 최종 발주 확정</button>
-        </div>
-      </div>
-
-      <!-- 하단 2단 -->
-      <div class="bottom-grid">
-
-        <!-- 왼쪽 컬럼: AI 사고과정 전체 -->
-        <div class="left-col">
-
-          <!-- AI 사고 과정 -->
-          <div class="ai-card">
-            <div class="card-label">발주 분석 요약</div>
-            <div id="anaList"></div>
-          </div>
-
-        </div>
-
-        <!-- 오른쪽 컬럼: 시리즈+신뢰도 | 인기검색어 -->
-        <div class="right-col" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-
-          <!-- 왼쪽: 네이버 + 시리즈 + 신뢰도 -->
-          <div style="display:flex;flex-direction:column;gap:8px;min-height:0;">
-
-            <!-- 네이버 관심도 -->
-            <div class="naver-bar" id="naverBar" style="flex-shrink:0;">
-              <div class="naver-dot"></div>
-              <div class="naver-lbl">네이버 관심도</div>
-              <span class="naver-status" id="naverStatus"></span>
-              <span style="font-size:10px;color:#6B7280;" id="naverCmnt"></span>
-              <span class="naver-cnt" id="naverCnt"></span>
-            </div>
-
-            <!-- 시리즈 판매 추이 -->
-            <div class="series-trust" style="flex-shrink:0;">
-              <div class="mini-label">📊 시리즈 판매 추이</div>
-              <div id="seriesChart"></div>
-            </div>
-
-            <!-- AI 예측 신뢰도 -->
-            <div class="series-trust" style="flex-shrink:0;">
-              <div class="mini-label">🎯 AI 예측 신뢰도</div>
-              <div class="t-row">
-                <div class="t-name">시리즈</div>
-                <div class="t-bg"><div class="t-fill" id="tr1"></div></div>
-                <div class="t-pct">95%</div>
+          <!-- AI 추천 발주량 (메인 블루 카드) -->
+          <div class="rl-rec-card">
+            <div class="rl-rec-top">
+              <div>
+                <div class="rl-rec-lbl">🎯 AI 권장 발주 수량</div>
+                <div class="rl-rec-sub" id="khRecommendSub">이번주 기준</div>
               </div>
-              <div class="t-row">
-                <div class="t-name">카테고리</div>
-                <div class="t-bg"><div class="t-fill amber" id="tr2"></div></div>
-                <div class="t-pct">75%</div>
+              <div class="rl-rec-num-wrap">
+                <span class="rl-rec-num" id="khRecommend">—</span>
+                <span class="rl-rec-unit">권</span>
               </div>
-              <div class="t-row">
-                <div class="t-name">시장동향</div>
-                <div class="t-bg"><div class="t-fill" id="tr3"></div></div>
-                <div class="t-pct">88%</div>
+            </div>
+            <!-- 계산공식 -->
+            <div class="rl-formula-box" id="oeFormula"></div>
+          </div>
+
+          <!-- 재고·입고·직원조정 (블루카드 바로 아래) -->
+          <div class="rl-order-card">
+            <div class="rl-order-stats">
+              <div class="rl-os"><div class="rl-os-lbl">현재 재고</div><div class="rl-os-val"><span id="oeStock">—</span>권</div></div>
+              <div class="rl-div"></div>
+              <div class="rl-os"><div class="rl-os-lbl">입고 예정</div><div class="rl-os-val"><span id="oeIncoming">—</span>권&nbsp;<span style="font-size:9px;color:#9CA3AF;">D+3</span></div></div>
+              <div class="rl-div"></div>
+              <div class="rl-os"><div class="rl-os-lbl">재고 소진</div><div class="rl-os-val" id="oeDays">—일</div></div>
+              <div style="flex:1;"></div>
+              <div class="rl-action">
+                <div class="rl-action-lbl">AI 추천 <span id="oeAiVal" style="color:var(--kyobo);font-weight:900;">—</span>권 → 직원 조정</div>
+                <div class="rl-stepper">
+                  <button class="rl-step-btn" onclick="adjStep(-10)">−10</button>
+                  <button class="rl-step-btn" onclick="adjStep(-1)">−</button>
+                  <input id="oeAdjInput" class="oe-adj-input" type="number" min="0" placeholder="수량" />
+                  <button class="rl-step-btn" onclick="adjStep(1)">+</button>
+                  <button class="rl-step-btn" onclick="adjStep(10)">+10</button>
+                  <button class="oe-confirm-btn" onclick="confirmOrder()">🛒 최종 발주 확정</button>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- 오른쪽: 실시간 인기검색어 (세로 전체) -->
-          <div class="hot-card" style="display:flex;flex-direction:column;">
-            <div class="hot-header" style="flex-shrink:0;">
+          <!-- 판매 데이터 3카드 -->
+          <div class="rl-sales-row">
+            <div class="rl-sales-card rl-sales-hl">
+              <div class="rls-lbl">📅 직전권 7일 판매</div>
+              <div class="rls-num"><span id="khForecast2w">—</span><span class="rls-u">권</span></div>
+              <div class="rls-note">기준 수량의 핵심 지표</div>
+            </div>
+            <div class="rl-sales-card">
+              <div class="rls-lbl">📅 직전권 14일 판매</div>
+              <div class="rls-num"><span id="khForecast4w">—</span><span class="rls-u">권</span></div>
+              <div class="rls-note">2주 누적 실적</div>
+            </div>
+            <div class="rl-sales-card">
+              <div class="rls-lbl">✍️ 저자 대표작 14일</div>
+              <div class="rls-num"><span id="khAuthorRep">—</span><span class="rls-u">권</span></div>
+              <div class="rls-note" id="khAuthorRepSub"></div>
+            </div>
+          </div>
+
+          <!-- 발주 근거 -->
+          <div class="rl-reason-card">
+            <div class="rl-reason-hd">
+              <span class="rl-reason-title">📋 발주 근거</span>
+              <span style="font-size:11px;color:#6B7280;font-weight:600;">총 추천&nbsp;<b id="reasonAmount" style="color:var(--kyobo);font-size:16px;">—</b>&nbsp;권</span>
+            </div>
+            <div class="rl-reason-body">
+              <div id="reasonList" class="rl-reason-list"></div>
+              <div id="warnBadgeRow" class="rl-warn-col"></div>
+            </div>
+          </div>
+
+          <!-- 시장 동향 3카드 -->
+          <div class="rl-mkt-section">
+            <div class="rl-section-hd">📈 시장 동향 분석</div>
+            <div class="rl-mkt-row">
+              <div class="rl-mkt-card">
+                <div class="rl-mkt-ico">📱</div>
+                <div class="rl-mkt-name">소셜 미디어 반응</div>
+                <div class="rl-mkt-val" id="mktSocial">—</div>
+              </div>
+              <div class="rl-mkt-card">
+                <div class="rl-mkt-ico">⭐</div>
+                <div class="rl-mkt-name">베스트셀러 상태</div>
+                <div class="rl-mkt-val" id="mktBest">—</div>
+              </div>
+              <div class="rl-mkt-card">
+                <div class="rl-mkt-ico">🔗</div>
+                <div class="rl-mkt-name">시리즈 연계성</div>
+                <div class="rl-mkt-val" id="mktSeries">—</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ═══ 오른쪽 ═══ -->
+        <div class="result-right">
+
+          <!-- 재고 위험도 -->
+          <div class="rr-card">
+            <div class="rr-card-title">📦 재고 위험 상태</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+              <div class="rr-risk-badge" id="khRisk">—</div>
+              <div class="rr-risk-sub" id="khRiskSub"></div>
+            </div>
+          </div>
+
+          <!-- 발주 분석 요약 -->
+          <div class="rr-card">
+            <div class="rr-card-title">📊 발주 분석 요약</div>
+            <div id="anaList" style="margin-top:6px;"></div>
+          </div>
+
+          <!-- 시리즈 판매 실적 -->
+          <div class="rr-card">
+            <div class="rr-card-title">📚 시리즈 판매 실적</div>
+            <div id="seriesChart" style="margin-top:8px;"></div>
+          </div>
+
+          <!-- 네이버 관심도 -->
+          <div class="naver-bar rr-card" id="naverBar" style="display:none;padding:10px 13px;">
+            <div class="naver-dot"></div>
+            <div class="naver-lbl">네이버 관심도</div>
+            <span class="naver-status" id="naverStatus"></span>
+            <span style="font-size:10px;color:#6B7280;" id="naverCmnt"></span>
+            <span class="naver-cnt" id="naverCnt"></span>
+          </div>
+
+          <!-- 실시간 인기검색어 -->
+          <div class="hot-card rr-card" style="padding:0;">
+            <div class="hot-header">
               <div class="hot-title">
                 <div class="hot-dot"></div>
-                <span id="hotCategory" style="color:var(--red);font-weight:800;"></span> 실시간 인기검색어
+                <span id="hotCategory" style="color:var(--red);font-weight:800;"></span>&nbsp;실시간 인기검색어
               </div>
               <span class="hot-time" id="hotTime"></span>
             </div>
-            <div id="hotList" style="display:flex;flex-direction:column;gap:2px;flex:1;"></div>
+            <div id="hotList" style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;"></div>
+          </div>
+
+          <!-- AI 예측 신뢰도 (맨 아래) -->
+          <div class="rr-card">
+            <div class="rr-card-title">🎯 AI 예측 신뢰도</div>
+            <div class="t-row" style="margin-top:8px;">
+              <div class="t-name">저자/시리즈</div>
+              <div class="t-bg"><div class="t-fill" id="tr1"></div></div>
+              <div class="t-pct">—</div>
+            </div>
+            <div class="t-row">
+              <div class="t-name">판매 집중도</div>
+              <div class="t-bg"><div class="t-fill amber" id="tr2"></div></div>
+              <div class="t-pct">—</div>
+            </div>
+            <div class="t-row">
+              <div class="t-name">시장 변동성</div>
+              <div class="t-bg"><div class="t-fill" id="tr3"></div></div>
+              <div class="t-pct">—</div>
+            </div>
           </div>
 
         </div>
@@ -1206,29 +1278,40 @@ function renderIssueList(){
     <span class="ich-stat">예상추가매출 <strong>+${Math.round(revenue/10000)}만원</strong></span>`;
 
   const rankEmoji = ['🥇','🥈','🥉'];
-  $('issueListWrap').innerHTML = filtered.map((b,i)=>{
+  const tableHd = `<div class="ib-table-hd">
+    <div></div>
+    <div>도서명</div>
+    <div>이슈점수</div>
+    <div style="text-align:right">재고</div>
+    <div style="text-align:right">예상판매</div>
+    <div style="text-align:right">AI 추천발주</div>
+    <div></div>
+  </div>`;
+  const rows = filtered.map((b,i)=>{
     const book = BOOKS[b.isbn];
-    const forecast2w = Math.round((book?.forecast||0)/2);
+    const forecast7d = Math.round((book?.forecast||0)/4);
     const recommend = book?.recommend||0;
-    const trust = Math.min(98, Math.round(b.issueScore*.95+3));
+    const stockVal = book?.stock ?? b.stock ?? 0;
     const rankCls = i<3?`r${i+1}`:'';
     const rkCls = i<3?`rk${i+1}`:(i<5?'rk4':'');
-    const rkTxt = i<3?rankEmoji[i]:(i+1);
-    const reasons = getReasons(b);
+    const rkTxt = i<3?rankEmoji[i]:`${i+1}`;
+    const stockCls = stockVal <= 30 ? 'low' : 'ok';
+    const recCls = recommend > 0 ? '' : 'zero';
+    const recTxt = recommend > 0 ? `+${recommend}권` : '불필요';
     return `<div class="issue-book-item ${rankCls}" onclick="loadFromIssue('${b.isbn}')">
-      <div class="ib-top">
-        <span class="ib-rank ${rkCls}">${rkTxt}</span>
+      <div class="ib-rank ${rkCls}">${rkTxt}</div>
+      <div class="ib-title-col">
         <span class="ib-name">${b.title}</span>
-        <span class="ib-score-badge ${getScoreCls(b.issueScore)}">이슈 ${b.issueScore}점</span>
+        <span class="ib-author">${b.author} · ${b.publisher}</span>
       </div>
-      <div class="ib-metrics">
-        <span class="ib-m">예상판매 <strong>${forecast2w}권</strong>(2주)</span>
-        <span class="ib-m">추천발주 <strong>${recommend}권</strong></span>
-        <span class="ib-m">AI신뢰도 <strong>${trust}%</strong></span>
-      </div>
-      <div class="ib-tags">${reasons.map(r=>`<span class="ib-tag ${r.c}">${r.t}</span>`).join('')}</div>
+      <div><span class="ib-score-badge ${getScoreCls(b.issueScore)}">${b.issueScore}점</span></div>
+      <div class="ib-stock ${stockCls}">${stockVal.toLocaleString()}권</div>
+      <div class="ib-forecast">${forecast7d.toLocaleString()}권</div>
+      <div class="ib-rec"><span class="ib-rec-chip ${recCls}">${recTxt}</span></div>
+      <button class="ib-btn" onclick="event.stopPropagation();loadFromIssue('${b.isbn}')">분석</button>
     </div>`;
   }).join('');
+  $('issueListWrap').innerHTML = tableHd + rows;
 }
 
 function loadFromIssue(isbn){
@@ -1245,6 +1328,12 @@ function mobileSearch(){
   doSearch();
   // 검색 후 결과 화면으로 이동 (약간 딜레이 후 분석 시작)
   setTimeout(()=>{ if(currentBook) startAnalysis(); }, 300);
+}
+
+function adjStep(delta){
+  const inp = $('oeAdjInput');
+  const cur = parseInt(inp.value)||0;
+  inp.value = Math.max(0, cur + delta);
 }
 
 function confirmOrder(){
@@ -1486,18 +1575,31 @@ function startAnalysis(){
   $('khRiskSub').textContent = risks.length === 0 ? '안전' : `위험요소 ${risks.length}건`;
 
   // 저자 대표작 박스
-  $('khAuthorRep').textContent    = book.authorRep.sales2w.toLocaleString() + '권';
-  $('khAuthorRepSub').textContent = `집중률 ${book.authorRep.ratio}% · ${book.authorRep.repTitle.slice(0,10)}…`;
+  $('khAuthorRep').textContent    = book.authorRep.sales2w.toLocaleString();
+  $('khAuthorRepSub').textContent = `집중률 ${book.authorRep.ratio}%`;
 
-  // 발주 계산식
+  // 시장 동향 3카드
+  const socialVal = mkt.growth >= 12 ? '화제 급증' : mkt.growth >= 6 ? '관심 높음' : '보통';
+  const socialColor = mkt.growth >= 12 ? '#16A34A' : mkt.growth >= 6 ? '#0E7490' : '#6B7280';
+  $('mktSocial').textContent = socialVal; $('mktSocial').style.color = socialColor;
+  const bestVal = mkt.growth >= 12 ? '진입 가능' : mkt.growth >= 6 ? '상위권 유지' : '안정';
+  $('mktBest').textContent = bestVal;
+  const seriesVal = prevBooks.length >= 3 ? '강함' : prevBooks.length >= 2 ? '보통' : '낮음';
+  const seriesColor = prevBooks.length >= 3 ? '#16A34A' : prevBooks.length >= 2 ? '#D97706' : '#6B7280';
+  $('mktSeries').textContent = seriesVal; $('mktSeries').style.color = seriesColor;
+
+  // 발주 계산식 (블루카드 하단 표시)
   const trendPct  = Math.round((trendFactor - 1) * 100);
   const marketPct = Math.round((marketFactor - 1) * 100);
+  const trendSign = trendPct >= 0 ? '+' : '';
+  const marketSign = marketPct >= 0 ? '+' : '';
   $('oeFormula').innerHTML =
-    `<span style="color:#6B7280;">기준 <b style="color:#374151;">${base7d.toLocaleString()}</b>권 <span style="font-weight:400;color:#9CA3AF;">(약 7일 판매)</span>` +
-    ` × 추세 <b style="color:${trendPct>=0?'#16A34A':'#E60012'}">${trendPct>=0?'+':''}${trendPct}%</b>` +
-    ` × 시장 <b style="color:#2563EB">+${marketPct}%</b> = <b style="color:#374151">${forecast7d.toLocaleString()}</b>권</span><br>` +
-    `<span style="color:#9CA3AF;">− 재고 ${book.stock.toLocaleString()} − 입고 ${book.incoming.toLocaleString()}</span>` +
-    ` <span style="color:var(--kyobo);font-size:13px;font-weight:900;">= ${week1.toLocaleString()}권</span>`;
+    `기준수량 <b style="color:white;">${base7d.toLocaleString()}권</b> <span style="opacity:.6;font-size:10px;">(직전권 7일 판매 기준)</span>` +
+    ` × 시리즈추세 <b style="color:${trendPct>=0?'#86EFAC':'#FCA5A5'};">${trendSign}${trendPct}%</b>` +
+    ` × 시장보정 <b style="color:#93C5FD;">${marketSign}${marketPct}%</b>` +
+    ` = 예측 <b style="color:white;">${forecast7d.toLocaleString()}권</b><br>` +
+    `<span style="opacity:.65;">− 현재재고 ${book.stock.toLocaleString()} − 입고예정 ${book.incoming.toLocaleString()}</span>` +
+    ` → <b style="color:#FDE68A;font-size:14px;">추천발주 ${week1.toLocaleString()}권</b>`;
 
   // 신뢰도 바
   ['tr1','tr2','tr3'].forEach(id=>$(id).style.width='0%');
