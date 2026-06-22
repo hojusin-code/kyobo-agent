@@ -468,8 +468,27 @@
 
       /* 책 목록: 스크롤 해제 */
       .issue-list-wrap { flex:none; overflow:visible; height:auto; }
-      .issue-book-item { margin-bottom:8px; }
+
+      /* 이슈 테이블 헤더 숨김 */
+      .ib-table-hd { display:none; }
+
+      /* 이슈 아이템: 순위·제목·추천발주 3열로 축소 */
+      .issue-book-item {
+        grid-template-columns: 28px 1fr 72px;
+        margin-bottom:8px;
+        padding:10px 12px 10px 10px;
+      }
+      /* 점수배지·재고·예상판매·분석버튼 숨김 */
+      .issue-book-item > .ib-score-badge,
+      .issue-book-item > .ib-stock,
+      .issue-book-item > .ib-forecast,
+      .issue-book-item > .ib-btn { display:none; }
+
       .ib-metrics { flex-wrap:wrap; gap:6px; }
+
+      /* 결과 화면 2열 → 1열 */
+      .result-main-grid { grid-template-columns:1fr; overflow:visible; }
+      .result-left, .result-right { overflow:visible; min-height:0; }
 
       /* 결과 영역 */
       #resultArea { overflow:visible; height:auto; }
