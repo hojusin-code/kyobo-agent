@@ -2384,7 +2384,7 @@ function calcRecommend(isbn){
   if(!book) return 0;
   const p = book.prev2w;
   if(!p) return 0;
-  const sales7d  = Math.round(p.sales2w / 2);
+  const sales7d  = p.sales7d || Math.round(p.sales2w / 2);
   const prevBooks = book.series.filter(s=>!s.forecast);
   const avg = Math.round(prevBooks.reduce((a,b)=>a+b.val,0)/prevBooks.length);
   const seriesAvg7d = Math.round(avg / 2);
@@ -2466,7 +2466,7 @@ function startAnalysis(){
   // ⑤ 추천 발주량
   const week1 = Math.max(0, forecast7d - book.stock - book.incoming);
 
-  const overOrderRisk = week1 > p.salesTotal * 0.6;
+  const overOrderRisk = p ? week1 > p.salesTotal * 0.6 : false;
 
   // 위험 요소별 판단
   const risks = [];
