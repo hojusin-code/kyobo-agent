@@ -1969,21 +1969,50 @@ MOCK_BOOKS_RAW.forEach(b=>{
       stock:Math.round(qty*0.05), incoming:Math.round(qty*0.02),
       forecast:fc, recommend:Math.round(fc*.9),
       grade: b.issueScore>=85?'intensive':b.issueScore>=70?'expand':'normal',
-      prev2w:{
-        prevTitle:b.title.replace(/\s\d+권?(\s.*)?$/,'')+' 전권',
-        pubDate:'2025.10.15', sales2w:s2w, salesTotal:qty,
-        comment:`실제 누적 판매 ${qty.toLocaleString()}권 · 2주 ${s2w}권`
-      },
-      authorRep:{
-        repTitle:b.title.replace(/\s\d+권?(\s.*)?$/,'')+' 대표작',
-        pubDate:'2024.06.01',
-        sales2w:Math.round(s2w*1.1), salesTotal:Math.round(qty*1.3),
-        ratio:Math.round(s2w/Math.max(qty,1)*100), comment:'저자 대표작 판매 이력 기반'
-      },
+      prev2w: null,
+      authorRep: null,
       series
     };
   }
 });
+
+// 2차 패스: 실제 직전권 데이터 연결
+(function linkPrevVolume(){
+  function parseSeriesVol(title){
+    const m = title.match(/^(.+?)\s+(\d+)(?:권)?(?:\s|$|\()/);
+    if(!m) return null;
+    return { seriesName: m[1].trim(), vol: parseInt(m[2]) };
+  }
+  // ISBN→title 역방향 맵
+  const titleToIsbn = {};
+  MOCK_BOOKS_RAW.forEach(b=>{ titleToIsbn[b.title] = b.isbn; });
+
+  Object.keys(BOOKS).forEach(isbn=>{
+    const book = BOOKS[isbn];
+    const parsed = parseSeriesVol(book.title);
+    if(!parsed || parsed.vol <= 1){ book.prev2w = null; return; }
+
+    // 직전권 제목 패턴으로 찾기
+    const prevVol = parsed.vol - 1;
+    const candidate = MOCK_BOOKS_RAW.find(b=>{
+      const p = parseSeriesVol(b.title);
+      return p && p.seriesName === parsed.seriesName && p.vol === prevVol;
+    });
+
+    if(candidate){
+      const prevQty = candidate.salesQty || 0;
+      const s2w = Math.round(prevQty * 0.12);
+      book.prev2w = {
+        prevTitle: candidate.title,
+        prevIsbn: candidate.isbn,
+        pubDate: '', sales2w: s2w, salesTotal: prevQty,
+        comment: `직전권(${prevVol}권) 누적 판매 ${prevQty.toLocaleString()}권 · 2주 ${s2w}권`
+      };
+    } else {
+      book.prev2w = null;
+    }
+  });
+})();
 
 const MOCK_BOOKS = MOCK_BOOKS_RAW;
 
@@ -2291,6 +2320,7 @@ function calcRecommend(isbn){
   const book = BOOKS[isbn];
   if(!book) return 0;
   const p = book.prev2w;
+  if(!p) return 0;
   const sales7d  = Math.round(p.sales2w / 2);
   const prevBooks = book.series.filter(s=>!s.forecast);
   const avg = Math.round(prevBooks.reduce((a,b)=>a+b.val,0)/prevBooks.length);
@@ -2314,7 +2344,7 @@ function startAnalysis(){
   if(!currentIsbn) return;
   const book = BOOKS[currentIsbn];
   const g = GRADE[book.grade];
-  const p = book.prev2w;
+  const p = book.prev2w; // null이면 직전권 데이터 없음
 
   $('issueMainArea').style.display='none';
   show('resultArea');
@@ -2325,11 +2355,17 @@ function startAnalysis(){
   const now = new Date();
   $('rTime').textContent = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
+  // ── 직전권 카드 표시/숨김 ──
+  const prev7dCard  = document.querySelector('.kh-prev7');
+  const prev14dCard = document.querySelector('.kh-prev14');
+  if(prev7dCard)  prev7dCard.style.display  = p ? '' : 'none';
+  if(prev14dCard) prev14dCard.style.display = p ? '' : 'none';
+
   // ── 1. 기본 수치 계산 ──
-  const ratio2w    = Math.round((p.sales2w/p.salesTotal)*100);
-  const sales7d    = Math.round(p.sales2w / 2);   // 직전권 7일 실적
-  const sales14d   = p.sales2w;                   // 직전권 14일 실적
-  const dailyAvg   = Math.round(p.sales2w / 14);
+  const ratio2w    = p ? Math.round((p.sales2w/p.salesTotal)*100) : 0;
+  const sales7d    = p ? Math.round(p.sales2w / 2) : 0;   // 직전권 7일 실적
+  const sales14d   = p ? p.sales2w : 0;                   // 직전권 14일 실적
+  const dailyAvg   = p ? Math.round(p.sales2w / 14) : 0;
   const daysLeft   = dailyAvg > 0 ? Math.round((book.stock + book.incoming) / dailyAvg) : 99;
   // week1은 시리즈/시장 데이터 계산 후 아래에서 확정
 
@@ -2344,8 +2380,8 @@ function startAnalysis(){
   const mktText = `${book.category} 분야 성장률 <b style="color:${mktColor};">${mktSign}${mkt.growth}%</b> (${mkt.trend})<br><span style="font-size:10.5px;color:#374151;">・${mkt.note}</span>`;
 
   // ── 리스크 Agent: 실제 데이터 기반 위험 요소 계산 ──
-  const ratio2wVal = Math.round((p.sales2w / p.salesTotal) * 100); // 2주 집중률
-  const stockCoverage = book.stock > 0 ? Math.round(book.stock / Math.max(1, Math.round(p.sales2w/14))) : 0; // 현재 재고로 버틸 수 있는 일수
+  const ratio2wVal = p ? Math.round((p.sales2w / p.salesTotal) * 100) : 0;
+  const stockCoverage = (book.stock > 0 && p) ? Math.round(book.stock / Math.max(1, Math.round(p.sales2w/14))) : 0;
   const seriesGrowth = prevBooks.length >= 2
     ? Math.round(((prevBooks[prevBooks.length-1].val - prevBooks[0].val) / prevBooks[0].val) * 100)
     : 0;
@@ -2423,8 +2459,8 @@ function startAnalysis(){
   $('khRiskSub').textContent = risks.length === 0 ? '안전' : `위험요소 ${risks.length}건`;
 
   // 저자 대표작 박스
-  $('khAuthorRep').textContent    = book.authorRep.sales2w.toLocaleString();
-  $('khAuthorRepSub').textContent = `집중률 ${book.authorRep.ratio}%`;
+  $('khAuthorRep').textContent    = book.authorRep ? book.authorRep.sales2w.toLocaleString() : '—';
+  $('khAuthorRepSub').textContent = book.authorRep ? `집중률 ${book.authorRep.ratio}%` : '데이터 없음';
 
   // 시장 동향 3카드
   const socialVal = mkt.growth >= 12 ? '화제 급증' : mkt.growth >= 6 ? '관심 높음' : '보통';
@@ -2463,8 +2499,7 @@ function startAnalysis(){
 
   // 발주 근거 리스트
   const okItems = [
-    `직전권 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`,
-    `저자 대표작 ${book.authorRep.sales2w.toLocaleString()}권 (집중률 ${book.authorRep.ratio}%)`,
+    ...(p ? [`직전권(${p.prevTitle}) 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`] : []),
     `동일 시리즈 ${prevBooks.length}권 평균 ${avg.toLocaleString()}권 (14일)`,
     `${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})`,
     `재고 소진 예상 ${daysLeft >= 30 ? '30일↑' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권`,
@@ -2526,8 +2561,8 @@ function startAnalysis(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
       <div class="ana-section" style="margin-bottom:0;">
         <div class="ana-hd">📊 판매 분석</div>
-        <div class="ana-row"><span class="ana-key">직전권 7일</span><span class="ana-val">${sales7d.toLocaleString()}권</span></div>
-        <div class="ana-row"><span class="ana-key">직전권 14일</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>
+        ${p ? `<div class="ana-row"><span class="ana-key">직전권 7일</span><span class="ana-val">${sales7d.toLocaleString()}권</span></div>
+        <div class="ana-row"><span class="ana-key">직전권 14일</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>` : `<div class="ana-row"><span class="ana-key">직전권</span><span class="ana-val" style="color:#9CA3AF;">데이터 없음</span></div>`}
         <div class="ana-row"><span class="ana-key">시리즈 평균</span><span class="ana-val">${avg.toLocaleString()}권 (14일)</span></div>
         <div class="ana-row"><span class="ana-key">14일 집중도</span><span class="ana-val ${concentrationClass}">${concentrationLabel} (${ratio2w}%)</span></div>
         <div class="ana-row"><span class="ana-key">시리즈 추세</span><span class="ana-val ${seriesTrendClass}">${seriesTrend} (${seriesGrowth>=0?'+':''}${seriesGrowth}%)</span></div>
