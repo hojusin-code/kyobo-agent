@@ -2176,6 +2176,26 @@ function initIssueMain(){
 
 let currentIsbn = null;
 const $ = id => document.getElementById(id);
+
+const GRADE = {
+  intensive: { label:'집중 발주', cls:'g-intensive', emoji:'🔴' },
+  expand:    { label:'확대 발주', cls:'g-expand',    emoji:'🟡' },
+  normal:    { label:'일반 발주', cls:'g-normal',    emoji:'🟢' }
+};
+
+const HOT_KEYWORDS = {
+  '소설':        [{kw:'한강',chg:'up',d:'+2'},{kw:'달러구트 꿈 백화점',chg:'same',d:'—'},{kw:'채식주의자',chg:'up',d:'+1'},{kw:'아몬드',chg:'new',d:'NEW'},{kw:'82년생 김지영',chg:'down',d:'1'}],
+  '한국소설':    [{kw:'채식주의자',chg:'up',d:'+1'},{kw:'파친코',chg:'same',d:'—'},{kw:'82년생 김지영',chg:'down',d:'1'},{kw:'아몬드',chg:'new',d:'NEW'},{kw:'달러구트',chg:'up',d:'+2'}],
+  '경제경영':    [{kw:'트렌드 코리아 2026',chg:'up',d:'+3'},{kw:'돈의 심리학',chg:'same',d:'—'},{kw:'초격차',chg:'down',d:'1'},{kw:'AI 리더십',chg:'new',d:'NEW'},{kw:'부의 법칙',chg:'up',d:'+1'}],
+  '인문':        [{kw:'사피엔스',chg:'same',d:'—'},{kw:'총균쇠',chg:'up',d:'+2'},{kw:'정의란 무엇인가',chg:'down',d:'1'},{kw:'철학의 위안',chg:'new',d:'NEW'},{kw:'지적 대화를 위한',chg:'up',d:'+1'}],
+  '자기계발':    [{kw:'아주 작은 습관의 힘',chg:'up',d:'+1'},{kw:'미라클 모닝',chg:'down',d:'2'},{kw:'그릿',chg:'same',d:'—'},{kw:'원씽',chg:'new',d:'NEW'},{kw:'데일 카네기',chg:'up',d:'+3'}],
+  '아동':        [{kw:'흔한남매',chg:'up',d:'+2'},{kw:'마법천자문',chg:'same',d:'—'},{kw:'설민석 세계사',chg:'new',d:'NEW'},{kw:'who 시리즈',chg:'down',d:'1'},{kw:'살아남기',chg:'up',d:'+3'}],
+  '아동 학습만화':[{kw:'흔한남매',chg:'up',d:'+2'},{kw:'마법천자문',chg:'same',d:'—'},{kw:'설민석 세계사',chg:'new',d:'NEW'},{kw:'who 시리즈',chg:'down',d:'1'},{kw:'살아남기',chg:'up',d:'+3'}],
+  '만화':        [{kw:'전지적 독자시점',chg:'up',d:'+1'},{kw:'나 혼자만 레벨업',chg:'same',d:'—'},{kw:'달빛조각사',chg:'new',d:'NEW'},{kw:'마법사 연대기',chg:'up',d:'+2'},{kw:'오버로드',chg:'down',d:'2'}],
+  '판타지':      [{kw:'전지적 독자시점',chg:'up',d:'+1'},{kw:'나 혼자만 레벨업',chg:'same',d:'—'},{kw:'달빛조각사',chg:'new',d:'NEW'},{kw:'마법사 연대기',chg:'up',d:'+2'},{kw:'오버로드',chg:'down',d:'2'}],
+  default:       [{kw:'베스트셀러',chg:'up',d:'+1'},{kw:'신간도서',chg:'same',d:'—'},{kw:'스테디셀러',chg:'up',d:'+2'},{kw:'추천도서',chg:'new',d:'NEW'},{kw:'화제의 책',chg:'down',d:'1'}]
+};
+
 const show = id => $(id).classList.remove('hidden');
 const hide = id => $(id).classList.add('hidden');
 
