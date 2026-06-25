@@ -787,12 +787,12 @@
             <div class="rl-sales-card rl-sales-hl">
               <div class="rls-lbl">📅 직전권 7일 판매</div>
               <div class="rls-num"><span id="khForecast2w">—</span><span class="rls-u">권</span></div>
-              <div class="rls-note">기준 수량의 핵심 지표</div>
+              <div class="rls-note" id="khForecast2wNote">출간일 기준 실측</div>
             </div>
             <div class="rl-sales-card">
               <div class="rls-lbl">📅 직전권 14일 판매</div>
               <div class="rls-num"><span id="khForecast4w">—</span><span class="rls-u">권</span></div>
-              <div class="rls-note">2주 누적 실적</div>
+              <div class="rls-note" id="khForecast4wNote">출간일 기준 실측</div>
             </div>
             <div class="rl-sales-card">
               <div class="rls-lbl">✍️ 저자 대표작 14일</div>
@@ -2006,6 +2006,34 @@ MOCK_BOOKS_RAW.forEach(b=>{
   }
 });
 
+// 직전권 출간일 기준 실제 7일/14일 판매 데이터 (test_data.xlsx에서 추출)
+const PREV_INIT_SALES = {
+  '9791173471148': {pubDate:'2025-03-06', s7d:17, s14d:33},  // 슈뻘맨의 숨은 생물 찾기 1
+  '9791169233651': {pubDate:'2025-01-23', s7d:10, s14d:20},  // 꽥 만약에 1
+  '9791138432283': {pubDate:'2025-01-15', s7d:15, s14d:39},  // 팬텀 버스터즈 2(S코믹스)
+  '9791142800238': {pubDate:'2025-03-25', s7d:23, s14d:42},  // 반딧불이의 혼례 6(JUMP COMICS SPECIAL)
+  '9791194654469': {pubDate:'2025-04-02', s7d:6,  s14d:9},   // 퇴마록 국내편 1
+  '9791141157531': {pubDate:'2025-01-15', s7d:0,  s14d:0},   // 진격의 거인 후회없는 선택 1
+  '9791127881184': {pubDate:'2025-03-27', s7d:18, s14d:28},  // 히카루가 죽은 여름 5
+  '9791141141462': {pubDate:'2025-01-25', s7d:12, s14d:24},  // 블루 록 Episode 나기 3
+  '9791142307775': {pubDate:'2025-01-14', s7d:0,  s14d:18},  // 열혈강호 92
+  '9791136797865': {pubDate:'2025-01-01', s7d:0,  s14d:0},   // 괴수 8호 14
+  '9791171713820': {pubDate:'2025-03-21', s7d:8,  s14d:20},  // 소맥거핀 일상 만화 3
+  '9791142800917': {pubDate:'2025-04-15', s7d:7,  s14d:14},  // 불가항력의 I Love You 4
+  '9791194616016': {pubDate:'2025-02-24', s7d:24, s14d:41},  // 설민석의 한국사 대모험 32
+  '9791192504551': {pubDate:'2025-03-19', s7d:7,  s14d:9},   // 백앤아 Go Go 챌린지 Go! 1
+  '9791136799159': {pubDate:'2025-02-25', s7d:26, s14d:41},  // 명탐정 코난 106
+  '9791173470196': {pubDate:'2025-01-16', s7d:5,  s14d:17},  // 환생학교 요괴반 5
+  '9791142302541': {pubDate:'2025-02-24', s7d:0,  s14d:0},   // 극락가 1
+  '9791141156497': {pubDate:'2025-03-27', s7d:7,  s14d:11},  // 오가미 츠미키와 기일상 1
+  '9791142303746': {pubDate:'2025-01-02', s7d:0,  s14d:4},   // 별의 커비 오늘도 동글동글 일기! 1
+  '9791142801020': {pubDate:'2025-04-24', s7d:4,  s14d:31},  // 괴수 8호 Relax 1
+  '9791138486392': {pubDate:'2025-05-15', s7d:7,  s14d:14},  // 찍히지 않습니다 1
+  '9791173710209': {pubDate:'2025-04-30', s7d:11, s14d:17},  // 꽥 만약에 2
+  '9791141151607': {pubDate:'2025-03-27', s7d:6,  s14d:12},  // 블루 록 30
+  '9791141161316': {pubDate:'2025-04-16', s7d:0,  s14d:4},   // 블루 록 31(한정판)
+};
+
 // 2차 패스: 실제 직전권 데이터 연결
 (function linkPrevVolume(){
   function parseSeriesVol(title){
@@ -2013,16 +2041,12 @@ MOCK_BOOKS_RAW.forEach(b=>{
     if(!m) return null;
     return { seriesName: m[1].trim(), vol: parseInt(m[2]) };
   }
-  // ISBN→title 역방향 맵
-  const titleToIsbn = {};
-  MOCK_BOOKS_RAW.forEach(b=>{ titleToIsbn[b.title] = b.isbn; });
 
   Object.keys(BOOKS).forEach(isbn=>{
     const book = BOOKS[isbn];
     const parsed = parseSeriesVol(book.title);
     if(!parsed || parsed.vol <= 1){ book.prev2w = null; return; }
 
-    // 직전권 제목 패턴으로 찾기
     const prevVol = parsed.vol - 1;
     const candidate = MOCK_BOOKS_RAW.find(b=>{
       const p = parseSeriesVol(b.title);
@@ -2031,13 +2055,22 @@ MOCK_BOOKS_RAW.forEach(b=>{
 
     if(candidate){
       const prevQty = candidate.salesQty || 0;
-      const s2w = Math.round(prevQty * 0.12);
-      book.prev2w = {
-        prevTitle: candidate.title,
-        prevIsbn: candidate.isbn,
-        pubDate: '', sales2w: s2w, salesTotal: prevQty,
-        comment: `직전권(${prevVol}권) 누적 판매 ${prevQty.toLocaleString()}권 · 2주 ${s2w}권`
-      };
+      const initData = PREV_INIT_SALES[candidate.isbn];
+      // 실제 출간일 기준 7/14일 데이터가 있으면 사용, 없으면 null
+      if(initData && (initData.s7d > 0 || initData.s14d > 0)){
+        book.prev2w = {
+          prevTitle: candidate.title,
+          prevIsbn: candidate.isbn,
+          pubDate: initData.pubDate,
+          sales7d: initData.s7d,
+          sales2w: initData.s14d,
+          salesTotal: prevQty,
+          comment: `직전권(${prevVol}권) 출간일(${initData.pubDate}) 7일:${initData.s7d}권 · 14일:${initData.s14d}권`
+        };
+      } else {
+        // 데이터 없음 — 추정값 사용 안 함
+        book.prev2w = null;
+      }
     } else {
       book.prev2w = null;
     }
@@ -2393,8 +2426,8 @@ function startAnalysis(){
 
   // ── 1. 기본 수치 계산 ──
   const ratio2w    = p ? Math.round((p.sales2w/p.salesTotal)*100) : 0;
-  const sales7d    = p ? Math.round(p.sales2w / 2) : 0;   // 직전권 7일 실적
-  const sales14d   = p ? p.sales2w : 0;                   // 직전권 14일 실적
+  const sales7d    = p ? (p.sales7d  || 0) : 0;   // 직전권 출간일 기준 실제 7일 판매
+  const sales14d   = p ? (p.sales2w  || 0) : 0;   // 직전권 출간일 기준 실제 14일 판매
   const dailyAvg   = p ? Math.round(p.sales2w / 14) : 0;
   const daysLeft   = dailyAvg > 0 ? Math.round((book.stock + book.incoming) / dailyAvg) : 99;
   // week1은 시리즈/시장 데이터 계산 후 아래에서 확정
@@ -2480,6 +2513,14 @@ function startAnalysis(){
   $('reasonAmount').textContent   = week1.toLocaleString();
   $('khForecast2w').textContent   = sales7d.toLocaleString();
   $('khForecast4w').textContent   = sales14d.toLocaleString();
+  if(p && p.pubDate){
+    const noteText = `출간일(${p.pubDate}) 기준 실측`;
+    $('khForecast2wNote').textContent = noteText;
+    $('khForecast4wNote').textContent = noteText;
+  } else {
+    $('khForecast2wNote').textContent = '출간일 기준 실측';
+    $('khForecast4wNote').textContent = '출간일 기준 실측';
+  }
 
   const trustColor = trustAvg >= 85 ? '#16A34A' : trustAvg >= 70 ? '#D97706' : '#E60012';
 
@@ -2508,7 +2549,7 @@ function startAnalysis(){
   const trendSign = trendPct >= 0 ? '+' : '';
   const marketSign = marketPct >= 0 ? '+' : '';
   $('oeFormula').innerHTML =
-    `기준수량 <b style="color:white;">${base7d.toLocaleString()}권</b> <span style="opacity:.6;font-size:10px;">(직전권 7일 판매 기준)</span>` +
+    `기준수량 <b style="color:white;">${base7d.toLocaleString()}권</b> <span style="opacity:.6;font-size:10px;">(직전권 7일 실측${p && p.pubDate ? ' · '+p.pubDate+' 출간' : ''})</span>` +
     ` × 시리즈추세 <b style="color:${trendPct>=0?'#86EFAC':'#FCA5A5'};">${trendSign}${trendPct}%</b>` +
     ` × 시장보정 <b style="color:#93C5FD;">${marketSign}${marketPct}%</b>` +
     ` = 예측 <b style="color:white;">${forecast7d.toLocaleString()}권</b><br>` +
@@ -2529,7 +2570,7 @@ function startAnalysis(){
 
   // 발주 근거 리스트
   const okItems = [
-    ...(p ? [`직전권(${p.prevTitle}) 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`] : []),
+    ...(p ? [`직전권(${p.prevTitle}) 출간일(${p.pubDate}) · 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`] : []),
     `동일 시리즈 ${prevBooks.length}권 평균 ${avg.toLocaleString()}권 (14일)`,
     `${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})`,
     `재고 소진 예상 ${daysLeft >= 30 ? '30일↑' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권`,
