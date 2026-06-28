@@ -2085,8 +2085,8 @@ const MOCK_BOOKS = MOCK_BOOKS_RAW;
 function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDateKo(d){ return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); }
 
-let currentFrom = new Date('2026-06-22');
-let currentTo   = new Date('2026-06-28');
+let currentFrom = new Date('2026-06-25');
+let currentTo   = new Date('2026-07-01');
 
 function setQuickDate(type){
   const today = new Date('2026-06-28');
@@ -2265,11 +2265,11 @@ function backToMain(){
 }
 
 function initIssueMain(){
-  const today = new Date('2026-06-28');
+  const today = new Date('2026-07-01');
   $('issueDate').textContent = fmtDateKo(today)+' 기준';
   $('dsFrom').value = fmtDate(currentFrom);
   $('dsTo').value   = fmtDate(currentTo);
-  $('dsPeriodTag').textContent = '최근 1주일';
+  $('dsPeriodTag').textContent = '6/25~7/1';
   document.querySelectorAll('.ds-q').forEach(b=>b.classList.remove('active'));
   const qw = document.getElementById('qWeek'); if(qw) qw.classList.add('active');
   renderIssueList();
