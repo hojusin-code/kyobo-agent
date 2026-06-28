@@ -2085,11 +2085,11 @@ const MOCK_BOOKS = MOCK_BOOKS_RAW;
 function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDateKo(d){ return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); }
 
-let currentFrom = new Date('2026-06-12');
-let currentTo   = new Date('2026-06-12');
+let currentFrom = new Date('2026-06-22');
+let currentTo   = new Date('2026-06-28');
 
 function setQuickDate(type){
-  const today = new Date('2026-06-12');
+  const today = new Date('2026-06-28');
   document.querySelectorAll('.ds-q').forEach(b=>b.classList.remove('active'));
   const tags = {today:'당일 기준', yesterday:'어제 기준', '3days':'최근 3일', week:'최근 1주일'};
   $('dsPeriodTag').textContent = tags[type];
@@ -2159,7 +2159,11 @@ function renderIssueList(){
 
   const dateBooksAll = MOCK_BOOKS.filter(b=>b.inboundDate>=fromStr && b.inboundDate<=toStr);
   const filtered = dateBooksAll.filter(b=>tabMatch(currentTab,b.category))
-    .sort((a,b)=>b.issueScore-a.issueScore);
+    .sort((a,b)=>{
+      // 신간(최신 입고일) 우선, 같은 날짜면 이슈점수 순
+      if(b.inboundDate !== a.inboundDate) return b.inboundDate > a.inboundDate ? 1 : -1;
+      return b.issueScore - a.issueScore;
+    });
   const priority = dateBooksAll.filter(b=>b.issueScore>=75);
   const revenue  = priority.reduce((s,b)=>s+(BOOKS[b.isbn]?.recommend||0)*15000,0);
 
@@ -2261,10 +2265,13 @@ function backToMain(){
 }
 
 function initIssueMain(){
-  const today = new Date('2026-06-12');
+  const today = new Date('2026-06-28');
   $('issueDate').textContent = fmtDateKo(today)+' 기준';
-  $('dsFrom').value = fmtDate(today);
-  $('dsTo').value   = fmtDate(today);
+  $('dsFrom').value = fmtDate(currentFrom);
+  $('dsTo').value   = fmtDate(currentTo);
+  $('dsPeriodTag').textContent = '최근 1주일';
+  document.querySelectorAll('.ds-q').forEach(b=>b.classList.remove('active'));
+  const qw = document.getElementById('qWeek'); if(qw) qw.classList.add('active');
   renderIssueList();
 }
 
