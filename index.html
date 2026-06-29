@@ -2081,6 +2081,72 @@ const PREV_INIT_SALES = {
 
 const MOCK_BOOKS = MOCK_BOOKS_RAW;
 
+/* ── 실데이터 테스트: 신간목록_20260625.xlsx (29종) ──
+   회사에서 받은 실제 신간 리스트. 직전권 "누적판매수량"만 제공되고
+   7일/14일 분리 판매, 현재 재고, 입고예정 수량, 시장/트렌드 점수는
+   미제공 — 화면에서 어떤 항목이 비는지 그대로 노출시켜 확인하는 용도. */
+const REAL_NEWBOOKS_0625 = [
+  ['9791173477683','슈뻘맨의 숨은 생물 찾기 2','슈뻘맨','미래엔아이세움','아동','슈뻘맨의 숨은 생물 찾기 1',183],
+  ['9791173710209','꽥 만약에 2','김강현','서울문화사','아동','꽥 만약에 1',279],
+  ['9791138436687','팬텀 버스터즈 3(S코믹스)','네오쇼코','소미미디어','만화','팬텀 버스터즈 2(S코믹스)',194],
+  ['9791142806049','반딧불이의 혼례 7(JUMP COMICS SPECIAL)','Oreco TACHIBANA','서울미디어코믹스(서울문화사)','만화','반딧불이의 혼례 6(JUMP COMICS SPECIAL)',175],
+  ['9791194654476','퇴마록 국내편 2','이우혁','반타','소설','퇴마록 국내편 1',157],
+  ['9791125603436','진격의 거인 후회없는 선택 2(학산코믹스HC 7322)','Hajime Isayama','학산문화사','만화','진격의 거인 후회없는 선택 1(학산코믹스HC 7315)',156],
+  ['9791127882433','히카루가 죽은 여름 6(특별판)(SL코믹스)','모쿠모쿠렌','디앤씨미디어','만화','히카루가 죽은 여름 5(SL코믹스)',142],
+  ['9791141151614','블루 록 Episode 나기 4(학산코믹스HC)','Muneyuki Kaneshiro','학산문화사','만화','블루 록 Episode 나기 3(학산코믹스HC)',139],
+  ['9791142319730','열혈강호 93','전극진','대원씨아이','만화','열혈강호 92',128],
+  ['9791142801778','괴수 8호 15(아이큐 점프)','Naoya Matsumoto','서울미디어코믹스(서울문화사)','만화','괴수 8호 14(아이큐 점프)',126],
+  ['9791171714582','소맥거핀 일상 만화 4','이종혁','위즈덤하우스','아동','소맥거핀 일상 만화 3',121],
+  ['9791142807060','불가항력의 I Love You 5(Wink Collection)','Mizuki Hoshino','서울미디어코믹스(서울문화사)','만화','불가항력의 I Love You 4(Wink Collection)',120],
+  ['9791194616023','설민석의 한국사 대모험 33','설민석','단꿈아이','아동','설민석의 한국사 대모험 32',118],
+  ['9791192504667','백앤아 Go Go 챌린지 Go! 2','백앤아','샌드박스스토리키즈','아동','백앤아 Go Go 챌린지 Go! 1',117],
+  ['9791142807992','명탐정 코난 107','Gosho Aoyama','서울미디어코믹스(서울문화사)','만화','명탐정 코난 106',117],
+  ['9791173476969','환생학교 요괴반 6(양장본 Hardcover)','웃소','미래엔아이세움','아동','환생학교 요괴반 5(웃소의 판타지 미션 코믹북)',113],
+  ['9791142302558','극락가 2','Yuto Sano','대원씨아이','만화','극락가 1',85],
+  ['9791141156503','오가미 츠미키와 기일상 2(학산 코믹스 10844)','Miyu Morishita','학산문화사','만화','오가미 츠미키와 기일상 1(학산 코믹스 10750)',108],
+  ['9791142303753','별의 커비 오늘도 동글동글 일기! 2','다이내믹 타로','대원키즈','아동','별의 커비 오늘도 동글동글 일기! 1',106],
+  ['9791130663340','별의 커비 울트라 슈퍼 푸푸푸 히어로 2','아오키 케이','다산어린이','아동','별의 커비 울트라 슈퍼 푸푸푸 히어로 1',100],
+  ['9791142321788','집사TV 베드왕국의 잡일 용사 2(집사TV 오리지널 코믹스)(양장본 Hardcover)','집사TV','대원키즈','아동','집사TV 베드왕국의 잡일 용사 1(집사TV 오리지널 코믹스)',92],
+  ['9791142806100','괴수 8호 Relax 2','Kizuku Watanabe','서울미디어코믹스(서울문화사)','만화','괴수 8호 Relax 1',84],
+  ['9791138486941','찍히지 않습니다 2','코노시마 루카','소미미디어','만화','찍히지 않습니다 1(S코믹스)',82],
+  ['9791173710360','꽥 만약에 3','꽥','서울문화사','아동','꽥 만약에 2',78],
+  ['9791192504636','백앤아 고 고 캐치 고 바니몽 4','백앤아','샌드박스스토리키즈','아동','백앤아 고 고 캐치 고 바니몽 3',70],
+  ['9791141161316','블루 록 31(한정판)','Muneyuki Kaneshiro','학산문화사','만화','블루 록 30(한정판)',17],
+  ['9791141161323','블루 록 32(한정판)','Yusuke Nomura','학산문화사','만화','블루 록 31(한정판)',38],
+  ['9791171179510','옐언니 6(양장본 Hardcover)','옐언니','아울북','아동','옐언니 5',68],
+  ['9791173710377','푸먹 4(맛있는 상식 시리즈)','푸먹','서울문화사','아동','푸먹 3(맛있는 상식 시리즈)',65],
+].map(r=>({
+  isbn:r[0], title:'🧪 '+r[1], author:r[2], publisher:r[3], category:r[4],
+  prevTitle:r[5], prevTotalQty:r[6],
+  inboundDate:'2026-06-25', issueScore:0, real:true,
+}));
+
+// 주의: 이 29개 ISBN은 이미 MOCK_BOOKS_RAW에 가짜 authorScore/seriesScore/
+// marketScore/trendScore로 미리 들어가 있던 항목들이다 (즉, 기존 mock 데이터가
+// 바로 이 실제 신간목록 파일을 베이스로 점수만 임의 생성한 것). 새로 추가(push)
+// 하면 같은 책이 두 줄로 중복 표시되므로, 기존 항목을 실데이터 기준으로
+// 덮어써서 "가짜 점수가 사라지면 무엇이 비는지"를 그대로 드러낸다.
+REAL_NEWBOOKS_0625.forEach(b=>{
+  // 일부 ISBN은 원본 mock 데이터에 중복으로 들어가 있어 find()가 아닌 filter()로 전부 덮어씀
+  MOCK_BOOKS_RAW.filter(m=>m.isbn===b.isbn).forEach(existing=>{
+    existing.title = b.title;
+    existing.issueScore = null;       // 저자/시리즈/시장/트렌드 점수 원천 데이터 없음 → 산정 불가
+    existing.real = true;
+    existing.authorScore = existing.seriesScore = existing.marketScore = existing.trendScore = null;
+  });
+  BOOKS[b.isbn] = {
+    title:b.title, author:b.author, publisher:b.publisher, category:b.category,
+    stock:0, incoming:0, forecast:0, recommend:0,
+    grade:'normal', real:true,
+    // 직전권 누적판매수량은 있지만 7일/14일 분리 판매가 없어 prev2w는 의도적으로 null
+    // → calcRecommend()가 0을 반환하고, 결과화면은 "데이터 없음"을 그대로 노출함
+    prev2w: null,
+    prevTotalOnly: { prevTitle:b.prevTitle, qty:b.prevTotalQty },
+    authorRep: null,
+    series: [{ label:'직전권(누적, 분리불가)', val:b.prevTotalQty, forecast:false }],
+  };
+});
+
 /* 날짜 유틸 */
 function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fmtDateKo(d){ return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); }
@@ -2162,7 +2228,7 @@ function renderIssueList(){
     .sort((a,b)=>{
       // 신간(최신 입고일) 우선, 같은 날짜면 이슈점수 순
       if(b.inboundDate !== a.inboundDate) return b.inboundDate > a.inboundDate ? 1 : -1;
-      return b.issueScore - a.issueScore;
+      return (b.issueScore ?? -1) - (a.issueScore ?? -1);
     });
   const priority = dateBooksAll.filter(b=>b.issueScore>=75);
   const revenue  = priority.reduce((s,b)=>s+(BOOKS[b.isbn]?.recommend||0)*15000,0);
@@ -2205,7 +2271,7 @@ function renderIssueList(){
         <span class="ib-name">${b.title}</span>
         <span class="ib-author">${b.author} · ${b.publisher}</span>
       </div>
-      <div><span class="ib-score-badge ${getScoreCls(b.issueScore)}">${b.issueScore}점</span></div>
+      <div><span class="ib-score-badge ${getScoreCls(b.issueScore)}">${b.issueScore==null?'데이터없음':b.issueScore+'점'}</span></div>
       <div class="ib-stock ${stockCls}">${stockVal.toLocaleString()}권</div>
       <div class="ib-forecast">${sales7d.toLocaleString()}권</div>
       <div class="ib-rec"><span class="ib-rec-chip ${recCls}">${recTxt}</span></div>
@@ -2420,6 +2486,17 @@ function startAnalysis(){
 
   $('issueMainArea').style.display='none';
   show('resultArea');
+
+  const oldBanner = document.getElementById('realDataGapBanner');
+  if(oldBanner) oldBanner.remove();
+  if(book.real){
+    const banner = document.createElement('div');
+    banner.id = 'realDataGapBanner';
+    banner.style = 'background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:10px;';
+    banner.innerHTML = `⚠ 실데이터 테스트 — 회사 제공 데이터에 직전권 누적판매(${book.prevTotalOnly.qty.toLocaleString()}권)만 있고,
+      7일/14일 분리 판매·현재 재고·입고예정·시장/트렌드 점수는 미제공이라 0 또는 "데이터 없음"으로 표시됩니다.`;
+    $('resultArea').prepend(banner);
+  }
 
   $('rTitle').textContent = book.title;
   $('rAuthor').textContent = book.author.split('/')[0].trim();
