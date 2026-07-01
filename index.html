@@ -2251,7 +2251,7 @@ function renderIssueList(){
   const tableHd = `<div class="ib-table-hd">
     <div></div>
     <div>도서명</div>
-    <div>이슈점수</div>
+    <div>발주 긴급도</div>
     <div style="text-align:right">재고</div>
     <div style="text-align:right">예상판매</div>
     <div style="text-align:right">AI 추천발주</div>
@@ -2266,6 +2266,12 @@ function renderIssueList(){
       : (book?.prevTotalOnly ? `${book.prevTotalOnly.qty.toLocaleString()}권<span style="font-size:9px;opacity:.65;">(누적)</span>` : `${sales7d.toLocaleString()}권`);
     const recommend = calcRecommend(b.isbn);
     const stockVal = book?.stock ?? b.stock ?? 0;
+    const incomingVal = book?.incoming ?? 0;
+    // 발주 긴급도: 재고+입고예정 대비 실측 일평균 판매(있을 때만) 기준 — 데이터 없으면 판단 보류(낮음)
+    const dailyAvg = hasSplit ? Math.round(book.prev2w.sales2w / 14) : 0;
+    const daysLeft = dailyAvg > 0 ? Math.round((stockVal + incomingVal) / dailyAvg) : 99;
+    const urgencyLabel = daysLeft<=3?'긴급':daysLeft<=7?'높음':daysLeft<=14?'보통':'낮음';
+    const urgencyCls   = daysLeft<=3?'sco-red':daysLeft<=7?'sco-amber':daysLeft<=14?'sco-blue':'sco-gray';
     const rankCls = i<3?`r${i+1}`:'';
     const rkCls = i<3?`rk${i+1}`:(i<5?'rk4':'');
     const rkTxt = i<3?rankEmoji[i]:`${i+1}`;
@@ -2278,7 +2284,7 @@ function renderIssueList(){
         <span class="ib-name">${b.title}</span>
         <span class="ib-author">${b.author} · ${b.publisher}</span>
       </div>
-      <div><span class="ib-score-badge ${getScoreCls(b.issueScore)}">${b.issueScore==null?'데이터없음':b.issueScore+'점'}</span></div>
+      <div><span class="ib-score-badge ${urgencyCls}">${urgencyLabel}</span></div>
       <div class="ib-stock ${stockCls}">${stockVal.toLocaleString()}권</div>
       <div class="ib-forecast">${forecastTxt}</div>
       <div class="ib-rec"><span class="ib-rec-chip ${recCls}">${recTxt}</span></div>
