@@ -2266,12 +2266,9 @@ function renderIssueList(){
       : (book?.prevTotalOnly ? `${book.prevTotalOnly.qty.toLocaleString()}권<span style="font-size:9px;opacity:.65;">(누적)</span>` : `${sales7d.toLocaleString()}권`);
     const recommend = calcRecommend(b.isbn);
     const stockVal = book?.stock ?? b.stock ?? 0;
-    const incomingVal = book?.incoming ?? 0;
-    // 발주 긴급도: 재고+입고예정 대비 실측 일평균 판매(있을 때만) 기준 — 데이터 없으면 판단 보류(낮음)
-    const dailyAvg = hasSplit ? Math.round(book.prev2w.sales2w / 14) : 0;
-    const daysLeft = dailyAvg > 0 ? Math.round((stockVal + incomingVal) / dailyAvg) : 99;
-    const urgencyLabel = daysLeft<=3?'긴급':daysLeft<=7?'높음':daysLeft<=14?'보통':'낮음';
-    const urgencyCls   = daysLeft<=3?'sco-red':daysLeft<=7?'sco-amber':daysLeft<=14?'sco-blue':'sco-gray';
+    // 발주 긴급도: AI 추천발주량 기준
+    const urgencyLabel = recommend>=10?'긴급':recommend>=5?'높음':recommend>=1?'보통':'낮음';
+    const urgencyCls   = recommend>=10?'sco-red':recommend>=5?'sco-amber':recommend>=1?'sco-blue':'sco-gray';
     const rankCls = i<3?`r${i+1}`:'';
     const rkCls = i<3?`rk${i+1}`:(i<5?'rk4':'');
     const rkTxt = i<3?rankEmoji[i]:`${i+1}`;
