@@ -2229,7 +2229,9 @@ function renderIssueList(){
   const dateBooksAll = MOCK_BOOKS.filter(b=>b.inboundDate>=fromStr && b.inboundDate<=toStr);
   const filtered = dateBooksAll.filter(b=>tabMatch(currentTab,b.category))
     .sort((a,b)=>{
-      // 신간(최신 입고일) 우선, 같은 날짜면 이슈점수 순
+      // AI 추천발주량 많은 순, 같으면 신간(최신 입고일) 우선, 그래도 같으면 이슈점수 순
+      const recDiff = calcRecommend(b.isbn) - calcRecommend(a.isbn);
+      if(recDiff !== 0) return recDiff;
       if(b.inboundDate !== a.inboundDate) return b.inboundDate > a.inboundDate ? 1 : -1;
       return (b.issueScore ?? -1) - (a.issueScore ?? -1);
     });
