@@ -2144,9 +2144,9 @@ REAL_NEWBOOKS_0625.forEach(b=>{
     prev2w: linkedPrev2w || null,
     prevTotalOnly: { prevTitle:b.prevTitle, qty:b.prevTotalQty },
     authorRep: null,
-    series: linkedPrev2w
-      ? [{ label:'직전권(7일)', val:linkedPrev2w.sales7d, forecast:false }, { label:'직전권(14일)', val:linkedPrev2w.sales2w, forecast:false }]
-      : [{ label:'직전권(누적, 분리불가)', val:b.prevTotalQty, forecast:false }],
+    // 직전권은 항상 "권수 1개"짜리 데이터포인트다 (7일/14일은 같은 권의 다른 집계기간일 뿐,
+    // 서로 다른 권이 아니므로 series에 둘 다 넣으면 안 됨 — 시리즈 성장률 계산이 오염됨)
+    series: [{ label:'직전권(누적)', val:b.prevTotalQty, forecast:false }],
   };
 });
 
