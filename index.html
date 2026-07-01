@@ -785,12 +785,12 @@
           <!-- 판매 데이터 3카드 -->
           <div class="rl-sales-row">
             <div class="rl-sales-card rl-sales-hl">
-              <div class="rls-lbl">📅 직전권 7일 판매</div>
+              <div class="rls-lbl" id="khForecast2wLbl">📅 직전권 7일 판매</div>
               <div class="rls-num"><span id="khForecast2w">—</span><span class="rls-u">권</span></div>
               <div class="rls-note" id="khForecast2wNote">출간일 기준 실측</div>
             </div>
             <div class="rl-sales-card">
-              <div class="rls-lbl">📅 직전권 14일 판매</div>
+              <div class="rls-lbl" id="khForecast4wLbl">📅 직전권 14일 판매</div>
               <div class="rls-num"><span id="khForecast4w">—</span><span class="rls-u">권</span></div>
               <div class="rls-note" id="khForecast4wNote">출간일 기준 실측</div>
             </div>
@@ -2134,16 +2134,19 @@ REAL_NEWBOOKS_0625.forEach(b=>{
     existing.real = true;
     existing.authorScore = existing.seriesScore = existing.marketScore = existing.trendScore = null;
   });
+  // linkPrevVolume()이 PREV_INIT_SALES 실측치로 이미 직전권 7일/14일 데이터를 연결해뒀다면
+  // 그 값을 그대로 사용 (없을 때만 누적수량만 표시)
+  const linkedPrev2w = BOOKS[b.isbn] && BOOKS[b.isbn].prev2w;
   BOOKS[b.isbn] = {
     title:b.title, author:b.author, publisher:b.publisher, category:b.category,
     stock:0, incoming:0, forecast:0, recommend:0,
     grade:'normal', real:true,
-    // 직전권 누적판매수량은 있지만 7일/14일 분리 판매가 없어 prev2w는 의도적으로 null
-    // → calcRecommend()가 0을 반환하고, 결과화면은 "데이터 없음"을 그대로 노출함
-    prev2w: null,
+    prev2w: linkedPrev2w || null,
     prevTotalOnly: { prevTitle:b.prevTitle, qty:b.prevTotalQty },
     authorRep: null,
-    series: [{ label:'직전권(누적, 분리불가)', val:b.prevTotalQty, forecast:false }],
+    series: linkedPrev2w
+      ? [{ label:'직전권(7일)', val:linkedPrev2w.sales7d, forecast:false }, { label:'직전권(14일)', val:linkedPrev2w.sales2w, forecast:false }]
+      : [{ label:'직전권(누적, 분리불가)', val:b.prevTotalQty, forecast:false }],
   };
 });
 
@@ -2256,7 +2259,11 @@ function renderIssueList(){
   </div>`;
   const rows = filtered.map((b,i)=>{
     const book = BOOKS[b.isbn];
-    const sales7d = Math.round((book?.prev2w?.sales2w||0) / 2);
+    const hasSplit = !!book?.prev2w;
+    const sales7d = hasSplit ? Math.round((book.prev2w.sales2w||0) / 2) : 0;
+    const forecastTxt = hasSplit
+      ? `${sales7d.toLocaleString()}권`
+      : (book?.prevTotalOnly ? `${book.prevTotalOnly.qty.toLocaleString()}권<span style="font-size:9px;opacity:.65;">(누적)</span>` : `${sales7d.toLocaleString()}권`);
     const recommend = calcRecommend(b.isbn);
     const stockVal = book?.stock ?? b.stock ?? 0;
     const rankCls = i<3?`r${i+1}`:'';
@@ -2273,7 +2280,7 @@ function renderIssueList(){
       </div>
       <div><span class="ib-score-badge ${getScoreCls(b.issueScore)}">${b.issueScore==null?'데이터없음':b.issueScore+'점'}</span></div>
       <div class="ib-stock ${stockCls}">${stockVal.toLocaleString()}권</div>
-      <div class="ib-forecast">${sales7d.toLocaleString()}권</div>
+      <div class="ib-forecast">${forecastTxt}</div>
       <div class="ib-rec"><span class="ib-rec-chip ${recCls}">${recTxt}</span></div>
       <button class="ib-btn" onclick="event.stopPropagation();loadFromIssue('${b.isbn}')">분석</button>
     </div>`;
@@ -2493,7 +2500,10 @@ function startAnalysis(){
     const banner = document.createElement('div');
     banner.id = 'realDataGapBanner';
     banner.style = 'background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:10px;';
-    banner.innerHTML = `⚠ 실데이터 테스트 — 회사 제공 데이터에 직전권 누적판매(${book.prevTotalOnly.qty.toLocaleString()}권)만 있고,
+    banner.innerHTML = p
+      ? `⚠ 실데이터 테스트 — 직전권 7일/14일 판매는 실측 데이터로 연결되었지만,
+      현재 재고·입고예정·시장/트렌드 점수는 회사 제공 데이터에 없어 0 또는 "데이터 없음"으로 표시됩니다.`
+      : `⚠ 실데이터 테스트 — 회사 제공 데이터에 직전권 누적판매(${book.prevTotalOnly.qty.toLocaleString()}권)만 있고,
       7일/14일 분리 판매·현재 재고·입고예정·시장/트렌드 점수는 미제공이라 0 또는 "데이터 없음"으로 표시됩니다.`;
     $('resultArea').prepend(banner);
   }
@@ -2597,13 +2607,27 @@ function startAnalysis(){
   $('oeAiVal').textContent        = week1.toLocaleString();
   $('oeAdjInput').value           = week1;
   $('reasonAmount').textContent   = week1.toLocaleString();
-  $('khForecast2w').textContent   = sales7d.toLocaleString();
-  $('khForecast4w').textContent   = sales14d.toLocaleString();
   if(p && p.pubDate){
+    $('khForecast2wLbl').textContent = '📅 직전권 7일 판매';
+    $('khForecast4wLbl').textContent = '📅 직전권 14일 판매';
+    $('khForecast2w').textContent   = sales7d.toLocaleString();
+    $('khForecast4w').textContent   = sales14d.toLocaleString();
     const noteText = `출간일(${p.pubDate}) 기준 실측`;
     $('khForecast2wNote').textContent = noteText;
     $('khForecast4wNote').textContent = noteText;
+  } else if(book.prevTotalOnly){
+    // 7일/14일 분리 데이터가 없는 실데이터 29종: 회사 제공 누적 판매수량을 그대로 노출
+    $('khForecast2wLbl').textContent = '📚 직전권 누적 판매';
+    $('khForecast4wLbl').textContent = '📚 직전권';
+    $('khForecast2w').textContent   = book.prevTotalOnly.qty.toLocaleString();
+    $('khForecast4w').textContent   = '—';
+    $('khForecast2wNote').textContent = `${book.prevTotalOnly.prevTitle} · 회사 제공 데이터`;
+    $('khForecast4wNote').textContent = '7일/14일 분리 불가';
   } else {
+    $('khForecast2wLbl').textContent = '📅 직전권 7일 판매';
+    $('khForecast4wLbl').textContent = '📅 직전권 14일 판매';
+    $('khForecast2w').textContent   = sales7d.toLocaleString();
+    $('khForecast4w').textContent   = sales14d.toLocaleString();
     $('khForecast2wNote').textContent = '출간일 기준 실측';
     $('khForecast4wNote').textContent = '출간일 기준 실측';
   }
@@ -2656,7 +2680,8 @@ function startAnalysis(){
 
   // 발주 근거 리스트
   const okItems = [
-    ...(p ? [`직전권(${p.prevTitle}) 출간일(${p.pubDate}) · 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`] : []),
+    ...(p ? [`직전권(${p.prevTitle}) 출간일(${p.pubDate}) · 7일 ${sales7d.toLocaleString()}권 · 14일 ${sales14d.toLocaleString()}권`]
+        : book.prevTotalOnly ? [`직전권(${book.prevTotalOnly.prevTitle}) 누적 판매 ${book.prevTotalOnly.qty.toLocaleString()}권 (회사 제공, 7일/14일 분리 불가)`] : []),
     `동일 시리즈 ${prevBooks.length}권 평균 ${avg.toLocaleString()}권 (14일)`,
     `${book.category} 시장 성장률 ${mktSign}${mkt.growth}% (${mkt.trend})`,
     `재고 소진 예상 ${daysLeft >= 30 ? '30일↑' : daysLeft+'일'} · 현재 재고 ${book.stock.toLocaleString()}권`,
@@ -2719,7 +2744,9 @@ function startAnalysis(){
       <div class="ana-section" style="margin-bottom:0;">
         <div class="ana-hd">📊 판매 분석</div>
         ${p ? `<div class="ana-row"><span class="ana-key">직전권 7일</span><span class="ana-val">${sales7d.toLocaleString()}권</span></div>
-        <div class="ana-row"><span class="ana-key">직전권 14일</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>` : `<div class="ana-row"><span class="ana-key">직전권</span><span class="ana-val" style="color:#9CA3AF;">데이터 없음</span></div>`}
+        <div class="ana-row"><span class="ana-key">직전권 14일</span><span class="ana-val">${sales14d.toLocaleString()}권</span></div>`
+        : book.prevTotalOnly ? `<div class="ana-row"><span class="ana-key">직전권 누적</span><span class="ana-val">${book.prevTotalOnly.qty.toLocaleString()}권</span></div>`
+        : `<div class="ana-row"><span class="ana-key">직전권</span><span class="ana-val" style="color:#9CA3AF;">데이터 없음</span></div>`}
         <div class="ana-row"><span class="ana-key">시리즈 평균</span><span class="ana-val">${avg.toLocaleString()}권 (14일)</span></div>
         <div class="ana-row"><span class="ana-key">14일 집중도</span><span class="ana-val ${concentrationClass}">${concentrationLabel} (${ratio2w}%)</span></div>
         <div class="ana-row"><span class="ana-key">시리즈 추세</span><span class="ana-val ${seriesTrendClass}">${seriesTrend} (${seriesGrowth>=0?'+':''}${seriesGrowth}%)</span></div>
