@@ -2839,7 +2839,7 @@ async function fetchAladin(isbn){
       const diffColor = diff >= 10 ? '#16A34A' : diff >= 0 ? '#0E7490' : '#DC2626';
       const sameGrade = grade.label === prevGrade.label;
       const trend = diff >= 20 ? '급상승' : diff >= 5 ? '상승' : diff >= -5 ? '유지' : diff >= -20 ? '하락' : '급하락';
-      diffBadge = `<span style="font-size:10px;color:${diffColor};margin-left:6px;">${sign} 직전권(${prevGrade.label}) 대비 ${trend}</span>`;
+      diffBadge = `<span style="font-size:10px;color:${diffColor};margin-left:6px;">${sign}${Math.abs(diff)}% · 직전권(${prevGrade.label}) 대비 ${trend}</span>`;
     }
 
     // 등급 배지로 표시 (숫자 숨김)
