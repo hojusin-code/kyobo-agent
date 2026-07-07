@@ -2795,17 +2795,44 @@ async function fetchAladin(isbn){
     const {item} = await res.json();
     if(!item) return;
 
-    // 표지 이미지: 알라딘이 더 고화질이면 덮어쓰기
+    // 표지 이미지
     if(item.cover && $('bookCover').style.display==='none'){
       $('bookCover').src = item.cover;
       $('bookCover').style.display='block';
       $('bookCoverPlaceholder').style.display='none';
     }
 
-    // 판매지수 표시
     const sp = item.salesPoint || 0;
+
+    // 직전권 ISBN이 있으면 함께 조회해서 비교
+    const book = BOOKS[isbn];
+    const prevIsbn = book?.prev2w?.prevIsbn || null;
+    let prevSp = null;
+    if(prevIsbn){
+      try{
+        const prevRes = await fetch(`/api/aladin?isbn=${prevIsbn}`);
+        if(prevRes.ok){
+          const {item: prevItem} = await prevRes.json();
+          if(prevItem) prevSp = prevItem.salesPoint || 0;
+        }
+      }catch(_){}
+    }
+
+    // 비교 텍스트 생성
+    let cmnt = '';
+    let diffBadge = '';
+    if(prevSp !== null && prevSp > 0){
+      const diff = Math.round(((sp - prevSp) / prevSp) * 100);
+      const sign = diff >= 0 ? '+' : '';
+      const diffColor = diff >= 10 ? '#16A34A' : diff >= 0 ? '#0E7490' : '#DC2626';
+      diffBadge = `<span style="font-size:10px;font-weight:700;color:${diffColor};margin-left:4px;">${sign}${diff}% (직전권 ${prevSp.toLocaleString()}pt 대비)</span>`;
+      cmnt = diff >= 20 ? '직전권보다 인기 급상승' : diff >= 5 ? '직전권 수준 유지' : diff >= -10 ? '직전권과 비슷' : '직전권보다 주춤';
+    } else {
+      cmnt = sp>50000?'카테고리 상위권':sp>20000?'판매 활발':sp>5000?'판매 보통':'판매 초기 단계';
+    }
+
     $('aladinPoint').textContent = sp.toLocaleString()+'pt';
-    $('aladinCmnt').textContent = sp>50000?'판매 매우 활발':sp>20000?'판매 활발':sp>5000?'판매 보통':'초기 판매 단계';
+    $('aladinCmnt').innerHTML = cmnt + diffBadge;
 
     // 베스트셀러 순위
     if(item.bestSellerRank){
@@ -2817,12 +2844,12 @@ async function fetchAladin(isbn){
 
     $('aladinBar').style.display='block';
 
-    // trendScore에 salesPoint 반영 (BOOKS 데이터 보완)
     if(BOOKS[isbn]){
       const trendScore = sp>50000?95:sp>20000?80:sp>5000?65:sp>1000?50:35;
       BOOKS[isbn]._aladinTrendScore = trendScore;
       BOOKS[isbn]._aladinSalesPoint = sp;
       BOOKS[isbn]._aladinRank = item.bestSellerRank || null;
+      BOOKS[isbn]._aladinPrevSp = prevSp;
     }
   }catch(e){console.warn('Aladin:',e);}
 }
