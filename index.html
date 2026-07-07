@@ -2818,21 +2818,33 @@ async function fetchAladin(isbn){
       }catch(_){}
     }
 
-    // 비교 텍스트 생성
-    let cmnt = '';
-    let diffBadge = '';
-    if(prevSp !== null && prevSp > 0){
-      const diff = Math.round(((sp - prevSp) / prevSp) * 100);
-      const sign = diff >= 0 ? '+' : '';
-      const diffColor = diff >= 10 ? '#16A34A' : diff >= 0 ? '#0E7490' : '#DC2626';
-      diffBadge = `<span style="font-size:10px;font-weight:700;color:${diffColor};margin-left:4px;">${sign}${diff}% (직전권 ${prevSp.toLocaleString()}pt 대비)</span>`;
-      cmnt = diff >= 20 ? '직전권보다 인기 급상승' : diff >= 5 ? '직전권 수준 유지' : diff >= -10 ? '직전권과 비슷' : '직전권보다 주춤';
-    } else {
-      cmnt = sp>50000?'카테고리 상위권':sp>20000?'판매 활발':sp>5000?'판매 보통':'판매 초기 단계';
+    // 판매지수 → 등급 변환
+    function spGrade(val){
+      if(val >= 100000) return { label:'베스트셀러 상위권', color:'#DC2626', bg:'#FEE2E2' };
+      if(val >= 50000)  return { label:'베스트셀러',        color:'#EA580C', bg:'#FED7AA' };
+      if(val >= 20000)  return { label:'중간 베스트',       color:'#D97706', bg:'#FEF3C7' };
+      if(val >= 5000)   return { label:'스테디셀러',        color:'#0E7490', bg:'#E0F2FE' };
+      if(val >= 1000)   return { label:'일반 판매',         color:'#6B7280', bg:'#F3F4F6' };
+      return               { label:'초기 단계',             color:'#9CA3AF', bg:'#F9FAFB' };
     }
 
-    $('aladinPoint').textContent = sp.toLocaleString()+'pt';
-    $('aladinCmnt').innerHTML = cmnt + diffBadge;
+    const grade = spGrade(sp);
+
+    // 직전권 비교 텍스트
+    let diffBadge = '';
+    if(prevSp !== null && prevSp > 0){
+      const prevGrade = spGrade(prevSp);
+      const diff = Math.round(((sp - prevSp) / prevSp) * 100);
+      const sign = diff >= 0 ? '▲' : '▼';
+      const diffColor = diff >= 10 ? '#16A34A' : diff >= 0 ? '#0E7490' : '#DC2626';
+      const sameGrade = grade.label === prevGrade.label;
+      const trend = diff >= 20 ? '급상승' : diff >= 5 ? '상승' : diff >= -5 ? '유지' : diff >= -20 ? '하락' : '급하락';
+      diffBadge = `<span style="font-size:10px;color:${diffColor};margin-left:6px;">${sign} 직전권(${prevGrade.label}) 대비 ${trend}</span>`;
+    }
+
+    // 등급 배지로 표시 (숫자 숨김)
+    $('aladinPoint').innerHTML = `<span style="background:${grade.bg};color:${grade.color};padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;">${grade.label}</span>`;
+    $('aladinCmnt').innerHTML = diffBadge;
 
     // 베스트셀러 순위
     if(item.bestSellerRank){
