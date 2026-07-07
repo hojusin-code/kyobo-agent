@@ -861,6 +861,17 @@
             <div id="seriesChart" style="margin-top:8px;"></div>
           </div>
 
+          <!-- 알라딘 판매지수 -->
+          <div class="rr-card" id="aladinBar" style="display:none;padding:10px 13px;background:#FFF7ED;border:1px solid #FED7AA;">
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+              <div style="width:6px;height:6px;border-radius:50%;background:#EA580C;flex-shrink:0;"></div>
+              <span style="font-size:10px;font-weight:700;color:#EA580C;">알라딘 판매지수</span>
+              <span id="aladinRank" style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:#FED7AA;color:#C2410C;display:none;"></span>
+              <span style="font-size:10px;color:#6B7280;" id="aladinCmnt"></span>
+              <span style="font-size:13px;font-weight:900;color:#EA580C;margin-left:auto;" id="aladinPoint"></span>
+            </div>
+          </div>
+
           <!-- 네이버 관심도 -->
           <div class="naver-bar rr-card" id="naverBar" style="display:none;padding:10px 13px;">
             <div class="naver-dot"></div>
@@ -2451,6 +2462,7 @@ function doSearch(){
   for(let i=0;i<sel.options.length;i++){ if(sel.options[i].text===book.category){sel.selectedIndex=i;break;} }
   show('formSection');
   fetchNaver(isbn);
+  fetchAladin(isbn);
 }
 
 // ── 공통 추천발주 계산 함수 (메인/결과 화면 동일 적용) ──
@@ -2773,6 +2785,46 @@ function startAnalysis(){
       <div class="ana-row"><span class="ana-key">품절 위험도</span><span class="ana-val" style="color:${riskColor2};">${riskLevel}</span></div>
       <div class="ana-row"><span class="ana-key">판단 근거</span><span class="ana-val" style="font-size:10px;color:#6B7280;">${judgeSummary}</span></div>
     </div>`;
+}
+
+async function fetchAladin(isbn){
+  try{
+    $('aladinBar').style.display='none';
+    const res = await fetch(`/api/aladin?isbn=${isbn}`);
+    if(!res.ok) return;
+    const {item} = await res.json();
+    if(!item) return;
+
+    // 표지 이미지: 알라딘이 더 고화질이면 덮어쓰기
+    if(item.cover && $('bookCover').style.display==='none'){
+      $('bookCover').src = item.cover;
+      $('bookCover').style.display='block';
+      $('bookCoverPlaceholder').style.display='none';
+    }
+
+    // 판매지수 표시
+    const sp = item.salesPoint || 0;
+    $('aladinPoint').textContent = sp.toLocaleString()+'pt';
+    $('aladinCmnt').textContent = sp>50000?'판매 매우 활발':sp>20000?'판매 활발':sp>5000?'판매 보통':'초기 판매 단계';
+
+    // 베스트셀러 순위
+    if(item.bestSellerRank){
+      $('aladinRank').textContent = '베스트 '+item.bestSellerRank+'위';
+      $('aladinRank').style.display='inline';
+    } else {
+      $('aladinRank').style.display='none';
+    }
+
+    $('aladinBar').style.display='block';
+
+    // trendScore에 salesPoint 반영 (BOOKS 데이터 보완)
+    if(BOOKS[isbn]){
+      const trendScore = sp>50000?95:sp>20000?80:sp>5000?65:sp>1000?50:35;
+      BOOKS[isbn]._aladinTrendScore = trendScore;
+      BOOKS[isbn]._aladinSalesPoint = sp;
+      BOOKS[isbn]._aladinRank = item.bestSellerRank || null;
+    }
+  }catch(e){console.warn('Aladin:',e);}
 }
 
 async function fetchNaver(isbn){
