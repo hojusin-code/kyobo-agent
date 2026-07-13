@@ -2777,7 +2777,7 @@ async function fetchHotNewBest(category){
     $('hotList').innerHTML = items.map((item,i)=>{
       const rankCls = ['n1','n2','n3','n4','n5'][i] || 'n5';
       return `<div class="hot-item">
-        <span class="hot-rank ${rankCls}" style="width:auto;font-size:11px;">${item.rank ? item.rank+'위' : '-'}</span>
+        <span class="hot-rank ${rankCls}" style="width:auto;font-size:11px;">${i+1}위</span>
         <span class="hot-kw">${item.title}</span>
         <span class="hot-chg new">D+${item.daysSince}</span>
       </div>`;
