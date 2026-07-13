@@ -187,11 +187,10 @@
     .right-col { display:flex; flex-direction:column; gap:10px; min-height:0; }
 
     /* 네이버 */
-    .naver-bar { display:none; align-items:center; gap:7px; background:#F0FFF4; border:1px solid #BBF7D0; border-radius:8px; padding:8px 12px; flex-shrink:0; }
-    .naver-dot { width:6px; height:6px; border-radius:50%; background:#03C75A; flex-shrink:0; }
-    .naver-lbl { font-size:10px; font-weight:700; color:#03C75A; }
-    .naver-status { font-size:9px; font-weight:700; padding:1px 6px; border-radius:4px; }
-    .naver-cnt { font-size:13px; font-weight:900; color:#03C75A; margin-left:auto; }
+    .naver-dot { width:7px; height:7px; border-radius:50%; background:#03C75A; flex-shrink:0; }
+    .naver-lbl { font-size:12px; font-weight:800; color:#03C75A; }
+    .naver-status { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+    .naver-cnt { font-size:22px; font-weight:900; color:#03C75A; }
 
     /* 시리즈 + 신뢰도 */
     .series-trust { background:white; border-radius:10px; padding:13px 15px; box-shadow:0 1px 4px rgba(0,0,0,0.07); flex:1; min-height:0; overflow-y:auto; }
@@ -221,13 +220,16 @@
     .hot-time   { font-size:10px; color:#9CA3AF; }
     .hot-item   { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; transition:background 0.1s; }
     .hot-item:hover { background:#F8F9FA; }
-    .hot-rank   { font-size:13px; font-weight:900; width:20px; text-align:center; flex-shrink:0; }
+    .hot-item   { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F3F4F6; }
+    .hot-item:last-child { border-bottom:none; padding-bottom:0; }
+    .hot-item:first-child { padding-top:0; }
+    .hot-rank   { font-size:14px; font-weight:900; width:26px; text-align:left; flex-shrink:0; }
     .hot-rank.n1 { color:var(--red); } .hot-rank.n2 { color:#F59E0B; } .hot-rank.n3 { color:#3B82F6; }
-    .hot-rank.n4,.hot-rank.n5 { color:#9CA3AF; font-size:12px; }
-    .hot-kw     { font-size:13px; font-weight:700; color:#111; flex:1; }
-    .hot-chg    { font-size:10px; font-weight:700; }
+    .hot-rank.n4,.hot-rank.n5 { color:#9CA3AF; font-size:13px; }
+    .hot-kw     { font-size:13px; font-weight:700; color:#111; flex:1; line-height:1.35; }
+    .hot-chg    { font-size:11px; font-weight:700; flex-shrink:0; }
     .hot-chg.up { color:var(--red); } .hot-chg.down { color:#3B82F6; }
-    .hot-chg.new { background:#FEE2E2; color:var(--red); padding:1px 5px; border-radius:3px; }
+    .hot-chg.new { background:#FEE2E2; color:var(--red); padding:2px 6px; border-radius:4px; }
     .hot-chg.same { color:#D1D5DB; }
 
     /* 복사 버튼 */
@@ -894,35 +896,38 @@
           </div>
 
           <!-- 네이버 관심도 -->
-          <div class="naver-bar rr-card" id="naverBar" style="display:none;padding:10px 13px;">
-            <div class="naver-dot"></div>
-            <div class="naver-lbl">네이버 관심도</div>
-            <span class="naver-status" id="naverStatus"></span>
-            <span style="font-size:10px;color:#6B7280;" id="naverCmnt"></span>
+          <!-- 네이버 관심도 -->
+          <div class="rr-card" id="naverBar" style="display:none;background:#F0FFF4;border:1px solid #BBF7D0;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+              <div class="naver-dot"></div>
+              <span class="naver-lbl">네이버 관심도</span>
+              <span class="naver-status" id="naverStatus"></span>
+              <span style="font-size:11px;color:#6B7280;margin-left:auto;" id="naverCmnt"></span>
+            </div>
             <span class="naver-cnt" id="naverCnt"></span>
           </div>
 
           <!-- 알라딘 판매지수 -->
-          <div class="rr-card" id="aladinBar" style="display:none;padding:10px 13px;background:#FFF7ED;border:1px solid #FED7AA;">
-            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-              <div style="width:6px;height:6px;border-radius:50%;background:#EA580C;flex-shrink:0;"></div>
-              <span style="font-size:10px;font-weight:700;color:#EA580C;">알라딘 판매지수</span>
-              <span id="aladinRank" style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:#FED7AA;color:#C2410C;display:none;"></span>
-              <span style="font-size:10px;color:#6B7280;" id="aladinPrevPoint"></span>
-              <span style="font-size:13px;font-weight:900;color:#EA580C;margin-left:auto;" id="aladinPoint"></span>
+          <div class="rr-card" id="aladinBar" style="display:none;background:#FFF7ED;border:1px solid #FED7AA;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#EA580C;flex-shrink:0;"></div>
+              <span style="font-size:12px;font-weight:800;color:#EA580C;">알라딘 판매지수</span>
+              <span id="aladinRank" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:#FED7AA;color:#C2410C;display:none;"></span>
+              <span style="font-size:11px;color:#9B7253;margin-left:auto;" id="aladinPrevPoint"></span>
             </div>
+            <span style="font-size:22px;font-weight:900;color:#EA580C;" id="aladinPoint"></span>
           </div>
 
-          <!-- 분야 신간 베스트 (알라딘 실판매 베스트셀러 중 최근 출간작) -->
-          <div class="hot-card rr-card" style="padding:0;">
-            <div class="hot-header">
-              <div class="hot-title">
+          <!-- 분야 신간 베스트 -->
+          <div class="rr-card" style="padding:13px 14px 10px;">
+            <div style="margin-bottom:10px;">
+              <div class="hot-title" style="margin-bottom:4px;">
                 <div class="hot-dot"></div>
                 알라딘&nbsp;<span id="hotCategory" style="color:var(--red);font-weight:800;"></span>&nbsp;최근 5일간 신간 베스트
               </div>
-              <span class="hot-time" id="hotTime"></span>
+              <span class="hot-time" id="hotTime" style="padding-left:13px;"></span>
             </div>
-            <div id="hotList" style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;"></div>
+            <div id="hotList" style="display:flex;flex-direction:column;"></div>
           </div>
 
 
@@ -2843,8 +2848,8 @@ async function fetchAladin(isbn){
 
     const grade = spGrade(sp);
 
-    // 등급 배지로 표시 (숫자 숨김)
-    $('aladinPoint').innerHTML = `<span style="background:${grade.bg};color:${grade.color};padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;">${grade.label}</span>`;
+    // 등급 배지로 표시
+    $('aladinPoint').innerHTML = `<span style="background:${grade.bg};color:${grade.color};padding:4px 12px;border-radius:6px;font-size:16px;font-weight:900;">${grade.label}</span>`;
 
     // 직전권 판매량은 비교/증감 계산 없이 참고용 수치만 표기 (출간 시점이 달라 증감률 비교는 의미 없음)
     $('aladinPrevPoint').textContent = (prevSp !== null) ? `직전권 판매지수 ${prevSp.toLocaleString()}점` : '';
@@ -2888,7 +2893,7 @@ async function fetchNaver(isbn){
     const cnt = searchCount||0;
     $('naverCnt').textContent = cnt.toLocaleString()+'건';
     $('naverCmnt').textContent = cnt>5000?'관심도 매우 높음':cnt>1000?'관심도 높음':cnt>300?'관심도 보통':'관심도 낮음';
-    $('naverBar').style.display='flex';
+    $('naverBar').style.display='block';
   }catch(e){console.warn('Naver:',e);}
 }
 
