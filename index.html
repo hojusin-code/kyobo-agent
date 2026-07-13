@@ -861,6 +861,15 @@
             <div id="seriesChart" style="margin-top:8px;"></div>
           </div>
 
+          <!-- 네이버 관심도 -->
+          <div class="naver-bar rr-card" id="naverBar" style="display:none;padding:10px 13px;">
+            <div class="naver-dot"></div>
+            <div class="naver-lbl">네이버 관심도</div>
+            <span class="naver-status" id="naverStatus"></span>
+            <span style="font-size:10px;color:#6B7280;" id="naverCmnt"></span>
+            <span class="naver-cnt" id="naverCnt"></span>
+          </div>
+
           <!-- 알라딘 판매지수 -->
           <div class="rr-card" id="aladinBar" style="display:none;padding:10px 13px;background:#FFF7ED;border:1px solid #FED7AA;">
             <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
@@ -872,21 +881,12 @@
             </div>
           </div>
 
-          <!-- 네이버 관심도 -->
-          <div class="naver-bar rr-card" id="naverBar" style="display:none;padding:10px 13px;">
-            <div class="naver-dot"></div>
-            <div class="naver-lbl">네이버 관심도</div>
-            <span class="naver-status" id="naverStatus"></span>
-            <span style="font-size:10px;color:#6B7280;" id="naverCmnt"></span>
-            <span class="naver-cnt" id="naverCnt"></span>
-          </div>
-
           <!-- 분야 신간 베스트 (알라딘 실판매 베스트셀러 중 최근 출간작) -->
           <div class="hot-card rr-card" style="padding:0;">
             <div class="hot-header">
               <div class="hot-title">
                 <div class="hot-dot"></div>
-                <span id="hotCategory" style="color:var(--red);font-weight:800;"></span>&nbsp;최근 5일 신간 베스트
+                알라딘&nbsp;<span id="hotCategory" style="color:var(--red);font-weight:800;"></span>&nbsp;최근 5일간 신간 베스트
               </div>
               <span class="hot-time" id="hotTime"></span>
             </div>
