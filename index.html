@@ -922,10 +922,11 @@
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
               <div style="width:6px;height:6px;border-radius:50%;background:#EA580C;flex-shrink:0;"></div>
               <span style="font-size:11px;font-weight:800;color:#EA580C;">알라딘 판매지수</span>
-              <span id="aladinPoint"></span>
+              <span id="aladinPoint" style="cursor:pointer;"></span>
               <span id="aladinRank" style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:#FED7AA;color:#C2410C;display:none;"></span>
               <span style="font-size:10px;color:#9B7253;margin-left:auto;" id="aladinPrevPoint"></span>
             </div>
+            <div id="aladinDetail" style="display:none;margin-top:6px;padding-top:6px;border-top:1px dashed #FED7AA;font-size:10px;color:#9A5B2E;line-height:1.6;"></div>
           </div>
 
           <!-- 분야 신간 베스트 -->
@@ -2822,6 +2823,11 @@ async function fetchHotNewBest(category){
   }
 }
 
+function toggleAladinDetail(){
+  const el = $('aladinDetail');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
 async function fetchAladin(isbn){
   try{
     $('aladinBar').style.display='none';
@@ -2865,8 +2871,12 @@ async function fetchAladin(isbn){
 
     const grade = spGrade(sp);
 
-    // 등급 배지로 표시
-    $('aladinPoint').innerHTML = `<span style="background:${grade.bg};color:${grade.color};padding:2px 8px;border-radius:5px;font-size:11px;font-weight:800;">${grade.label}</span>`;
+    // 등급 배지로 표시 (클릭하면 실제 판매지수 숫자 + 등급 기준표 노출)
+    $('aladinPoint').innerHTML = `<span onclick="toggleAladinDetail()" style="background:${grade.bg};color:${grade.color};padding:2px 8px;border-radius:5px;font-size:11px;font-weight:800;">${grade.label} ▾</span>`;
+    $('aladinDetail').innerHTML =
+      `<b>판매지수 ${sp.toLocaleString()}점</b> · 알라딘이 최근 판매량에 가중치를 둬 산출하는 자체 지표<br>` +
+      `100,000↑ 베스트셀러 상위권 · 50,000↑ 베스트셀러 · 20,000↑ 중간 베스트 · 5,000↑ 스테디셀러 · 1,000↑ 일반 판매 · 미만 초기 단계`;
+    $('aladinDetail').style.display = 'none';
 
     // 직전권 판매량은 비교/증감 계산 없이 참고용 수치만 표기 (출간 시점이 달라 증감률 비교는 의미 없음)
     $('aladinPrevPoint').textContent = (prevSp !== null) ? `직전권 판매지수 ${prevSp.toLocaleString()}점` : '';
