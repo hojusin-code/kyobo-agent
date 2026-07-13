@@ -897,13 +897,24 @@
 
           <!-- 네이버 관심도 (데이터랩 검색어트렌드, 최근 30일 자체 최고치=100 기준) -->
           <div class="rr-card" id="naverBar" style="display:none;background:#F0FFF4;border:1px solid #BBF7D0;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
               <div class="naver-dot"></div>
               <span class="naver-lbl">네이버 검색 관심도</span>
               <span class="naver-status" id="naverStatus"></span>
-              <span style="font-size:11px;color:#6B7280;margin-left:auto;" id="naverCmnt"></span>
             </div>
-            <span class="naver-cnt" id="naverCnt"></span><span style="font-size:13px;font-weight:700;color:#03C75A;margin-left:2px;">지수</span>
+            <div style="display:flex;align-items:stretch;gap:14px;">
+              <div style="flex:1;">
+                <div style="font-size:10px;color:#6B7280;font-weight:700;margin-bottom:3px;">현재 수준</div>
+                <div><span class="naver-cnt" id="naverCnt"></span><span style="font-size:12px;font-weight:700;color:#03C75A;margin-left:2px;">지수</span></div>
+                <div style="font-size:11px;color:#16A34A;font-weight:700;margin-top:3px;" id="naverGrade"></div>
+              </div>
+              <div style="width:1px;background:#BBF7D0;flex-shrink:0;"></div>
+              <div style="flex:1;">
+                <div style="font-size:10px;color:#6B7280;font-weight:700;margin-bottom:3px;">최근 추세</div>
+                <div style="font-size:17px;font-weight:900;" id="naverTrendVal"></div>
+                <div style="font-size:10px;color:#9CA3AF;margin-top:3px;">최근 7일 vs 이전 7일</div>
+              </div>
+            </div>
           </div>
 
           <!-- 알라딘 판매지수 -->
@@ -2890,9 +2901,12 @@ async function fetchNaver(isbn){
     else if(isRecent){statusEl.textContent='🟢 출간 직후';statusEl.style.cssText='background:#DCFCE7;color:#16A34A;';}
     else{statusEl.textContent='⚪ 출간';statusEl.style.cssText='background:#F3F4F6;color:#6B7280;';}
     const score = interestScore||0;
-    const trendTxt = trend==='up'?' ▲상승':trend==='down'?' ▼하락':'';
     $('naverCnt').textContent = score+'';
-    $('naverCmnt').textContent = (score>=70?'관심도 매우 높음':score>=40?'관심도 높음':score>=15?'관심도 보통':'관심도 낮음')+trendTxt;
+    $('naverGrade').textContent = score>=70?'관심도 매우 높음':score>=40?'관심도 높음':score>=15?'관심도 보통':'관심도 낮음';
+    const trendEl = $('naverTrendVal');
+    if(trend==='up'){ trendEl.textContent='▲ 상승'; trendEl.style.color='#DC2626'; }
+    else if(trend==='down'){ trendEl.textContent='▼ 하락'; trendEl.style.color='#2563EB'; }
+    else { trendEl.textContent='- 보합'; trendEl.style.color='#9CA3AF'; }
     $('naverBar').style.display='block';
   }catch(e){console.warn('Naver:',e);}
 }
