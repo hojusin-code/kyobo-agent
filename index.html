@@ -311,7 +311,15 @@
     .ds-sep { font-size:11px; color:#9CA3AF; font-weight:700; }
     .ds-go { background:var(--kyobo); color:white; border:none; border-radius:6px; padding:4px 11px; font-size:11px; font-weight:700; cursor:pointer; transition:opacity .15s; }
     .ds-go:hover { opacity:.85; }
-    .ds-period-tag { font-size:10px; font-weight:700; color:var(--kyobo); background:#EEF2FF; padding:2px 9px; border-radius:99px; margin-left:auto; white-space:nowrap; }
+    .ds-period-tag { font-size:10px; font-weight:700; color:var(--kyobo); background:#EEF2FF; padding:2px 9px; border-radius:99px; white-space:nowrap; }
+
+    /* 오늘의 액션 요약 (조회기간 행 우측) */
+    .issue-action-summary { display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0; flex-wrap:wrap; }
+    .ias-chip { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800; padding:4px 11px; border-radius:99px; white-space:nowrap; }
+    .ias-chip b { font-weight:900; }
+    .ias-chip.urgent { background:#FEE2E2; color:#B91C1C; }
+    .ias-chip.review { background:#FEF3C7; color:#92400E; }
+    .ias-chip.ok     { background:#DCFCE7; color:#15803D; }
 
     /* ── 결과 화면 메인 그리드 ── */
     .result-main-grid { display:grid; grid-template-columns:1fr 340px; gap:12px; flex:1; min-height:0; overflow:hidden; }
@@ -456,6 +464,7 @@
       .ds-quick-group { flex-wrap:wrap; }
       .ds-range { flex-wrap:wrap; }
       .ds-period-tag { margin-left:0; }
+      .issue-action-summary { margin-left:0; width:100%; }
 
       /* 탭: 가로 스크롤 */
       .issue-tabs { flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch; margin-bottom:8px; }
@@ -681,6 +690,11 @@
           <button class="ds-go" onclick="onDateSearch()">조회</button>
         </div>
         <span class="ds-period-tag" id="dsPeriodTag">당일 기준</span>
+        <div class="issue-action-summary" title="AI 추천발주량 기준 — 10권↑ 긴급발주 · 1~9권 검토필요 · 0권 이상없음">
+          <span class="ias-chip urgent">🔥 오늘 긴급발주 <b id="iasUrgentCnt">—</b>종</span>
+          <span class="ias-chip review">⚠️ 검토필요 <b id="iasReviewCnt">—</b>종</span>
+          <span class="ias-chip ok">✅ 이상없음 <b id="iasOkCnt">—</b>종</span>
+        </div>
       </div>
 
       <div class="issue-tabs">
@@ -2281,6 +2295,16 @@ function renderIssueList(){
   $('isuTotal').textContent    = dateBooksAll.length+'종';
   $('isuPriority').textContent = priority.length+'종';
   $('isuRevenue').textContent  = '+'+Math.round(revenue/10000)+'만원';
+
+  // 오늘의 액션 요약: AI 추천발주량 기준 3단계 (발주 긴급도 배지와 동일한 기준)
+  let urgentCnt=0, reviewCnt=0, okCnt=0;
+  dateBooksAll.forEach(b=>{
+    const rec = calcRecommend(b.isbn);
+    if(rec>=10) urgentCnt++; else if(rec>=1) reviewCnt++; else okCnt++;
+  });
+  $('iasUrgentCnt').textContent = urgentCnt;
+  $('iasReviewCnt').textContent = reviewCnt;
+  $('iasOkCnt').textContent     = okCnt;
 
   const catLabel = currentTab==='전체'?'전체 신간':('오늘의 '+currentTab+' 이슈 신간');
   $('issueCatTitle').textContent = catLabel;
