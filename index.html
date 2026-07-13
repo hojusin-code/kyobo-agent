@@ -895,16 +895,15 @@
             <div id="seriesChart" style="margin-top:8px;"></div>
           </div>
 
-          <!-- 네이버 관심도 -->
-          <!-- 네이버 관심도 -->
+          <!-- 네이버 관심도 (데이터랩 검색어트렌드, 최근 30일 자체 최고치=100 기준) -->
           <div class="rr-card" id="naverBar" style="display:none;background:#F0FFF4;border:1px solid #BBF7D0;">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
               <div class="naver-dot"></div>
-              <span class="naver-lbl">네이버 관심도</span>
+              <span class="naver-lbl">네이버 검색 관심도</span>
               <span class="naver-status" id="naverStatus"></span>
               <span style="font-size:11px;color:#6B7280;margin-left:auto;" id="naverCmnt"></span>
             </div>
-            <span class="naver-cnt" id="naverCnt"></span>
+            <span class="naver-cnt" id="naverCnt"></span><span style="font-size:13px;font-weight:700;color:#03C75A;margin-left:2px;">지수</span>
           </div>
 
           <!-- 알라딘 판매지수 -->
@@ -2878,7 +2877,7 @@ async function fetchNaver(isbn){
   try{
     const res = await fetch(`/api/search?isbn=${isbn}`);
     if(!res.ok) return;
-    const {item, searchCount} = await res.json();
+    const {item, interestScore, trend} = await res.json();
     if(!item) return;
     if(item.image){ $('bookCover').src=item.image; $('bookCover').style.display='block'; $('bookCoverPlaceholder').style.display='none'; }
     const pd = item.pubdate||'';
@@ -2890,9 +2889,10 @@ async function fetchNaver(isbn){
     if(isPre){statusEl.textContent='🟡 예약판매중';statusEl.style.cssText='background:#FEF3C7;color:#D97706;';}
     else if(isRecent){statusEl.textContent='🟢 출간 직후';statusEl.style.cssText='background:#DCFCE7;color:#16A34A;';}
     else{statusEl.textContent='⚪ 출간';statusEl.style.cssText='background:#F3F4F6;color:#6B7280;';}
-    const cnt = searchCount||0;
-    $('naverCnt').textContent = cnt.toLocaleString()+'건';
-    $('naverCmnt').textContent = cnt>5000?'관심도 매우 높음':cnt>1000?'관심도 높음':cnt>300?'관심도 보통':'관심도 낮음';
+    const score = interestScore||0;
+    const trendTxt = trend==='up'?' ▲상승':trend==='down'?' ▼하락':'';
+    $('naverCnt').textContent = score+'';
+    $('naverCmnt').textContent = (score>=70?'관심도 매우 높음':score>=40?'관심도 높음':score>=15?'관심도 보통':'관심도 낮음')+trendTxt;
     $('naverBar').style.display='block';
   }catch(e){console.warn('Naver:',e);}
 }
