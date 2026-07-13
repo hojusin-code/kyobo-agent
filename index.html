@@ -247,6 +247,11 @@
     .live-badge { font-size:9px; font-weight:700; background:#DCFCE7; color:#16A34A; padding:2px 7px; border-radius:99px; animation:blink 2s infinite; }
     .issue-sum-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex-shrink:0; margin-bottom:10px; }
     .issue-sum-card { background:white; border-radius:8px; padding:10px 13px; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
+    .qf-clickable { cursor:pointer; transition:box-shadow .15s, transform .1s; border:1.5px solid transparent; }
+    .qf-clickable:hover { box-shadow:0 2px 10px rgba(0,0,0,.1); transform:translateY(-1px); }
+    .qf-clickable.qf-active, .ias-chip.qf-active { border:1.5px solid var(--kyobo); box-shadow:0 0 0 3px rgba(0,49,137,.12); }
+    .ias-chip { cursor:pointer; transition:box-shadow .15s, transform .1s; }
+    .ias-chip:hover { transform:translateY(-1px); }
     .isu-lbl { font-size:9px; font-weight:700; color:#6B7280; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; }
     .isu-val { font-size:20px; font-weight:900; line-height:1.1; }
     .isu-val.cv { color:var(--kyobo); } .isu-val.cr { color:#7C3AED; } .isu-val.cg { color:#16A34A; }
@@ -262,7 +267,7 @@
     .ich-stat strong { color:white; font-weight:900; }
     .issue-list-wrap { flex:1; overflow-y:auto; min-height:0; }
     /* ── 이슈 테이블 헤더 ── */
-    .ib-table-hd { display:grid; grid-template-columns:28px 1fr 64px 56px 56px 72px 60px; gap:0 8px; padding:5px 12px 5px 10px; font-size:9px; font-weight:700; color:#9CA3AF; letter-spacing:.5px; text-transform:uppercase; border-bottom:2px solid #E5E7EB; margin-bottom:4px; }
+    .ib-table-hd { display:grid; grid-template-columns:28px 1fr 64px 56px 56px 72px 60px; gap:0 8px; padding:7px 12px 7px 10px; font-size:10.5px; font-weight:800; color:#1E3A5F; letter-spacing:.4px; text-transform:uppercase; border-bottom:2px solid var(--kyobo); margin-bottom:4px; position:sticky; top:0; z-index:3; background:#F3F6FC; }
     /* ── 이슈 리스트 아이템 (테이블 행) ── */
     .issue-book-item { display:grid; grid-template-columns:28px 1fr 64px 56px 56px 72px 60px; gap:0 8px; align-items:center; background:white; border-radius:8px; padding:9px 12px 9px 10px; margin-bottom:3px; box-shadow:0 1px 2px rgba(0,0,0,.05); cursor:pointer; transition:all .13s; border-left:3px solid transparent; }
     .issue-book-item:hover { border-left-color:var(--kyobo); background:#F5F8FF; box-shadow:0 2px 8px rgba(0,0,0,.09); }
@@ -657,12 +662,12 @@
         <span style="font-size:11px;color:#9CA3AF;" id="issueDate"></span>
       </div>
       <div class="issue-sum-row">
-        <div class="issue-sum-card">
+        <div class="issue-sum-card qf-clickable" id="cardTotal" onclick="resetIssueFilter()">
           <div class="isu-lbl">입고 신간</div>
           <div class="isu-val cv" id="isuTotal">—</div>
-          <div class="isu-sub">오늘 입고</div>
+          <div class="isu-sub">오늘 입고 · 클릭 시 전체보기</div>
         </div>
-        <div class="issue-sum-card" title="이슈점수 = 저자30%+시리즈30%+시장20%+트렌드20% 가중합. 발주 긴급도(재고 소진 임박)와는 무관한 별개 지표입니다.">
+        <div class="issue-sum-card qf-clickable" id="cardPriority" title="이슈점수 = 저자30%+시리즈30%+시장20%+트렌드20% 가중합. 발주 긴급도(재고 소진 임박)와는 무관한 별개 지표입니다. 클릭 시 이 목록만 보기" onclick="setListFilter('priority')">
           <div class="isu-lbl">우선 검토</div>
           <div class="isu-val cr" id="isuPriority">—</div>
           <div class="isu-sub">이슈점수 75점↑ (저자·시리즈·시장·트렌드 종합)</div>
@@ -690,10 +695,10 @@
           <button class="ds-go" onclick="onDateSearch()">조회</button>
         </div>
         <span class="ds-period-tag" id="dsPeriodTag">당일 기준</span>
-        <div class="issue-action-summary" title="AI 추천발주량 기준 — 10권↑ 긴급발주 · 1~9권(높음+보통) 검토필요 · 0권 이상없음. 리스트의 발주 긴급도 배지(긴급/높음/보통/낮음)와 같은 기준값을 씁니다.">
-          <span class="ias-chip urgent">🔥 오늘 긴급발주 <b id="iasUrgentCnt">—</b>종</span>
-          <span class="ias-chip review">⚠️ 검토필요(높음+보통) <b id="iasReviewCnt">—</b>종</span>
-          <span class="ias-chip ok">✅ 이상없음 <b id="iasOkCnt">—</b>종</span>
+        <div class="issue-action-summary" title="AI 추천발주량 기준 — 10권↑ 긴급발주 · 1~9권(높음+보통) 검토필요 · 0권 이상없음. 리스트의 발주 긴급도 배지(긴급/높음/보통/낮음)와 같은 기준값을 씁니다. 클릭하면 그 목록만 보입니다.">
+          <span class="ias-chip urgent" id="chipUrgent" onclick="setListFilter('urgent')">🔥 오늘 긴급발주 <b id="iasUrgentCnt">—</b>종</span>
+          <span class="ias-chip review" id="chipReview" onclick="setListFilter('review')">⚠️ 검토필요(높음+보통) <b id="iasReviewCnt">—</b>종</span>
+          <span class="ias-chip ok" id="chipOk" onclick="setListFilter('ok')">✅ 이상없음 <b id="iasOkCnt">—</b>종</span>
         </div>
       </div>
 
@@ -2267,11 +2272,38 @@ function getReasons(b){
 }
 
 let currentTab = '전체';
+let currentQuickFilter = null; // null | 'priority' | 'urgent' | 'review' | 'ok'
+
+const QUICK_FILTER_LABEL = {
+  priority: '우선검토 대상만',
+  urgent:   '오늘 긴급발주 대상만',
+  review:   '검토필요(높음+보통) 대상만',
+  ok:       '이상없음 대상만',
+};
 
 function selectTab(tab){
   currentTab = tab;
+  if(tab==='전체') currentQuickFilter = null;
   document.querySelectorAll('.i-tab').forEach(el=>{
     el.classList.toggle('active', el.textContent===tab);
+  });
+  renderIssueList();
+}
+
+function setListFilter(type){
+  currentQuickFilter = type;
+  currentTab = '전체';
+  document.querySelectorAll('.i-tab').forEach(el=>{
+    el.classList.toggle('active', el.textContent==='전체');
+  });
+  renderIssueList();
+}
+
+function resetIssueFilter(){
+  currentQuickFilter = null;
+  currentTab = '전체';
+  document.querySelectorAll('.i-tab').forEach(el=>{
+    el.classList.toggle('active', el.textContent==='전체');
   });
   renderIssueList();
 }
@@ -2281,8 +2313,18 @@ function renderIssueList(){
   const toStr   = fmtDate(currentTo);
 
   const dateBooksAll = MOCK_BOOKS.filter(b=>b.inboundDate>=fromStr && b.inboundDate<=toStr);
-  const filtered = dateBooksAll.filter(b=>tabMatch(currentTab,b.category))
-    .sort((a,b)=>{
+  let filtered = dateBooksAll.filter(b=>tabMatch(currentTab,b.category));
+  if(currentQuickFilter){
+    filtered = filtered.filter(b=>{
+      if(currentQuickFilter==='priority') return b.issueScore>=75;
+      const rec = calcRecommend(b.isbn);
+      if(currentQuickFilter==='urgent') return rec>=10;
+      if(currentQuickFilter==='review') return rec>=1 && rec<10;
+      if(currentQuickFilter==='ok')     return rec===0;
+      return true;
+    });
+  }
+  filtered = filtered.sort((a,b)=>{
       // AI 추천발주량 많은 순, 같으면 신간(최신 입고일) 우선, 그래도 같으면 이슈점수 순
       const recDiff = calcRecommend(b.isbn) - calcRecommend(a.isbn);
       if(recDiff !== 0) return recDiff;
@@ -2306,7 +2348,16 @@ function renderIssueList(){
   $('iasReviewCnt').textContent = reviewCnt;
   $('iasOkCnt').textContent     = okCnt;
 
-  const catLabel = currentTab==='전체'?'전체 신간':('오늘의 '+currentTab+' 이슈 신간');
+  // 클릭 필터 활성 상태 시각 표시
+  document.querySelectorAll('.qf-clickable, .ias-chip').forEach(el=>el.classList.remove('qf-active'));
+  if(currentQuickFilter==='priority') $('cardPriority').classList.add('qf-active');
+  else if(currentQuickFilter==='urgent') $('chipUrgent').classList.add('qf-active');
+  else if(currentQuickFilter==='review') $('chipReview').classList.add('qf-active');
+  else if(currentQuickFilter==='ok')     $('chipOk').classList.add('qf-active');
+  else $('cardTotal').classList.add('qf-active');
+
+  const catLabel = currentQuickFilter ? QUICK_FILTER_LABEL[currentQuickFilter]
+    : (currentTab==='전체'?'전체 신간':('오늘의 '+currentTab+' 이슈 신간'));
   $('issueCatTitle').textContent = catLabel;
   $('issueCatStats').innerHTML = `
     <span class="ich-stat">입고 <strong>${filtered.length}종</strong></span>
