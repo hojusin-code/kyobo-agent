@@ -881,6 +881,7 @@
               <div class="rr-risk-badge" id="khRisk">—</div>
               <div class="rr-risk-sub" id="khRiskSub"></div>
             </div>
+            <div style="font-size:9px;color:#9CA3AF;margin-top:3px;">현재 보유재고 기준 (입고예정 미반영)</div>
           </div>
 
           <!-- 발주 분석 요약 -->
@@ -2603,8 +2604,9 @@ function startAnalysis(){
   // 위험 요소별 판단
   const risks = [];
   const safes = [];
+  const criticalStockout = stockCoverage < 3;
 
-  if(stockCoverage < 3)       risks.push(`재고 ${stockCoverage}일치 — 품절 위험 높음`);
+  if(criticalStockout)        risks.push(`재고 ${stockCoverage}일치 — 품절 위험 높음`);
   else if(stockCoverage < 7)  risks.push(`재고 ${stockCoverage}일치 — 추가 발주 권장`);
   else                        safes.push(`재고 ${stockCoverage}일치 확보 — 단기 품절 위험 낮음`);
 
@@ -2619,8 +2621,8 @@ function startAnalysis(){
   if(overOrderRisk)           risks.push(`권장 발주량이 누적 판매 대비 과다 — 반품 리스크 검토 필요`);
   else                        safes.push(`권장 발주량 적정 수준`);
 
-  const riskLevel = risks.length === 0 ? '낮음' : risks.length === 1 ? '보통' : '높음';
-  const riskColor = risks.length === 0 ? '#16A34A' : risks.length === 1 ? '#D97706' : '#E60012';
+  const riskLevel = criticalStockout ? '높음' : risks.length === 0 ? '낮음' : risks.length === 1 ? '보통' : '높음';
+  const riskColor = criticalStockout ? '#E60012' : risks.length === 0 ? '#16A34A' : risks.length === 1 ? '#D97706' : '#E60012';
   const riskItems = [
     ...risks.map(r=>`<span style="color:#B91C1C;">⚠ ${r}</span>`),
     ...safes.map(s=>`<span style="color:#065F46;">✓ ${s}</span>`)
@@ -2670,9 +2672,8 @@ function startAnalysis(){
 
   const trustColor = trustAvg >= 85 ? '#16A34A' : trustAvg >= 70 ? '#D97706' : '#E60012';
 
-  const riskColor2 = risks.length === 0 ? '#16A34A' : risks.length === 1 ? '#D97706' : '#E60012';
   $('khRisk').textContent    = riskLevel;
-  $('khRisk').style.color    = riskColor2;
+  $('khRisk').style.color    = riskColor;
   $('khRiskSub').textContent = risks.length === 0 ? '안전' : `위험요소 ${risks.length}건`;
 
   // 저자 대표작 박스
@@ -2730,7 +2731,10 @@ function startAnalysis(){
 
   $('warnBadgeRow').innerHTML =
     risks.map(r => `<div class="warn-badge">⚠ ${r}</div>`).join('') +
-    `<div class="urgency-badge" style="background:${urgencyBg};color:${urgencyColor};">🚨 발주 긴급도: <b>${urgencyText}</b></div>`;
+    `<div class="urgency-badge" style="background:${urgencyBg};color:${urgencyColor};flex-direction:column;">
+      <div>🚨 발주 긴급도: <b>${urgencyText}</b></div>
+      <div style="font-size:9px;font-weight:400;opacity:0.75;margin-top:2px;">재고+입고예정 기준</div>
+    </div>`;
 
   // 시리즈 차트
   const maxV = Math.max(...book.series.map(s=>s.val));
@@ -2785,7 +2789,7 @@ function startAnalysis(){
         <span style="font-size:20px;font-weight:900;color:var(--kyobo);">${week1.toLocaleString()}권</span>
       </div>
       <div class="ana-row"><span class="ana-key">AI 신뢰도</span><span class="ana-val" style="color:${trustColor};">${trustAvg}%</span></div>
-      <div class="ana-row"><span class="ana-key">품절 위험도</span><span class="ana-val" style="color:${riskColor2};">${riskLevel}</span></div>
+      <div class="ana-row"><span class="ana-key">품절 위험도</span><span class="ana-val" style="color:${riskColor};">${riskLevel}</span></div>
       <div class="ana-row"><span class="ana-key">판단 근거</span><span class="ana-val" style="font-size:10px;color:#6B7280;">${judgeSummary}</span></div>
     </div>`;
 }
