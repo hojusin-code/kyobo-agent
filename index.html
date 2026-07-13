@@ -2198,7 +2198,7 @@ let currentFrom = new Date('2026-06-25');
 let currentTo   = new Date('2026-07-01');
 
 function setQuickDate(type){
-  const today = new Date('2026-06-28');
+  const today = new Date('2026-06-25'); // 목업 입고 데이터(INBOUND_MAP) 최신일과 동일하게 맞춤
   document.querySelectorAll('.ds-q').forEach(b=>b.classList.remove('active'));
   const tags = {today:'당일 기준', yesterday:'어제 기준', '3days':'최근 3일', week:'최근 1주일'};
   $('dsPeriodTag').textContent = tags[type];
