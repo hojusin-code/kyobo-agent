@@ -249,7 +249,7 @@
     .issue-sum-card { background:white; border-radius:8px; padding:10px 13px; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
     .isu-lbl { font-size:9px; font-weight:700; color:#6B7280; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; }
     .isu-val { font-size:20px; font-weight:900; line-height:1.1; }
-    .isu-val.cv { color:var(--kyobo); } .isu-val.cr { color:var(--red); } .isu-val.cg { color:#16A34A; }
+    .isu-val.cv { color:var(--kyobo); } .isu-val.cr { color:#D97706; } .isu-val.cg { color:#16A34A; }
     .isu-sub { font-size:9px; color:#9CA3AF; font-weight:600; margin-top:2px; }
     .issue-tabs { display:flex; gap:4px; flex-shrink:0; margin-bottom:10px; flex-wrap:wrap; }
     .i-tab { font-size:11px; font-weight:700; padding:4px 11px; border-radius:99px; border:1.5px solid #E5E7EB; background:white; cursor:pointer; color:#6B7280; transition:all .15s; white-space:nowrap; }
@@ -653,15 +653,15 @@
           <div class="isu-val cv" id="isuTotal">—</div>
           <div class="isu-sub">오늘 입고</div>
         </div>
-        <div class="issue-sum-card">
+        <div class="issue-sum-card" title="이슈점수 = 저자30%+시리즈30%+시장20%+트렌드20% 가중합. 발주 긴급도(재고 소진 임박)와는 무관한 별개 지표입니다.">
           <div class="isu-lbl">우선 검토</div>
           <div class="isu-val cr" id="isuPriority">—</div>
-          <div class="isu-sub">이슈점수 75↑</div>
+          <div class="isu-sub">이슈점수 75점↑ (저자·시리즈·시장·트렌드 종합)</div>
         </div>
-        <div class="issue-sum-card">
+        <div class="issue-sum-card" title="우선검토(이슈점수 75점↑) 대상 도서들의 AI 추천발주량 × 권당 15,000원 합산">
           <div class="isu-lbl">예상 추가매출</div>
           <div class="isu-val cg" id="isuRevenue">—</div>
-          <div class="isu-sub">우선검토 기준</div>
+          <div class="isu-sub">우선검토 대상 추천발주 기준</div>
         </div>
       </div>
       <!-- 날짜 선택 -->
