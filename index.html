@@ -709,9 +709,9 @@
           <button class="mobile-isbn-btn" onclick="mobileSearch()">조회</button>
         </div>
         <div class="mobile-quick-row">
-          <button class="mobile-quick-btn" onclick="mobileQuick('9791165341003')">소년이 온다 2</button>
-          <button class="mobile-quick-btn" onclick="mobileQuick('9791165342009')">트렌드 코리아</button>
-          <button class="mobile-quick-btn" onclick="mobileQuick('9791165344001')">미라클 모닝 2</button>
+          <button class="mobile-quick-btn" onclick="mobileQuick('9788936434120')">소년이 온다</button>
+          <button class="mobile-quick-btn" onclick="mobileQuick('9788959897223')">트렌드 코리아 2025</button>
+          <button class="mobile-quick-btn" onclick="mobileQuick('9791173473968')">흔한남매 19</button>
         </div>
       </div>
     </div>
@@ -2906,7 +2906,16 @@ async function fetchNaver(isbn){
     const res = await fetch(`/api/search?isbn=${isbn}`);
     if(!res.ok) return;
     const {item, interestScore, trend} = await res.json();
-    if(!item) return;
+    if(!item){
+      // 네이버에 등록되지 않은 도서(가상 ISBN 등) — 카드를 숨기지 않고 데이터 없음 상태로 표시
+      $('naverStatus').textContent = '';
+      $('naverCnt').textContent = '—';
+      $('naverGrade').textContent = '검색 결과 없음';
+      $('naverTrendVal').textContent = '—';
+      $('naverTrendVal').style.color = '#9CA3AF';
+      $('naverBar').style.display = 'block';
+      return;
+    }
     if(item.image){ $('bookCover').src=item.image; $('bookCover').style.display='block'; $('bookCoverPlaceholder').style.display='none'; }
     const pd = item.pubdate||'';
     const pubDate = pd.length===8?new Date(+pd.slice(0,4),+pd.slice(4,6)-1,+pd.slice(6,8)):null;
