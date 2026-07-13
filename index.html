@@ -867,7 +867,7 @@
               <div style="width:6px;height:6px;border-radius:50%;background:#EA580C;flex-shrink:0;"></div>
               <span style="font-size:10px;font-weight:700;color:#EA580C;">알라딘 판매지수</span>
               <span id="aladinRank" style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:#FED7AA;color:#C2410C;display:none;"></span>
-              <span style="font-size:10px;color:#6B7280;" id="aladinCmnt"></span>
+              <span style="font-size:10px;color:#6B7280;" id="aladinPrevPoint"></span>
               <span style="font-size:13px;font-weight:900;color:#EA580C;margin-left:auto;" id="aladinPoint"></span>
             </div>
           </div>
@@ -2830,21 +2830,11 @@ async function fetchAladin(isbn){
 
     const grade = spGrade(sp);
 
-    // 직전권 비교 텍스트
-    let diffBadge = '';
-    if(prevSp !== null && prevSp > 0){
-      const prevGrade = spGrade(prevSp);
-      const diff = Math.round(((sp - prevSp) / prevSp) * 100);
-      const sign = diff >= 0 ? '▲' : '▼';
-      const diffColor = diff >= 10 ? '#16A34A' : diff >= 0 ? '#0E7490' : '#DC2626';
-      const sameGrade = grade.label === prevGrade.label;
-      const trend = diff >= 20 ? '급상승' : diff >= 5 ? '상승' : diff >= -5 ? '유지' : diff >= -20 ? '하락' : '급하락';
-      diffBadge = `<span style="font-size:10px;color:${diffColor};margin-left:6px;">${sign}${Math.abs(diff)}% · 직전권(${prevGrade.label}) 대비 ${trend}</span>`;
-    }
-
     // 등급 배지로 표시 (숫자 숨김)
     $('aladinPoint').innerHTML = `<span style="background:${grade.bg};color:${grade.color};padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;">${grade.label}</span>`;
-    $('aladinCmnt').innerHTML = diffBadge;
+
+    // 직전권 판매량은 비교/증감 계산 없이 참고용 수치만 표기 (출간 시점이 달라 증감률 비교는 의미 없음)
+    $('aladinPrevPoint').textContent = (prevSp !== null) ? `직전권 판매지수 ${prevSp.toLocaleString()}점` : '';
 
     // 베스트셀러 순위
     if(item.bestSellerRank){
