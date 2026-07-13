@@ -249,7 +249,7 @@
     .issue-sum-card { background:white; border-radius:8px; padding:10px 13px; box-shadow:0 1px 4px rgba(0,0,0,0.07); }
     .isu-lbl { font-size:9px; font-weight:700; color:#6B7280; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; }
     .isu-val { font-size:20px; font-weight:900; line-height:1.1; }
-    .isu-val.cv { color:var(--kyobo); } .isu-val.cr { color:#D97706; } .isu-val.cg { color:#16A34A; }
+    .isu-val.cv { color:var(--kyobo); } .isu-val.cr { color:#7C3AED; } .isu-val.cg { color:#16A34A; }
     .isu-sub { font-size:9px; color:#9CA3AF; font-weight:600; margin-top:2px; }
     .issue-tabs { display:flex; gap:4px; flex-shrink:0; margin-bottom:10px; flex-wrap:wrap; }
     .i-tab { font-size:11px; font-weight:700; padding:4px 11px; border-radius:99px; border:1.5px solid #E5E7EB; background:white; cursor:pointer; color:#6B7280; transition:all .15s; white-space:nowrap; }
@@ -3011,6 +3011,7 @@ function parseAndRenderSalesData(rows, fileName) {
     uploadedSalesData = Object.values(isbnMap);
 
     // 전체 ISBN을 BOOKS에 자동 주입 (직접 검색 가능하도록)
+    let issueListTouched = false;
     uploadedSalesData.forEach(d => {
       if (!BOOKS[d.isbn]) {
         const netQty = Math.max(0, d.qty - d.returns);
@@ -3031,10 +3032,27 @@ function parseAndRenderSalesData(rows, fileName) {
             comment: '업로드 데이터 기준' },
           series: [{ label: '실적', val: netQty }, { label: '예측', val: forecast, forecast: true }],
         };
+
+        // '오늘의 이슈 신간 분석' 리스트/우선검토·예상매출 집계에도 반영
+        const pd8 = (d.pubdate || '').replace(/[^0-9]/g, '');
+        const inboundKey = pd8.length === 8 ? `${pd8.slice(0,4)}-${pd8.slice(4,6)}-${pd8.slice(6,8)}` : null;
+        if (inboundKey) {
+          if (!INBOUND_MAP[inboundKey]) INBOUND_MAP[inboundKey] = [];
+          if (!INBOUND_MAP[inboundKey].includes(d.isbn)) INBOUND_MAP[inboundKey].push(d.isbn);
+          ISBN_DATE[d.isbn] = inboundKey;
+          MOCK_BOOKS_RAW.push({
+            isbn: d.isbn, title: d.name, author: d.author, publisher: d.pub, category,
+            salesQty: netQty,
+            issueScore: grade === 'intensive' ? 90 : grade === 'expand' ? 78 : 55,
+            inboundDate: inboundKey, uploaded: true,
+          });
+          issueListTouched = true;
+        }
       }
     });
+    if (issueListTouched) renderIssueList();
 
-    status.innerHTML = `<span style="color:#16A34A;font-weight:700;">✓ ${uploadedSalesData.length}종 로드 완료 · ISBN 직접 검색 가능</span>`;
+    status.innerHTML = `<span style="color:#16A34A;font-weight:700;">✓ ${uploadedSalesData.length}종 로드 완료 · ISBN 직접 검색 가능 · 출판일 기준 이슈 신간 리스트에도 반영</span>`;
     list.innerHTML = uploadedSalesData.map(d => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:3px;background:#F8FAFC;border-radius:5px;border:1px solid #E5E7EB;cursor:pointer;"
            onclick="loadUploadedBook('${d.isbn}')">
